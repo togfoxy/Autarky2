@@ -34,7 +34,7 @@ function love.load()
     cf.AddScreen("World", SCREEN_STACK)
 
     fun.initialiseMap()     -- initialises 2d map with nils
-	fun.initialisePeople()	-- adds ppl to the world
+	people.initialise()		-- adds ppl to the world
 end
 
 function love.draw()
@@ -58,10 +58,8 @@ function love.update(dt)
 		end
 	end
 
-	if WORLD_HOURS = 8 then
+	if WORLD_HOURS == 8 then
 		-- assign people to their occupations
 		people.assignDestination()
-
-
 	end
 end
