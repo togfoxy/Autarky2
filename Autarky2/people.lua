@@ -1,0 +1,6 @@
+people = {}
+
+
+
+
+return people
