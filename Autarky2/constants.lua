@@ -20,12 +20,13 @@ function constants.load()
     NUMBER_OF_STOCK_TYPES = 1
     STOCK_HISTORY = {}
 
-    WORLD_HOURS = 0
+    WORLD_HOURS = 5
     WORLD_DAYS = 0
     TICKER = 0          -- dt or seconds (in fractions)
 
     PERSONS = {}
     PERSONS_RADIUS = 5      -- for drawing purposes
+    MOVEMENT_RATE = 300       -- number of pixels person moves pers second (not per dt)
 
 
 end

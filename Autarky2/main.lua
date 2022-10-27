@@ -41,25 +41,30 @@ function love.draw()
     res.start()
 
     draw.world()
-	draw.people()
+	people.draw()
 
     res.stop()
 end
 
 function love.update(dt)
 
+	local movement = people.moveToDestination(dt)
+
 	TICKER = TICKER + dt
+
 	if TICKER >= 1 then
 		TICKER = TICKER - 1
-		WORLD_HOURS = WORLD_HOURS + 1
-		if WORLD_HOURS >= 24 then
-			WORLD_HOURS = WORLD_HOURS - 24
-			WORLD_DAYS = WORLD_DAYS + 1
+		if not movement then
+			WORLD_HOURS = WORLD_HOURS + 1
+			if WORLD_HOURS == 8 then
+				people.assignDestination(8)
+			end
+			if WORLD_HOURS >= 24 then
+				WORLD_HOURS = WORLD_HOURS - 24
+				WORLD_DAYS = WORLD_DAYS + 1
+			end
 		end
 	end
 
-	if WORLD_HOURS == 8 then
-		-- assign people to their occupations
-		people.assignDestination()
-	end
+
 end

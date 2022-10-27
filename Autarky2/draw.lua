@@ -29,20 +29,6 @@ function draw.world()
 
 end
 
-function draw.people()
 
-    for k, person in pairs(PERSONS) do
-        local drawy = ((person.row - 1) * TILE_SIZE) + person.y + TOP_MARGIN
-        local drawx = ((person.col - 1) * TILE_SIZE) + person.x + LEFT_MARGIN
-
-        assert(drawx > LEFT_MARGIN)
-        assert(drawy > TOP_MARGIN)
-
-        love.graphics.setColor(1,1,1,1)
-        love.graphics.circle("fill", drawx, drawy, PERSONS_RADIUS)
-
-        -- print(drawx, drawy, person.col, person.row, person.x, person.y, TILE_SIZE, TOP_MARGIN)
-    end
-end
 
 return draw
