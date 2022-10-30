@@ -16,6 +16,7 @@ function constants.load()
     MAP = {}
 
     SCREEN_STACK = {}
+    IMAGES = {}
 
     NUMBER_OF_STOCK_TYPES = 1
     STOCK_HISTORY = {}
@@ -27,6 +28,15 @@ function constants.load()
     PERSONS = {}
     PERSONS_RADIUS = 5      -- for drawing purposes
     MOVEMENT_RATE = 300       -- number of pixels person moves pers second (not per dt)
+
+    STRUCTURES = {}           -- any sort of tile improvement
+
+
+
+    -- enums
+    enum = {}
+    enum.well = 1       -- this is for image and structure type
+
 
 
 end

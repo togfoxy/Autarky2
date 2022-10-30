@@ -1,10 +1,13 @@
 draw = {}
 
 function draw.world()
+    -- draw the map including structures
+
     for col = 1, NUMBER_OF_COLS do
 		for row = 1, NUMBER_OF_ROWS do
-            drawx = LEFT_MARGIN + (col -1) * TILE_SIZE
-            drawy = TOP_MARGIN + (row - 1) * TILE_SIZE
+            -- drawx = LEFT_MARGIN + (col -1) * TILE_SIZE
+            -- drawy = TOP_MARGIN + (row - 1) * TILE_SIZE
+            local drawx, drawy = fun.getTileXY(row, col)
 
             if MAP[row][col].tileType == 1 then
                 -- dry grass
@@ -19,7 +22,16 @@ function draw.world()
                 error("Unexpected else statement.")
             end
             love.graphics.rectangle("fill", drawx, drawy, TILE_SIZE, TILE_SIZE)
+            --! need to draw tiles one day
             -- love.graphics.print(MAP[row][col].tileType, drawx + 7, drawy + 7)
+
+            -- draw structures
+            if MAP[row][col].structure ~= nil then
+                love.graphics.setColor(1,1,1,1)
+                love.graphics.draw(IMAGES[enum.well], drawx, drawy)
+            end
+
+
         end
     end
 
@@ -28,6 +40,8 @@ function draw.world()
     love.graphics.print("Time: " .. WORLD_HOURS .. " Day: " .. WORLD_DAYS, 10, 10)
 
 end
+
+
 
 
 

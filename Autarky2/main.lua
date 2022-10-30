@@ -35,6 +35,7 @@ function love.load()
 
     fun.initialiseMap()     -- initialises 2d map with nils
 	people.initialise()		-- adds ppl to the world
+	fun.loadImages()
 end
 
 function love.draw()
@@ -59,6 +60,10 @@ function love.update(dt)
 			if WORLD_HOURS == 8 then
 				people.assignDestination(8)
 			end
+			if WORLD_HOURS == 18 then
+				people.assignDestination(8)
+			end
+
 			if WORLD_HOURS >= 24 then
 				WORLD_HOURS = WORLD_HOURS - 24
 				WORLD_DAYS = WORLD_DAYS + 1
