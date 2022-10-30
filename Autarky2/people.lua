@@ -27,36 +27,24 @@ end
 function people.draw()
 
     for k, person in pairs(PERSONS) do
-        local drawy = ((person.row - 1) * TILE_SIZE) + person.y + TOP_MARGIN
-        local drawx = ((person.col - 1) * TILE_SIZE) + person.x + LEFT_MARGIN
-
-
-
-        assert(drawx > LEFT_MARGIN)
-        assert(drawy > TOP_MARGIN)
-
-local drawx, drawy = fun.getTileXY(person.row, person.col)
+        local drawx, drawy = fun.getTileXY(person.row, person.col)
+        drawx = drawx + person.x
+        drawy = drawy + person.y
 
         love.graphics.setColor(1,1,1,1)
         love.graphics.circle("fill", drawx, drawy, PERSONS_RADIUS)
 
-        -- print(drawx, drawy, person.col, person.row, person.x, person.y, TILE_SIZE, TOP_MARGIN)
-
-        -- destination
-        -- if person.destrow ~= nil and person.destcol ~= nil then
-        --     drawy = ((person.destrow - 1) * TILE_SIZE) + person.desty + TOP_MARGIN
-        --     drawx = ((person.destcol - 1) * TILE_SIZE) + person.destx + LEFT_MARGIN
-        --     love.graphics.setColor(1,0,0,0.5)
-        --     love.graphics.circle("line", drawx, drawy, PERSONS_RADIUS)
-        -- end
-
         -- draw debug information
         if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
             local drawx, drawy = fun.getTileXY(person.row, person.col)
+            drawx = drawx + person.x + 7
+            drawy = drawy + person.y - 17
+
             local txt = ""
             txt = "Food: " .. person.food
             love.graphics.setColor(1,1,1,1)
-            love.graphics.print(txt, drawx, drawy, 0, 1, 1, -15, 60)
+            love.graphics.print(txt, drawx, drawy, 0, 1, 1, 0, 0)
+
         end
     end
 end

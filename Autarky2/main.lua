@@ -51,6 +51,7 @@ function love.update(dt)
 
 	local movement = people.moveToDestination(dt)
 
+
 	TICKER = TICKER + dt
 
 	if TICKER >= 1 then
@@ -69,6 +70,12 @@ function love.update(dt)
 				WORLD_DAYS = WORLD_DAYS + 1
 			end
 		end
+
+		-- dinner time
+		if WORLD_HOURS == 19 then
+			print("Nom")		--!
+		end
+
 	end
 
 

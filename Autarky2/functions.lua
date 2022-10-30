@@ -62,5 +62,4 @@ function functions.getTileXY(row, col)
 end
 
 
-
 return functions
