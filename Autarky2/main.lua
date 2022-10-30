@@ -58,10 +58,10 @@ function love.update(dt)
 		if not movement then
 			WORLD_HOURS = WORLD_HOURS + 1
 			if WORLD_HOURS == 8 then
-				people.assignDestination(8)
+				people.assignDestination(WORLD_HOURS)
 			end
 			if WORLD_HOURS == 18 then
-				people.assignDestination(8)
+				people.assignDestination(WORLD_HOURS)
 			end
 
 			if WORLD_HOURS >= 24 then

@@ -30,7 +30,8 @@ function constants.load()
     MOVEMENT_RATE = 300       -- number of pixels person moves pers second (not per dt)
 
     STRUCTURES = {}           -- any sort of tile improvement
-
+    WELLROW = 0                 -- stored here for convenience and easy recall
+    WELLCOL = 0
 
 
     -- enums

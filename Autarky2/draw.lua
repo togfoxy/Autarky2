@@ -30,8 +30,6 @@ function draw.world()
                 love.graphics.setColor(1,1,1,1)
                 love.graphics.draw(IMAGES[enum.well], drawx, drawy)
             end
-
-
         end
     end
 

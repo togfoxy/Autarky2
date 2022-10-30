@@ -49,7 +49,9 @@ function functions.initialiseMap()
     local wellrow = love.math.random(minrow, maxrow)
     local wellcol = love.math.random(mincol, maxcol)
     MAP[wellrow][wellcol].structure = enum.well
-
+    -- store globals for easy recall
+    WELLROW = wellrow
+    WELLCOL = wellcol
 end
 
 function functions.getTileXY(row, col)

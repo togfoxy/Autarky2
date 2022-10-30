@@ -18,6 +18,9 @@ function people.initialise()
         PERSONS[i].y = love.math.random(min, max)
         PERSONS[i].destx = PERSONS[i].x
         PERSONS[i].desty = PERSONS[i].y
+
+        PERSONS[i].occupation = nil
+
     end
 end
 
@@ -50,15 +53,33 @@ function people.assignDestination(hour)
 
     for k, person in pairs(PERSONS) do
         if hour == 8 then
+            if person.occupation == nil then
+                -- move to well
+                local minrow = math.max(WELLROW - 1, 1)
+                local mincol = math.max(WELLCOL - 1, 1)
+                local maxrow = math.min(WELLROW + 1, NUMBER_OF_ROWS)
+                local maxcol = math.min(WELLCOL + 1, NUMBER_OF_COLS)
+                person.destrow = love.math.random(minrow, maxrow)
+                person.destcol = love.math.random(mincol, maxcol)
+            else
+                --! currently random
+                person.destrow = love.math.random(1, NUMBER_OF_ROWS)
+                person.destcol = love.math.random(1, NUMBER_OF_COLS)
+            end
+
+        else
             --! currently random
             person.destrow = love.math.random(1, NUMBER_OF_ROWS)
             person.destcol = love.math.random(1, NUMBER_OF_COLS)
 
-            local min = 0 + (PERSONS_RADIUS * 2)
-            local max = TILE_SIZE - (PERSONS_RADIUS * 2)
-            person.destx = love.math.random(min, max)
-            person.desty = love.math.random(min, max)
+
         end
+        -- determine a random location inside the destination tile
+        -- this happens to every destination regardless of occupaiton or type of activity
+        local min = 0 + (PERSONS_RADIUS * 2)
+        local max = TILE_SIZE - (PERSONS_RADIUS * 2)
+        person.destx = love.math.random(min, max)
+        person.desty = love.math.random(min, max)
     end
 end
 
