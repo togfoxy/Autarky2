@@ -20,7 +20,7 @@ function people.initialise()
         PERSONS[i].desty = PERSONS[i].y
 
         PERSONS[i].occupation = nil
-
+        PERSONS[i].food = 7                 -- days
     end
 end
 
@@ -30,8 +30,12 @@ function people.draw()
         local drawy = ((person.row - 1) * TILE_SIZE) + person.y + TOP_MARGIN
         local drawx = ((person.col - 1) * TILE_SIZE) + person.x + LEFT_MARGIN
 
+
+
         assert(drawx > LEFT_MARGIN)
         assert(drawy > TOP_MARGIN)
+
+local drawx, drawy = fun.getTileXY(person.row, person.col)
 
         love.graphics.setColor(1,1,1,1)
         love.graphics.circle("fill", drawx, drawy, PERSONS_RADIUS)
@@ -45,6 +49,15 @@ function people.draw()
         --     love.graphics.setColor(1,0,0,0.5)
         --     love.graphics.circle("line", drawx, drawy, PERSONS_RADIUS)
         -- end
+
+        -- draw debug information
+        if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
+            local drawx, drawy = fun.getTileXY(person.row, person.col)
+            local txt = ""
+            txt = "Food: " .. person.food
+            love.graphics.setColor(1,1,1,1)
+            love.graphics.print(txt, drawx, drawy, 0, 1, 1, -15, 60)
+        end
     end
 end
 
@@ -66,13 +79,10 @@ function people.assignDestination(hour)
                 person.destrow = love.math.random(1, NUMBER_OF_ROWS)
                 person.destcol = love.math.random(1, NUMBER_OF_COLS)
             end
-
         else
             --! currently random
             person.destrow = love.math.random(1, NUMBER_OF_ROWS)
             person.destcol = love.math.random(1, NUMBER_OF_COLS)
-
-
         end
         -- determine a random location inside the destination tile
         -- this happens to every destination regardless of occupaiton or type of activity

@@ -28,7 +28,7 @@ function draw.world()
             -- draw structures
             if MAP[row][col].structure ~= nil then
                 love.graphics.setColor(1,1,1,1)
-                love.graphics.draw(IMAGES[enum.well], drawx, drawy)
+                love.graphics.draw(IMAGES[enum.well], drawx, drawy, 0, 1, 1, TILE_SIZE / 2, TILE_SIZE / 2)
             end
         end
     end
