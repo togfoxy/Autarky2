@@ -52,6 +52,9 @@ function functions.initialiseMap()
     -- store globals for easy recall
     WELLROW = wellrow
     WELLCOL = wellcol
+
+    HISTORY[enum.historyFood] = {}
+    HISTORY[enum.historyHealth] = {}
 end
 
 function functions.getTileXY(row, col)
@@ -61,5 +64,21 @@ function functions.getTileXY(row, col)
     return drawx, drawy
 end
 
+function functions.RecordHistory(day)
+
+    local personcount = #PERSONS
+    local foodsum = 0
+    local healthsum = 0
+
+    -- get some stats
+    for k, person in pairs(PERSONS) do
+        foodsum = foodsum + person.food
+        healthsum = healthsum + person.health
+    end
+
+    table.insert(HISTORY[enum.historyFood], foodsum/personcount)
+    table.insert(HISTORY[enum.historyHealth], healthsum/personcount)
+
+end
 
 return functions

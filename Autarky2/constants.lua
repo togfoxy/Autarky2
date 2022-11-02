@@ -14,12 +14,13 @@ function constants.load()
     TOP_MARGIN = cf.round(TILE_SIZE / 1)
     GAME_LOG_DRAWX = SCREEN_WIDTH - 275
     MAP = {}
+    SHOW_GRAPH = false
 
     SCREEN_STACK = {}
     IMAGES = {}
 
     NUMBER_OF_STOCK_TYPES = 1
-    STOCK_HISTORY = {}
+    HISTORY = {}
 
     WORLD_HOURS = 5
     WORLD_DAYS = 0
@@ -38,7 +39,8 @@ function constants.load()
     enum = {}
     enum.well = 1       -- this is for image and structure type
 
-
+    enum.historyFood = 1
+    enum.historyHealth = 2
 
 end
 

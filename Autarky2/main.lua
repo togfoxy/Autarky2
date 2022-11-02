@@ -15,6 +15,9 @@ function love.keyreleased( key, scancode )
 	if key == "escape" then
 		cf.RemoveScreen(SCREEN_STACK)
 	end
+	if key == "g" then
+		SHOW_GRAPH = not SHOW_GRAPH
+	end
 end
 
 function love.load()
@@ -36,6 +39,10 @@ function love.load()
     fun.initialiseMap()     -- initialises 2d map with nils
 	people.initialise()		-- adds ppl to the world
 	fun.loadImages()
+
+
+	-- make this last to capture the initial state of the world
+	fun.RecordHistory(WORLD_DAYS)
 end
 
 function love.draw()
@@ -43,6 +50,9 @@ function love.draw()
 
     draw.world()
 	people.draw()
+	if SHOW_GRAPH then
+		draw.graphs()
+	end
 
     res.stop()
 end
@@ -51,9 +61,7 @@ function love.update(dt)
 
 	local movement = people.moveToDestination(dt)
 
-
 	TICKER = TICKER + dt
-
 	if TICKER >= 1 then
 		TICKER = TICKER - 1
 		if not movement then
@@ -66,17 +74,19 @@ function love.update(dt)
 			end
 
 			if WORLD_HOURS >= 24 then
+				fun.RecordHistory(WORLD_DAYS)		-- record key stats for graphs etc. Do before the day ticker increments
 				WORLD_HOURS = WORLD_HOURS - 24
 				WORLD_DAYS = WORLD_DAYS + 1
+
+				-- do once per day
+
 			end
 		end
 
 		-- dinner time
 		if WORLD_HOURS == 19 then
 			print("Nom")		--!
+			people.eat()
 		end
-
 	end
-
-
 end

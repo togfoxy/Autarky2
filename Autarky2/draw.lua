@@ -3,6 +3,13 @@ draw = {}
 function draw.world()
     -- draw the map including structures
 
+    local alpha
+    if SHOW_GRAPH then
+         alpha = 0.25       -- a modifier (not the actual alpha)
+    else
+        alpha = 1
+    end
+
     for col = 1, NUMBER_OF_COLS do
 		for row = 1, NUMBER_OF_ROWS do
             -- drawx = LEFT_MARGIN + (col -1) * TILE_SIZE
@@ -11,13 +18,13 @@ function draw.world()
 
             if MAP[row][col].tileType == 1 then
                 -- dry grass
-                love.graphics.setColor(220/255, 175/255, 26/255,0.5)
+                love.graphics.setColor(220/255, 175/255, 26/255,0.5 * alpha)
             elseif MAP[row][col].tileType == 2 then
                 -- green grass
-                love.graphics.setColor(38/255, 168/255, 38/255,0.5)
+                love.graphics.setColor(38/255, 168/255, 38/255,0.5 * alpha)
             elseif MAP[row][col].tileType == 3 then
                 -- teal grass (?)
-                love.graphics.setColor(89/255, 232/255, 89/255,0.5)
+                love.graphics.setColor(89/255, 232/255, 89/255,0.5 * alpha)
             else
                 error("Unexpected else statement.")
             end
@@ -27,7 +34,7 @@ function draw.world()
 
             -- draw structures
             if MAP[row][col].structure ~= nil then
-                love.graphics.setColor(1,1,1,1)
+                love.graphics.setColor(1,1,1,1 * alpha)
                 love.graphics.draw(IMAGES[enum.well], drawx, drawy, 0, 1, 1, TILE_SIZE / 2, TILE_SIZE / 2)
             end
         end
@@ -39,8 +46,25 @@ function draw.world()
 
 end
 
+function draw.graphs()
 
+    love.graphics.setColor(1,1,1,1)
+    -- food
+    local drawx = 50
+    local drawy = 50
+    love.graphics.print("Food", drawx, drawy)
+    drawy = drawy + 25
 
+    love.graphics.line(drawx, drawy, drawx, drawy + 100)
+    love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
+    drawy = drawy + 100
 
+    for i = 1, #HISTORY[enum.historyFood] do
+        drawx = drawx + 1
+        drawy = drawy - HISTORY[enum.historyFood][i]
+        love.graphics.points(drawx, drawy)
+    end
+
+end
 
 return draw

@@ -2,7 +2,7 @@ people = {}
 
 function people.initialise()
 
-    local numofppl = 50
+    local numofppl = 10
 
     for i = 1, numofppl do
         PERSONS[i] = {}
@@ -20,31 +20,47 @@ function people.initialise()
         PERSONS[i].desty = PERSONS[i].y
 
         PERSONS[i].occupation = nil
-        PERSONS[i].food = 7                 -- days
+        PERSONS[i].food = 0                 -- days
+        PERSONS[i].food = love.math.random(0,10)                 -- days
+        PERSONS[i].health = 100
     end
 end
 
+function people.drawDebug(person)
+    local drawx, drawy = fun.getTileXY(person.row, person.col)
+    drawx = drawx + person.x + 7
+    drawy = drawy + person.y - 17
+
+    local txt = ""
+    txt = txt .. "Food: " .. person.food .. "\n"
+    txt = txt .. "Health: " .. person.health .. "\n"
+
+
+
+    love.graphics.setColor(1,1,1,1)
+    love.graphics.print(txt, drawx, drawy, 0, 1, 1, 0, 0)
+end
+
 function people.draw()
+
+    local alpha
+    if SHOW_GRAPH then
+         alpha = 0.25       -- a modifier (not the actual alpha)
+    else
+        alpha = 1
+    end
 
     for k, person in pairs(PERSONS) do
         local drawx, drawy = fun.getTileXY(person.row, person.col)
         drawx = drawx + person.x
         drawy = drawy + person.y
 
-        love.graphics.setColor(1,1,1,1)
+        love.graphics.setColor(1,1,1,1 * alpha)
         love.graphics.circle("fill", drawx, drawy, PERSONS_RADIUS)
 
         -- draw debug information
         if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
-            local drawx, drawy = fun.getTileXY(person.row, person.col)
-            drawx = drawx + person.x + 7
-            drawy = drawy + person.y - 17
-
-            local txt = ""
-            txt = "Food: " .. person.food
-            love.graphics.setColor(1,1,1,1)
-            love.graphics.print(txt, drawx, drawy, 0, 1, 1, 0, 0)
-
+            people.drawDebug(person)
         end
     end
 end
@@ -148,6 +164,28 @@ function people.moveToDestination(dt)
         end
     end
     return result
+end
+
+function people.eat()
+    for k, person in pairs(PERSONS) do
+        person.food = person.food - 1
+        if person.food < 0 then
+            person.food = 0
+            person.health = person.health - 15      -- %
+            if person.health <= 0 then
+                people.dies(person)
+            end
+        end
+    end
+end
+
+function people.dies(person)
+    for i = #PERSONS, 1, -1 do
+        if PERSONS[i] == person then
+            table.remove(PERSONS, i)
+            print("Person died. Check for errors.")
+        end
+    end
 end
 
 return people
