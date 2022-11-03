@@ -18,6 +18,7 @@ function people.initialise()
         PERSONS[i].y = love.math.random(min, max)
         PERSONS[i].destx = PERSONS[i].x
         PERSONS[i].desty = PERSONS[i].y
+        PERSONS[i].isSelected = false
 
         PERSONS[i].occupation = nil
         PERSONS[i].food = 0                 -- days
@@ -55,7 +56,12 @@ function people.draw()
         drawx = drawx + person.x
         drawy = drawy + person.y
 
-        love.graphics.setColor(1,1,1,1 * alpha)
+        if person.isSelected then
+            love.graphics.setColor(0,1,0,1 * alpha)
+        else
+            love.graphics.setColor(1,1,1,1 * alpha)
+        end
+
         love.graphics.circle("fill", drawx, drawy, PERSONS_RADIUS)
 
         -- draw debug information

@@ -64,6 +64,18 @@ function functions.getTileXY(row, col)
     return drawx, drawy
 end
 
+function functions.getDrawXY(person)
+    local row = person.row
+    local col = person.col
+    local x = person.x
+    local y = person.y
+
+    local drawx, drawy = fun.getTileXY(row, col)
+    return drawx + x, drawy + y
+end
+
+
+
 function functions.RecordHistory(day)
 
     local personcount = #PERSONS
@@ -78,7 +90,6 @@ function functions.RecordHistory(day)
 
     table.insert(HISTORY[enum.historyFood], foodsum/personcount)
     table.insert(HISTORY[enum.historyHealth], healthsum/personcount)
-
 end
 
 return functions

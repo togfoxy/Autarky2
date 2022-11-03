@@ -29,6 +29,7 @@ function constants.load()
     PERSONS = {}
     PERSONS_RADIUS = 5      -- for drawing purposes
     MOVEMENT_RATE = 300       -- number of pixels person moves pers second (not per dt)
+    VILLAGERS_SELECTED = 0
 
     STRUCTURES = {}           -- any sort of tile improvement
     WELLROW = 0                 -- stored here for convenience and easy recall

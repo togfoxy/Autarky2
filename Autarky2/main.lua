@@ -20,6 +20,28 @@ function love.keyreleased( key, scancode )
 	end
 end
 
+function love.mousepressed( x, y, button, istouch, presses )
+
+	if button == 1 then
+		-- select the villager if clicked, else select the tile (further down)
+		for k, person in pairs(PERSONS) do
+			local x2, y2 = fun.getDrawXY(person)
+
+			local dist = math.abs(cf.GetDistance(x, y, x2, y2))
+
+			if dist <= PERSONS_RADIUS then
+				if person.isSelected then
+					person.isSelected = false
+					VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1
+				else
+					person.isSelected = true
+					VILLAGERS_SELECTED = VILLAGERS_SELECTED + 1
+				end
+			end
+		end
+	end
+end
+
 function love.load()
 
 	love.window.setMode(800,600,{fullscreen=true, display=1, resizable=true, borderless=false})
