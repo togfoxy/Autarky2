@@ -61,10 +61,9 @@ function draw.graphs()
 
     for i = 1, #HISTORY[enum.historyFood] do
         drawx = drawx + 1
-        drawy = drawy - HISTORY[enum.historyFood][i]
-        love.graphics.points(drawx, drawy)
+        local yvalue = drawy - HISTORY[enum.historyFood][i]
+        love.graphics.points(drawx, yvalue)
     end
-
 end
 
 return draw
