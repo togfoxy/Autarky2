@@ -64,6 +64,11 @@ function people.draw()
 
         love.graphics.circle("fill", drawx, drawy, PERSONS_RADIUS)
 
+        local quad = QUADS[enum.spriteBlueWoman][2]
+        -- love.graphics.draw(texture, quad, x, y, r, sx, sy, ox, oy, kx, ky)
+        love.graphics.draw(SPRITES[enum.spriteBlueWoman], quad, drawx, drawy, 0, 1, 1, 10, 25)
+
+
         -- draw debug information
         if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
             people.drawDebug(person)

@@ -16,9 +16,9 @@ function draw.world()
             -- drawy = TOP_MARGIN + (row - 1) * TILE_SIZE
             local drawx, drawy = fun.getTileXY(row, col)
 
+            -- the grid border/outline
             love.graphics.setColor(1,1,1,0.25)
             love.graphics.rectangle("line", drawx, drawy, TILE_SIZE, TILE_SIZE)
-
 
             if MAP[row][col].tileType == 1 then
                 -- dry grass
