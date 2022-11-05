@@ -62,7 +62,7 @@ function people.draw()
             love.graphics.setColor(1,1,1,1 * alpha)
         end
 
-        love.graphics.circle("fill", drawx, drawy, PERSONS_RADIUS)
+        -- love.graphics.circle("fill", drawx, drawy, PERSONS_RADIUS)
 
         local quad = QUADS[enum.spriteBlueWoman][2]
         -- love.graphics.draw(texture, quad, x, y, r, sx, sy, ox, oy, kx, ky)
