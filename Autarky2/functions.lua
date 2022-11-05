@@ -5,6 +5,10 @@ function functions.loadImages()
     IMAGES[enum.well] = love.graphics.newImage("assets/images/well_50x45.png")
 
 
+    -- quads
+    SPRITES[enum.spriteBlueWoman] = love.graphics.newImage("assets/images/Civilian Female Walk Blue.png")
+    QUADS[enum.spriteBlueWoman] = cf.fromImageToQuads(SPRITES[enum.spriteBlueWoman], 15, 32)
+
 
 end
 
