@@ -16,6 +16,10 @@ function draw.world()
             -- drawy = TOP_MARGIN + (row - 1) * TILE_SIZE
             local drawx, drawy = fun.getTileXY(row, col)
 
+            love.graphics.setColor(1,1,1,0.25)
+            love.graphics.rectangle("line", drawx, drawy, TILE_SIZE, TILE_SIZE)
+
+
             if MAP[row][col].tileType == 1 then
                 -- dry grass
                 love.graphics.setColor(220/255, 175/255, 26/255,0.5 * alpha)
@@ -35,7 +39,8 @@ function draw.world()
             -- draw structures
             if MAP[row][col].structure ~= nil then
                 love.graphics.setColor(1,1,1,1 * alpha)
-                love.graphics.draw(IMAGES[enum.well], drawx, drawy, 0, 1, 1, TILE_SIZE / 2, TILE_SIZE / 2)
+                -- love.graphics.draw(IMAGES[enum.well], drawx, drawy, 0, 1, 1, TILE_SIZE / 2, TILE_SIZE / 2)
+                love.graphics.draw(IMAGES[enum.well], drawx, drawy, 0, 1, 1)
             end
         end
     end

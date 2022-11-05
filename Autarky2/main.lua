@@ -18,6 +18,16 @@ function love.keyreleased( key, scancode )
 	if key == "g" then
 		SHOW_GRAPH = not SHOW_GRAPH
 	end
+
+	if key == "f" then
+		for k,person in pairs(PERSONS) do
+			if person.isSelected and person.occupation == nil then
+				person.occupation = enum.jobFarmer
+				person.isSelected = false
+				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1		-- not sure if this will be used
+			end
+		end
+	end
 end
 
 function love.mousepressed( x, y, button, istouch, presses )
