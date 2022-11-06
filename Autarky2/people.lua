@@ -56,12 +56,9 @@ function people.draw()
         drawx = drawx + person.x
         drawy = drawy + person.y
 
-        if person.isSelected then
-            love.graphics.setColor(0,1,0,1 * alpha)
-        else
-            love.graphics.setColor(1,1,1,1 * alpha)
-        end
+        love.graphics.setColor(1,1,1,1 * alpha)
 
+        -- determine which quad to display
         local quad
         local spritenumber
         if person.isSelected then
@@ -71,7 +68,10 @@ function people.draw()
             quad = QUADS[enum.spriteBlueWoman][2]
             spritenumber = enum.spriteBlueWoman
         end
-        love.graphics.draw(SPRITES[spritenumber], quad, drawx, drawy, 0, 1, 1, 10, 25)
+
+        love.graphics.draw(SPRITES[spritenumber], quad, drawx, drawy, 0, 1, 1, 7, 20)
+        -- circle for debugging
+        -- love.graphics.circle("fill", drawx, drawy, PERSONS_RADIUS)
 
         -- draw debug information
         if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then

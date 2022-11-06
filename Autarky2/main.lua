@@ -45,8 +45,6 @@ function love.mousepressed( x, y, button, istouch, presses )
 			local x2, y2 = fun.getDrawXY(person)
 			local dist = math.abs(cf.GetDistance(gamex, gamey, x2, y2))
 
--- print(x2,y2)
-
 			if dist <= PERSONS_RADIUS then
 				if person.isSelected then
 					person.isSelected = false
