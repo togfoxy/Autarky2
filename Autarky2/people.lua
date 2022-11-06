@@ -74,6 +74,14 @@ function people.draw()
         -- circle for debugging
         -- love.graphics.circle("fill", drawx, drawy, PERSONS_RADIUS)
 
+        -- draw occupation icon
+        if person.occupation ~= nil then
+            local imagenumber = person.occupation + 100     -- +100 gives the correct offset to avoid image clashes
+            love.graphics.draw(IMAGES[imagenumber], drawx, drawy, 0, 0.30, 0.30, 0, 80)
+
+        end
+
+
         -- draw debug information
         if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
             drawDebug(person)

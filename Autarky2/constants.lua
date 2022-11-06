@@ -46,7 +46,10 @@ function constants.load()
     enum = {}
     enum.well = 1       -- this is for image and structure type
     enum.market = 2
+
     enum.farm = 3
+    enum.jobFarmer = 3      -- job and icon need to have the same number
+    enum.iconFarmer = 103   -- offset the icon by 100
 
     -- sprites and quads
     enum.spriteBlueWoman = 1
@@ -55,7 +58,7 @@ function constants.load()
     enum.historyFood = 1
     enum.historyHealth = 2
 
-    enum.jobFarmer = 1
+
 
 
 

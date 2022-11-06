@@ -13,6 +13,9 @@ function functions.loadImages()
     SPRITES[enum.spriteRedWoman] = love.graphics.newImage("assets/images/Civilian Female Walk Red.png")
     QUADS[enum.spriteRedWoman] = cf.fromImageToQuads(SPRITES[enum.spriteRedWoman], 15, 32)
 
+    -- icons
+    IMAGES[enum.iconFarmer] = love.graphics.newImage("assets/images/appleicon64x64.png")
+
 end
 
 function functions.initialiseMap()
