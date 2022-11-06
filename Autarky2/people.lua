@@ -27,7 +27,7 @@ function people.initialise()
     end
 end
 
-function people.drawDebug(person)
+local function drawDebug(person)
     local drawx, drawy = fun.getTileXY(person.row, person.col)
     drawx = drawx + person.x + 7
     drawy = drawy + person.y - 17
@@ -62,15 +62,20 @@ function people.draw()
             love.graphics.setColor(1,1,1,1 * alpha)
         end
 
-        -- love.graphics.circle("fill", drawx, drawy, PERSONS_RADIUS)
-
-        local quad = QUADS[enum.spriteBlueWoman][2]
-        -- love.graphics.draw(texture, quad, x, y, r, sx, sy, ox, oy, kx, ky)
-        love.graphics.draw(SPRITES[enum.spriteBlueWoman], quad, drawx, drawy, 0, 1, 1, 10, 25)
+        local quad
+        local spritenumber
+        if person.isSelected then
+            quad = QUADS[enum.spriteRedWoman][2]
+            spritenumber = enum.spriteRedWoman
+        else
+            quad = QUADS[enum.spriteBlueWoman][2]
+            spritenumber = enum.spriteBlueWoman
+        end
+        love.graphics.draw(SPRITES[spritenumber], quad, drawx, drawy, 0, 1, 1, 10, 25)
 
         -- draw debug information
         if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
-            people.drawDebug(person)
+            drawDebug(person)
         end
     end
 end

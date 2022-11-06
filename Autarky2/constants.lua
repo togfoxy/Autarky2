@@ -46,9 +46,11 @@ function constants.load()
     enum = {}
     enum.well = 1       -- this is for image and structure type
     enum.market = 2
+    enum.farm = 3
 
     -- sprites and quads
     enum.spriteBlueWoman = 1
+    enum.spriteRedWoman = 2
 
     enum.historyFood = 1
     enum.historyHealth = 2

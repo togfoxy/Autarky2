@@ -11,6 +11,8 @@ require 'draw'
 require 'constants'
 require 'people'
 
+GAME_VERSION = "0.01"
+
 function love.keyreleased( key, scancode )
 	if key == "escape" then
 		cf.RemoveScreen(SCREEN_STACK)
@@ -25,6 +27,9 @@ function love.keyreleased( key, scancode )
 				person.occupation = enum.jobFarmer
 				person.isSelected = false
 				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1		-- not sure if this will be used
+
+				local row, col = fun.getEmptyTile()
+				MAP[row][col].structure = enum.farm
 			end
 		end
 	end
@@ -32,12 +37,15 @@ end
 
 function love.mousepressed( x, y, button, istouch, presses )
 
+
+	local gamex, gamey = res.toGame(x, y)
 	if button == 1 then
 		-- select the villager if clicked, else select the tile (further down)
 		for k, person in pairs(PERSONS) do
 			local x2, y2 = fun.getDrawXY(person)
+			local dist = math.abs(cf.GetDistance(gamex, gamey, x2, y2))
 
-			local dist = math.abs(cf.GetDistance(x, y, x2, y2))
+-- print(x2,y2)
 
 			if dist <= PERSONS_RADIUS then
 				if person.isSelected then
@@ -50,6 +58,8 @@ function love.mousepressed( x, y, button, istouch, presses )
 			end
 		end
 	end
+-- print("******")
+
 end
 
 function love.load()
@@ -59,9 +69,9 @@ function love.load()
 	SCREEN_HEIGHT = love.graphics.getHeight()
 	love.window.setMode(SCREEN_WIDTH,SCREEN_HEIGHT,{fullscreen=false, display=1, resizable=true, borderless=false})
 
-	res.setGame(SCREEN_WIDTH, SCREEN_HEIGHT)
+	res.setGame(1920, 1080)
 
-    constants.load()
+	constants.load()
 
     love.window.setTitle("Autarky2 " .. GAME_VERSION)
 	love.keyboard.setKeyRepeat(true)
@@ -71,7 +81,6 @@ function love.load()
     fun.initialiseMap()     -- initialises 2d map with nils
 	people.initialise()		-- adds ppl to the world
 	fun.loadImages()
-
 
 	-- make this last to capture the initial state of the world
 	fun.RecordHistory(WORLD_DAYS)
@@ -121,4 +130,5 @@ function love.update(dt)
 			people.eat()
 		end
 	end
+	res.update()
 end
