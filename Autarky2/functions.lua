@@ -1,10 +1,17 @@
 functions = {}
 
 function functions.loadImages()
-	-- terrain tiles
+	-- structure tiles
     IMAGES[enum.well] = love.graphics.newImage("assets/images/well_50x45.png")
+    IMAGES[enum.market] = love.graphics.newImage("assets/images/market_50x50.png")
+    IMAGES[enum.farm] = love.graphics.newImage("assets/images/appletree_37x50.png")
 
+    -- quads
+    SPRITES[enum.spriteBlueWoman] = love.graphics.newImage("assets/images/Civilian Female Walk Blue.png")
+    QUADS[enum.spriteBlueWoman] = cf.fromImageToQuads(SPRITES[enum.spriteBlueWoman], 15, 32)
 
+    SPRITES[enum.spriteRedWoman] = love.graphics.newImage("assets/images/Civilian Female Walk Red.png")
+    QUADS[enum.spriteRedWoman] = cf.fromImageToQuads(SPRITES[enum.spriteRedWoman], 15, 32)
 
 end
 
@@ -53,6 +60,17 @@ function functions.initialiseMap()
     WELLROW = wellrow
     WELLCOL = wellcol
 
+    -- add a marketplace but not too close to the well
+    local marketrow
+    local marketcol
+    repeat
+        marketrow = love.math.random(minrow, maxrow)
+        marketcol = love.math.random(minrow, maxrow)
+    until math.abs(wellrow - marketrow) > 1 or math.abs(wellcol - marketcol) > 1
+    MAP[marketrow][marketcol].structure = enum.market
+    MARKETROW = marketrow
+    MARKETCOL = marketcol
+
     HISTORY[enum.historyFood] = {}
     HISTORY[enum.historyHealth] = {}
 end
@@ -74,10 +92,7 @@ function functions.getDrawXY(person)
     return drawx + x, drawy + y
 end
 
-
-
 function functions.RecordHistory(day)
-
     local personcount = #PERSONS
     local foodsum = 0
     local healthsum = 0
@@ -90,6 +105,33 @@ function functions.RecordHistory(day)
 
     table.insert(HISTORY[enum.historyFood], foodsum/personcount)
     table.insert(HISTORY[enum.historyHealth], healthsum/personcount)
+end
+
+function functions.getEmptyTile()
+    local count = 0
+    local row, col
+    repeat
+        count = count + 1
+        local tilevalid = true
+        row = love.math.random(1, NUMBER_OF_ROWS)
+        col = love.math.random(1, NUMBER_OF_COLS)
+
+        if MAP[row][col].structure ~= nil then
+            tilevalid = false
+        end
+
+        if math.abs(WELLROW - row) < 2 and math.abs(WELLCOL - col) < 2 then
+            tilevalid = false
+        end
+        if math.abs(MARKETROW - row) < 2 and math.abs(MARKETCOL - col) < 2 then
+            tilevalid = false
+        end
+    until tilevalid or count > 999
+
+    if count > 999 then
+        error("Cound not find a blank tile")
+    end
+    return row, col
 end
 
 return functions

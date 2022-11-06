@@ -18,6 +18,8 @@ function constants.load()
 
     SCREEN_STACK = {}
     IMAGES = {}
+    SPRITES = {}
+    QUADS = {}
 
     NUMBER_OF_STOCK_TYPES = 1
     HISTORY = {}
@@ -34,16 +36,30 @@ function constants.load()
     STRUCTURES = {}           -- any sort of tile improvement
     WELLROW = 0                 -- stored here for convenience and easy recall
     WELLCOL = 0
+    MARKETROW = 0
+    MARKETCOL = 0
 
-
+    -- ********************
     -- enums
+    -- ********************
+
     enum = {}
     enum.well = 1       -- this is for image and structure type
+    enum.market = 2
+    enum.farm = 3
+
+    -- sprites and quads
+    enum.spriteBlueWoman = 1
+    enum.spriteRedWoman = 2
 
     enum.historyFood = 1
     enum.historyHealth = 2
 
     enum.jobFarmer = 1
+
+
+
+
 
 end
 
