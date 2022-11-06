@@ -22,9 +22,9 @@ function people.initialise()
         PERSONS[i].isSelected = false
 
         PERSONS[i].occupation = nil
-        PERSONS[i].food = 0                 -- days
-        PERSONS[i].food = love.math.random(0,10)                 -- days
         PERSONS[i].health = 100
+        PERSONS[i].stock = {}
+        PERSONS[i].stock[enum.stockFood] = love.math.random(0,10)                 -- days
     end
 end
 
@@ -34,10 +34,8 @@ local function drawDebug(person)
     drawy = drawy + person.y - 17
 
     local txt = ""
-    txt = txt .. "Food: " .. person.food .. "\n"
+    txt = txt .. "Food: " .. person.stock[enum.stockFood] .. "\n"
     txt = txt .. "Health: " .. person.health .. "\n"
-
-
 
     love.graphics.setColor(1,1,1,1)
     love.graphics.print(txt, drawx, drawy, 0, 1, 1, 0, 0)
@@ -78,9 +76,7 @@ function people.draw()
         if person.occupation ~= nil then
             local imagenumber = person.occupation + 100     -- +100 gives the correct offset to avoid image clashes
             love.graphics.draw(IMAGES[imagenumber], drawx, drawy, 0, 0.30, 0.30, 0, 80)
-
         end
-
 
         -- draw debug information
         if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
@@ -192,9 +188,9 @@ end
 
 function people.eat()
     for k, person in pairs(PERSONS) do
-        person.food = person.food - 1
-        if person.food < 0 then
-            person.food = 0
+        person.stock[enum.stockFood] = person.stock[enum.stockFood] - 1
+        if person.stock[enum.stockFood] < 0 then
+            person.stock[enum.stockFood] = 0
             person.health = person.health - 15      -- %
             if person.health <= 0 then
                 people.dies(person)
@@ -208,6 +204,19 @@ function people.dies(person)
         if PERSONS[i] == person then
             table.remove(PERSONS, i)
             print("Person died. Check for errors.")
+        end
+    end
+end
+
+function people.pay()
+    for k, person in pairs(PERSONS) do
+        if person.occupation ~= nil then
+            if person. occupationstock ~= nil then
+                local stocktype = person.occupationstock
+                local stockgain = person.occupationstockgain
+                person.stock[stocktype] = person.stock[stocktype] + stockgain
+print("stock gain = " .. stockgain)
+            end
         end
     end
 end

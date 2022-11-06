@@ -102,7 +102,7 @@ function functions.RecordHistory(day)
 
     -- get some stats
     for k, person in pairs(PERSONS) do
-        foodsum = foodsum + person.food
+        foodsum = foodsum + person.stock[enum.stockFood]
         healthsum = healthsum + person.health
     end
 

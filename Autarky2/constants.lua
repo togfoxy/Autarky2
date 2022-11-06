@@ -50,6 +50,7 @@ function constants.load()
     enum.farm = 3
     enum.jobFarmer = 3      -- job and icon need to have the same number
     enum.iconFarmer = 103   -- offset the icon by 100
+    enum.stockFood = 3
 
     -- sprites and quads
     enum.spriteBlueWoman = 1

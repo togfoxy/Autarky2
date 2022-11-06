@@ -33,6 +33,9 @@ function love.keyreleased( key, scancode )
 				MAP[row][col].owner = person.guid
 				person.workrow = row
 				person.workcol = col
+				person.occupationstock = enum.stockFood
+                person.occupationstockgain = love.math.random(15,25) / 10	-- (1.5 -> 2.5)
+
 			end
 		end
 	end
@@ -111,6 +114,8 @@ function love.update(dt)
 			if WORLD_HOURS == 8 then
 				people.assignDestination(WORLD_HOURS)
 			end
+
+
 			if WORLD_HOURS == 18 then
 				people.assignDestination(WORLD_HOURS)
 			end
@@ -123,6 +128,11 @@ function love.update(dt)
 				-- do once per day
 
 			end
+		end
+
+		-- pay time
+		if WORLD_HOURS == 17 then
+			people.pay()
 		end
 
 		-- dinner time
