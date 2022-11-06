@@ -6,6 +6,7 @@ function people.initialise()
 
     for i = 1, numofppl do
         PERSONS[i] = {}
+        PERSONS[i].guid = cf.getGUID()
         PERSONS[i].row = love.math.random(1, NUMBER_OF_ROWS)
         PERSONS[i].col = love.math.random(1, NUMBER_OF_COLS)
         PERSONS[i].destrow = PERSONS[i].row
@@ -95,8 +96,8 @@ function people.assignDestination(hour)
                 person.destcol = love.math.random(mincol, maxcol)
             else
                 --! currently random
-                person.destrow = love.math.random(1, NUMBER_OF_ROWS)
-                person.destcol = love.math.random(1, NUMBER_OF_COLS)
+                person.destrow = person.workrow
+                person.destcol = person.workcol
             end
         else
             --! currently random

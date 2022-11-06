@@ -24,12 +24,15 @@ function love.keyreleased( key, scancode )
 	if key == "f" then
 		for k,person in pairs(PERSONS) do
 			if person.isSelected and person.occupation == nil then
-				person.occupation = enum.jobFarmer
 				person.isSelected = false
 				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1		-- not sure if this will be used
 
+				person.occupation = enum.jobFarmer
 				local row, col = fun.getEmptyTile()
 				MAP[row][col].structure = enum.farm
+				MAP[row][col].owner = person.guid
+				person.workrow = row
+				person.workcol = col
 			end
 		end
 	end

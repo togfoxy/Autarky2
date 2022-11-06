@@ -105,7 +105,7 @@ function AddVectorToPoint(x,y,headingdegrees,distance)
 	return (x + xdelta), (y + ydelta)		-- 0 = NORTH!
 end
 
-function Getuuid()
+function getGUID()
 	local random = math.random
     local template ='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
     return string.gsub(template, '[xy]', function (c)
