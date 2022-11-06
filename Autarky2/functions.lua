@@ -4,7 +4,7 @@ function functions.loadImages()
 	-- structure tiles
     IMAGES[enum.well] = love.graphics.newImage("assets/images/well_50x45.png")
     IMAGES[enum.market] = love.graphics.newImage("assets/images/market_50x50.png")
-    IMAGES[enum.farm] = love.graphics.newImage("assets/images/appletree_37x50.png")
+    IMAGES[enum.farm] = love.graphics.newImage("assets/images/appletree_50x50.png")
 
     -- quads
     SPRITES[enum.spriteBlueWoman] = love.graphics.newImage("assets/images/Civilian Female Walk Blue.png")
