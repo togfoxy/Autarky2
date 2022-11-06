@@ -3,6 +3,7 @@ functions = {}
 function functions.loadImages()
 	-- terrain tiles
     IMAGES[enum.well] = love.graphics.newImage("assets/images/well_50x45.png")
+    IMAGES[enum.market] = love.graphics.newImage("assets/images/market_50x50.png")
 
 
     -- quads
@@ -56,6 +57,17 @@ function functions.initialiseMap()
     -- store globals for easy recall
     WELLROW = wellrow
     WELLCOL = wellcol
+
+    -- add a marketplace but not too close to the well
+    local marketrow
+    local marketcol
+    repeat
+        marketrow = love.math.random(minrow, maxrow)
+        marketcol = love.math.random(minrow, maxrow)
+    until math.abs(wellrow - marketrow) > 1 or math.abs(wellcol - marketcol) > 1
+    MAP[marketrow][marketcol].structure = enum.market
+    MARKETROW = marketrow
+    MARKETCOL = marketcol
 
     HISTORY[enum.historyFood] = {}
     HISTORY[enum.historyHealth] = {}

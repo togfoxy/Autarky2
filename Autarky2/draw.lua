@@ -37,11 +37,17 @@ function draw.world()
             -- love.graphics.print(MAP[row][col].tileType, drawx + 7, drawy + 7)
 
             -- draw structures
+            -- if MAP[row][col].structure == enum.well then
+            --     love.graphics.setColor(1,1,1,1 * alpha)
+            --     love.graphics.draw(IMAGES[enum.well], drawx, drawy, 0, 1, 1)
+            -- end
+
             if MAP[row][col].structure ~= nil then
+                local structureid = MAP[row][col].structure
                 love.graphics.setColor(1,1,1,1 * alpha)
-                -- love.graphics.draw(IMAGES[enum.well], drawx, drawy, 0, 1, 1, TILE_SIZE / 2, TILE_SIZE / 2)
-                love.graphics.draw(IMAGES[enum.well], drawx, drawy, 0, 1, 1)
+                love.graphics.draw(IMAGES[structureid], drawx, drawy, 0, 1, 1)
             end
+
         end
     end
 
