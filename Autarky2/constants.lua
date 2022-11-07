@@ -29,7 +29,7 @@ function constants.load()
     TICKER = 0          -- dt or seconds (in fractions)
 
     PERSONS = {}
-    PERSONS_RADIUS = 5      -- for drawing purposes
+    PERSONS_RADIUS = 7      -- for drawing and mouse click purposes
     MOVEMENT_RATE = 300       -- number of pixels person moves pers second (not per dt)
     VILLAGERS_SELECTED = 0
 
@@ -46,7 +46,15 @@ function constants.load()
     enum = {}
     enum.well = 1       -- this is for image and structure type
     enum.market = 2
+    enum.stockHealth = 1
+    enum.stockWealth = 2
+
     enum.farm = 3
+    enum.jobFarmer = 3      -- job and icon need to have the same number
+    enum.iconFarmer = 103   -- offset the icon by 100
+    enum.stockFood = 3
+
+
 
     -- sprites and quads
     enum.spriteBlueWoman = 1
@@ -54,9 +62,6 @@ function constants.load()
 
     enum.historyFood = 1
     enum.historyHealth = 2
-
-    enum.jobFarmer = 1
-
 
 
 

@@ -4,7 +4,7 @@ function functions.loadImages()
 	-- structure tiles
     IMAGES[enum.well] = love.graphics.newImage("assets/images/well_50x45.png")
     IMAGES[enum.market] = love.graphics.newImage("assets/images/market_50x50.png")
-    IMAGES[enum.farm] = love.graphics.newImage("assets/images/appletree_37x50.png")
+    IMAGES[enum.farm] = love.graphics.newImage("assets/images/appletree_50x50.png")
 
     -- quads
     SPRITES[enum.spriteBlueWoman] = love.graphics.newImage("assets/images/Civilian Female Walk Blue.png")
@@ -12,6 +12,9 @@ function functions.loadImages()
 
     SPRITES[enum.spriteRedWoman] = love.graphics.newImage("assets/images/Civilian Female Walk Red.png")
     QUADS[enum.spriteRedWoman] = cf.fromImageToQuads(SPRITES[enum.spriteRedWoman], 15, 32)
+
+    -- icons
+    IMAGES[enum.iconFarmer] = love.graphics.newImage("assets/images/appleicon64x64.png")
 
 end
 
@@ -99,8 +102,8 @@ function functions.RecordHistory(day)
 
     -- get some stats
     for k, person in pairs(PERSONS) do
-        foodsum = foodsum + person.food
-        healthsum = healthsum + person.health
+        foodsum = foodsum + person.stock[enum.stockFood]
+        healthsum = healthsum + person.stock[enum.stockHealth]
     end
 
     table.insert(HISTORY[enum.historyFood], foodsum/personcount)

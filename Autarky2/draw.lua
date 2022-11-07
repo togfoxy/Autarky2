@@ -63,7 +63,7 @@ function draw.graphs()
     -- food
     local drawx = 50
     local drawy = 50
-    love.graphics.print("Food", drawx, drawy)
+    love.graphics.print("Avg food", drawx, drawy)
     drawy = drawy + 25
 
     love.graphics.line(drawx, drawy, drawx, drawy + 100)
@@ -79,7 +79,7 @@ function draw.graphs()
     -- health
     drawx = drawx + 125
     drawy = 50
-    love.graphics.print("Health", drawx, drawy)
+    love.graphics.print("Avg health", drawx, drawy)
     drawy = drawy + 25
 
     love.graphics.line(drawx, drawy, drawx, drawy + 100)

@@ -5,6 +5,8 @@ inspect = require 'lib.inspect'
 res = require 'lib.resolution_solution'
 -- https://github.com/Vovkiv/resolution_solution
 
+marketplace = require 'lib.Marketplace.marketplace'
+
 cf = require 'lib.commonfunctions'
 fun = require 'functions'
 require 'draw'
@@ -24,12 +26,19 @@ function love.keyreleased( key, scancode )
 	if key == "f" then
 		for k,person in pairs(PERSONS) do
 			if person.isSelected and person.occupation == nil then
-				person.occupation = enum.jobFarmer
 				person.isSelected = false
 				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1		-- not sure if this will be used
 
+				person.occupation = enum.jobFarmer
 				local row, col = fun.getEmptyTile()
 				MAP[row][col].structure = enum.farm
+				MAP[row][col].owner = person.guid
+				person.workrow = row
+				person.workcol = col
+                person.occupationstockgain = love.math.random(15,25) / 10	-- (1.5 -> 2.5)
+				person.occupationstockinput = nil
+				person.occupationstockoutput = enum.stockFood		--! this is probably redundant and same as occupationstock
+
 			end
 		end
 	end
@@ -108,6 +117,7 @@ function love.update(dt)
 			if WORLD_HOURS == 8 then
 				people.assignDestination(WORLD_HOURS)
 			end
+
 			if WORLD_HOURS == 18 then
 				people.assignDestination(WORLD_HOURS)
 			end
@@ -116,16 +126,24 @@ function love.update(dt)
 				fun.RecordHistory(WORLD_DAYS)		-- record key stats for graphs etc. Do before the day ticker increments
 				WORLD_HOURS = WORLD_HOURS - 24
 				WORLD_DAYS = WORLD_DAYS + 1
-
 				-- do once per day
-
 			end
+		end
+
+		-- pay time
+		if WORLD_HOURS == 17 then
+			people.pay()
 		end
 
 		-- dinner time
 		if WORLD_HOURS == 19 then
 			print("Nom")		--!
 			people.eat()
+		end
+
+		if WORLD_HOURS == 20 then
+			-- market time
+			people.doMarketplace()
 		end
 	end
 	res.update()

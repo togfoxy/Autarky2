@@ -6,6 +6,7 @@ function people.initialise()
 
     for i = 1, numofppl do
         PERSONS[i] = {}
+        PERSONS[i].guid = cf.getGUID()
         PERSONS[i].row = love.math.random(1, NUMBER_OF_ROWS)
         PERSONS[i].col = love.math.random(1, NUMBER_OF_COLS)
         PERSONS[i].destrow = PERSONS[i].row
@@ -21,9 +22,14 @@ function people.initialise()
         PERSONS[i].isSelected = false
 
         PERSONS[i].occupation = nil
-        PERSONS[i].food = 0                 -- days
-        PERSONS[i].food = love.math.random(0,10)                 -- days
-        PERSONS[i].health = 100
+        PERSONS[i].stock = {}
+        PERSONS[i].stock[enum.stockFood] = love.math.random(0,10)                 -- days
+        PERSONS[i].stock[enum.stockHealth] = 100
+        PERSONS[i].stock[enum.stockWealth] = 10
+
+        PERSONS[i].beliefRange = {}                     -- eg PERSONS[i].beliefRange[enum.stockFood] = {1,10}
+        PERSONS[i].stockHistory = {}
+
     end
 end
 
@@ -33,10 +39,9 @@ local function drawDebug(person)
     drawy = drawy + person.y - 17
 
     local txt = ""
-    txt = txt .. "Food: " .. person.food .. "\n"
-    txt = txt .. "Health: " .. person.health .. "\n"
-
-
+    txt = txt .. "Food: " .. person.stock[enum.stockFood] .. "\n"
+    txt = txt .. "Health: " .. person.stock[enum.stockHealth] .. "\n"
+    txt = txt .. "Wealth: " .. person.stock[enum.stockWealth] .. "\n"
 
     love.graphics.setColor(1,1,1,1)
     love.graphics.print(txt, drawx, drawy, 0, 1, 1, 0, 0)
@@ -73,6 +78,12 @@ function people.draw()
         -- circle for debugging
         -- love.graphics.circle("fill", drawx, drawy, PERSONS_RADIUS)
 
+        -- draw occupation icon
+        if person.occupation ~= nil then
+            local imagenumber = person.occupation + 100     -- +100 gives the correct offset to avoid image clashes
+            love.graphics.draw(IMAGES[imagenumber], drawx, drawy, 0, 0.30, 0.30, 0, 80)
+        end
+
         -- draw debug information
         if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
             drawDebug(person)
@@ -95,8 +106,8 @@ function people.assignDestination(hour)
                 person.destcol = love.math.random(mincol, maxcol)
             else
                 --! currently random
-                person.destrow = love.math.random(1, NUMBER_OF_ROWS)
-                person.destcol = love.math.random(1, NUMBER_OF_COLS)
+                person.destrow = person.workrow
+                person.destcol = person.workcol
             end
         else
             --! currently random
@@ -183,11 +194,11 @@ end
 
 function people.eat()
     for k, person in pairs(PERSONS) do
-        person.food = person.food - 1
-        if person.food < 0 then
-            person.food = 0
-            person.health = person.health - 15      -- %
-            if person.health <= 0 then
+        person.stock[enum.stockFood] = person.stock[enum.stockFood] - 1
+        if person.stock[enum.stockFood] < 0 then
+            person.stock[enum.stockFood] = 0
+            person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - 15      -- %
+            if person.stock[enum.stockHealth] <= 0 then
                 people.dies(person)
             end
         end
@@ -201,6 +212,83 @@ function people.dies(person)
             print("Person died. Check for errors.")
         end
     end
+end
+
+function people.pay()
+    for k, person in pairs(PERSONS) do
+        if person.occupation ~= nil then
+            if person.occupationstockoutput ~= nil then
+                local stocktype = person.occupationstockoutput
+                local stockgain = person.occupationstockgain
+                person.stock[stocktype] = person.stock[stocktype] + stockgain
+            end
+        end
+    end
+end
+
+function people.doMarketplace()
+    -- determine if they need to buy/sell
+    for k, person in pairs(PERSONS) do
+        if person.stock[enum.stockFood] < 7 then
+            -- try to buy food
+            local wealth = person.stock[enum.stockWealth]
+
+            -- determine bid price
+            local bidprice = marketplace.determineCommodityPrice(person.beliefRange[enum.stockFood])
+
+            -- determine bid qty
+            local maxqtycanafford = wealth / bidprice
+            local maxqtycanhold = 14 - person.stock[enum.stockFood]
+            local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
+            local bidqty = marketplace.determineQty(maxqtytobuy, person.stockHistory[enum.stockFood])       -- accepts nil history
+            bidqty = cf.round(bidqty)
+
+            -- register the bid
+            marketplace.createBid(enum.stockFood, bidqty, bidprice, person.guid)
+        end
+
+        -- make a bid (buy)     --! if there are lots of bids and they are all succesful then agent could be in debt
+        local stockinput = person.occupationstockinput      -- stock type
+        local wealth = person.stock[enum.stockWealth]
+        if stockinput ~= nil and stockinput < 7 then
+            local bidprice = marketplace.determineCommodityPrice(person.beliefRange[stockinput])
+            local maxqtycanafford = wealth / bidprice
+            local maxqtycanhold = 14 - person.stock[stockinput]
+            local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
+            local bidqty = marketplace.determineQty(maxqtytobuy, person.stockHistory[stockinput])       -- accepts nil history
+            bidqty = cf.round(bidqty)
+            marketplace.createBid(stockinput, bidqty, bidprice, person.guid)
+        end
+
+        -- make an ask (sell)
+        local stockoutput = person.occupationstockoutput        -- stock type
+        if stockoutput ~= nil and person.stock[stockoutput] > 7 then
+           local maxqtytosell = person.stock[stockoutput]
+           local askqty = marketplace.determineQty(maxqtytosell, person.stockHistory[stockoutput]) -- commodity, maxQty, commodityKnowledge
+           askqty = cf.round(askqty)
+
+           -- determine ask price
+           local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
+
+           -- register the ask
+           marketplace.createAsk(stockoutput, askqty, askprice, person.guid)
+        end
+
+        --! need something about buying luxuries (wants)
+    end
+
+    -- resolve bids/asks after all persons have had a chance to update orders
+    results = {}
+    results = marketplace.resolveOrders()
+
+    if results ~= nil then
+        --! do something
+        print("----------------------")
+        print("Market results")
+        print(inspect(results))
+        print("----------------------")
+    end
+
 end
 
 return people
