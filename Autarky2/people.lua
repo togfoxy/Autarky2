@@ -231,25 +231,32 @@ function people.doMarketplace()
     for k, person in pairs(PERSONS) do
         if person.stock[enum.stockFood] < 7 then
             -- try to buy food
-            -- determine bid qty
-            local maxqtytobuy = 14 - person.stock[enum.stockFood]       -- try to top up to 2 weeks of food
-            local bidqty = marketplace.determineQty(maxqtytobuy, person.stockHistory[enum.stockFood])       -- accepts nil history
-            bidqty = cf.round(bidqty)
+            local wealth = person.stock[enum.stockWealth]
 
             -- determine bid price
             local bidprice = marketplace.determineCommodityPrice(person.beliefRange[enum.stockFood])
+
+            -- determine bid qty
+            local maxqtycanafford = wealth / bidprice
+            local maxqtycanhold = 14 - person.stock[enum.stockFood]
+            local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
+            local bidqty = marketplace.determineQty(maxqtytobuy, person.stockHistory[enum.stockFood])       -- accepts nil history
+            bidqty = cf.round(bidqty)
 
             -- register the bid
             marketplace.createBid(enum.stockFood, bidqty, bidprice, person.guid)
         end
 
-        -- make a bid (buy)
+        -- make a bid (buy)     --! if there are lots of bids and they are all succesful then agent could be in debt
         local stockinput = person.occupationstockinput      -- stock type
+        local wealth = person.stock[enum.stockWealth]
         if stockinput ~= nil and stockinput < 7 then
-            local maxqtytobuy = 14 - person.stock[stockinput]
+            local bidprice = marketplace.determineCommodityPrice(person.beliefRange[stockinput])
+            local maxqtycanafford = wealth / bidprice
+            local maxqtycanhold = 14 - person.stock[stockinput]
+            local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
             local bidqty = marketplace.determineQty(maxqtytobuy, person.stockHistory[stockinput])       -- accepts nil history
             bidqty = cf.round(bidqty)
-            local bidprice = marketplace.determineCommodityPrice(person.beliefRange[stockinput])
             marketplace.createBid(stockinput, bidqty, bidprice, person.guid)
         end
 
@@ -276,6 +283,10 @@ function people.doMarketplace()
 
     if results ~= nil then
         --! do something
+        print("----------------------")
+        print("Market results")
+        print(inspect(results))
+        print("----------------------")
     end
 
 end

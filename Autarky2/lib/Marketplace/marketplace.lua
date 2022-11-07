@@ -220,7 +220,8 @@ function marketplace.resolveOrders()
             print("* Processing commodity ID: " .. commodity)
             print("*******************")
 
-            while #bidtable[commodity] ~= 0 and #asktable[commodity] ~= 0 do
+            while #bidtable[commodity] ~= nil and #asktable[commodity] ~= nil and
+            #bidtable[commodity] ~= 0 and #asktable[commodity] ~= 0 do
                 -- the [1] indicates the first item (top of sorted table)
                 -- the [2] indicates the bid/ask price (not qty)
                 local bidprice = bidtable[commodity][1][2]
@@ -241,15 +242,16 @@ function marketplace.resolveOrders()
                         print("Bid qty partially satisfied")
                     end
 
-                    --! adjust bidqty/askqty by math.min
+                    -- adjust bidqty/askqty by math.min
                     local transactionamt = math.min(bidqty, askqty)
                     bidtable[commodity][1][1] = bidtable[commodity][1][1] - transactionamt
                     asktable[commodity][1][1] = asktable[commodity][1][1] - transactionamt
 
                     --! record the transaction somewhere
                     local outcome = {}
-                    outcome.buyerguid = bidtable[commodity][1].playerID
-                    outcome.sellerguid = asktable[commodity][1].playerID
+                    -- [3] is the players guid specifed during createBid/createAsk
+                    outcome.buyerguid = bidtable[commodity][1][3]
+                    outcome.sellerguid = asktable[commodity][1][3]
                     outcome.commodityID = commodity
                     outcome.transactionTotalPrice = transactionprice * transactionamt
                     outcome.transactionTotalQty = transactionamt
@@ -268,6 +270,8 @@ function marketplace.resolveOrders()
 
                 else
                     print("Price not agreed. Trade fails")
+                    -- remove bid as bid price is too low to be satisfied
+                    table.remove(bidtable[commodity], 1)
                 end
 
     -- print("**********************")
