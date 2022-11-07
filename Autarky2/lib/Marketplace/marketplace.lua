@@ -7,6 +7,9 @@ local outcometable = {}
 function marketplace.determineCommodityPrice(beliefRange)
     -- this is called by buyers and sellers
 
+    print("belief table")
+    print(inspect(beliefRange))
+
     local min, max
     if beliefRange == nil then
         min = 1
@@ -126,7 +129,7 @@ local function adjustBiddersBeliefs()
     -- belief ranges are stored as following:
     -- persons[i].beliefRange["sugar"] = {1,10}
 
-    local highestbelief = beliefRange[commodity][2]
+    -- local highestbelief = beliefRange[commodity][2]
     local bidqty
     local transactionqty
     local transactionprice
@@ -182,12 +185,17 @@ local function adjustBeliefs()
 end
 
 function marketplace.resolveOrders()
+    -- bidtable and asktable are local to this module and are populated by calling
+    -- createBid and createAsk before calling this function
+
     print("**********************")
-    print("All bids:")
+    print("All bids (qty, price):")
     print(inspect(bidtable))
-    print("All asks:")
+    print("All asks (qty, price):")
     print(inspect(asktable))
     print("**********************")
+
+    local results = {}
 
     for k, commodity in pairs(bidtable) do
         -- print(inspect(commodity))
@@ -209,55 +217,85 @@ function marketplace.resolveOrders()
 
         for k, v in pairs(commoditybook) do
             print("*******************")
-            print("* " .. commodity)
+            print("* Processing commodity ID: " .. commodity)
             print("*******************")
 
-            local bidprice = bidtable[commodity][1][2]
-            print("Bid price is $" .. bidprice)
-            local askprice = asktable[commodity][1][2]
-            print("Ask price is $" .. askprice)
+            while #bidtable[commodity] ~= 0 and #asktable[commodity] ~= 0 do
+                -- the [1] indicates the first item (top of sorted table)
+                -- the [2] indicates the bid/ask price (not qty)
+                local bidprice = bidtable[commodity][1][2]
+                print("Bid price is $" .. bidprice)
+                local askprice = asktable[commodity][1][2]
+                print("Ask price is $" .. askprice)
 
-            if bidprice >= askprice then
-                local transactionprice = (bidprice + askprice) / 2      --! this is a float
-                print("Price agreed at $" .. transactionprice)
-                local bidqty = bidtable[commodity][1][1]
-                local askqty = asktable[commodity][1][1]
-                print("Bid qty = " .. bidqty .. " and ask qty = " .. askqty)
-                if askqty >= bidqty then
-                    -- purchase fully satisfied
-                    print("Bid qty fully satisified")
+                if bidprice >= askprice then
+                    local transactionprice = (bidprice + askprice) / 2      --! this is a float
+                    print("Price agreed at $" .. transactionprice)
+                    local bidqty = bidtable[commodity][1][1]
+                    local askqty = asktable[commodity][1][1]
+                    print("Bid qty = " .. bidqty .. " and ask qty = " .. askqty)
+                    if askqty >= bidqty then
+                        -- purchase fully satisfied
+                        print("Bid qty fully satisified")
+                    else
+                        print("Bid qty partially satisfied")
+                    end
+
+                    --! adjust bidqty/askqty by math.min
+                    local transactionamt = math.min(bidqty, askqty)
+                    bidtable[commodity][1][1] = bidtable[commodity][1][1] - transactionamt
+                    asktable[commodity][1][1] = asktable[commodity][1][1] - transactionamt
+
+                    --! record the transaction somewhere
+                    local outcome = {}
+                    outcome.buyerguid = bidtable[commodity][1].playerID
+                    outcome.sellerguid = asktable[commodity][1].playerID
+                    outcome.commodityID = commodity
+                    outcome.transactionTotalPrice = transactionprice * transactionamt
+                    outcome.transactionTotalQty = transactionamt
+                    table.insert(results, outcome)
+
+                    -- remove bid if qty satisfied
+                    if bidtable[commodity][1][1] <= 0 then
+                        table.remove(bidtable[commodity], 1)
+                    end
+                    -- remove ask if qty exhausted
+                    if asktable[commodity][1][1] <= 0 then
+                        table.remove(asktable[commodity], 1)
+                    end
+
+                    -- loop
+
                 else
-                    print("Bid qty partially satisfied")
+                    print("Price not agreed. Trade fails")
                 end
 
-                --! adjust bidqty/askqty by math.min
-                local transactionamt = math.min(bidqty, askqty)
-                bidtable[commodity][1][1] = bidtable[commodity][1][1] - transactionamt
-                asktable[commodity][1][1] = asktable[commodity][1][1] - transactionamt
+    -- print("**********************")
+    -- print("All bids (qty, price):")
+    -- print(inspect(bidtable))
+    -- print("All asks (qty, price):")
+    -- print(inspect(asktable))
+    -- print("**********************")
+    -- print(asktable[3] == {})
+    -- print(asktable[3] == nil)
+    -- print(#asktable[3])
+    -- print("~~~~~~~~~~~~~~~~~~~~~~")
 
-                --! record the transaction somewhere
 
-                -- remove bid if qty satisfied
-                if bidtable[commodity][1][1] <=0 then
-                    table.remove(bidtable[commodity], 1)
-                end
-                -- remove ask if qty exhausted
-                if asktable[commodity][1][1] <=0 then
-                    table.remove(asktable[commodity], 1)
-                end
 
-                -- loop
-
-            else
-                print("Price not agreed. Trade fails")
             end
-
-            print(commodity, inspect(commoditybook))
+            print(commodity, "Bids left: " .. inspect(commoditybook))
         end
     end
 
     --! adjust beliefs
     adjustBeliefs()
+
+    -- clear bids and asks so it is ready for next round
+    bidtable = {}
+    asktable = {}
+
+    return results
 
 end
 

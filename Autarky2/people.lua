@@ -271,7 +271,12 @@ function people.doMarketplace()
     end
 
     -- resolve bids/asks after all persons have had a chance to update orders
-    marketplace.resolveOrders()
+    results = {}
+    results = marketplace.resolveOrders()
+
+    if results ~= nil then
+        --! do something
+    end
 
 end
 
