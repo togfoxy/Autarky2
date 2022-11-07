@@ -103,7 +103,7 @@ function functions.RecordHistory(day)
     -- get some stats
     for k, person in pairs(PERSONS) do
         foodsum = foodsum + person.stock[enum.stockFood]
-        healthsum = healthsum + person.health
+        healthsum = healthsum + person.stock[enum.stockHealth]
     end
 
     table.insert(HISTORY[enum.historyFood], foodsum/personcount)

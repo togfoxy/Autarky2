@@ -22,9 +22,14 @@ function people.initialise()
         PERSONS[i].isSelected = false
 
         PERSONS[i].occupation = nil
-        PERSONS[i].health = 100
         PERSONS[i].stock = {}
         PERSONS[i].stock[enum.stockFood] = love.math.random(0,10)                 -- days
+        PERSONS[i].stock[enum.stockHealth] = 100
+        PERSONS[i].stock[enum.stockWealth] = 10
+
+        PERSONS[i].beliefRange = {}                     -- eg PERSONS[i].beliefRange[enum.stockFood] = {1,10}
+        PERSONS[i].stockHistory = {}
+
     end
 end
 
@@ -35,7 +40,8 @@ local function drawDebug(person)
 
     local txt = ""
     txt = txt .. "Food: " .. person.stock[enum.stockFood] .. "\n"
-    txt = txt .. "Health: " .. person.health .. "\n"
+    txt = txt .. "Health: " .. person.stock[enum.stockHealth] .. "\n"
+    txt = txt .. "Wealth: " .. person.stock[enum.stockWealth] .. "\n"
 
     love.graphics.setColor(1,1,1,1)
     love.graphics.print(txt, drawx, drawy, 0, 1, 1, 0, 0)
@@ -191,8 +197,8 @@ function people.eat()
         person.stock[enum.stockFood] = person.stock[enum.stockFood] - 1
         if person.stock[enum.stockFood] < 0 then
             person.stock[enum.stockFood] = 0
-            person.health = person.health - 15      -- %
-            if person.health <= 0 then
+            person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - 15      -- %
+            if person.stock[enum.stockHealth] <= 0 then
                 people.dies(person)
             end
         end
@@ -211,14 +217,62 @@ end
 function people.pay()
     for k, person in pairs(PERSONS) do
         if person.occupation ~= nil then
-            if person. occupationstock ~= nil then
-                local stocktype = person.occupationstock
+            if person.occupationstockoutput ~= nil then
+                local stocktype = person.occupationstockoutput
                 local stockgain = person.occupationstockgain
                 person.stock[stocktype] = person.stock[stocktype] + stockgain
-print("stock gain = " .. stockgain)
             end
         end
     end
+end
+
+function people.doMarketplace()
+    -- determine if they need to buy/sell
+    for k, person in pairs(PERSONS) do
+        if person.stock[enum.stockFood] < 7 then
+            -- try to buy food
+            -- determine bid qty
+            local maxqtytobuy = 14 - person.stock[enum.stockFood]       -- try to top up to 2 weeks of food
+            local bidqty = marketplace.determineQty(maxqtytobuy, person.stockHistory[enum.stockFood])       -- accepts nil history
+            bidqty = cf.round(bidqty)
+
+            -- determine bid price
+            local bidprice = marketplace.determineCommodityPrice(person.beliefRange[enum.stockFood])
+
+            -- register the bid
+            marketplace.createBid(enum.stockFood, bidqty, bidprice, person.guid)
+        end
+
+        -- make a bid (buy)
+        local stockinput = person.occupationstockinput      -- stock type
+        if stockinput ~= nil and stockinput < 7 then
+            local maxqtytobuy = 14 - person.stock[stockinput]
+            local bidqty = marketplace.determineQty(maxqtytobuy, person.stockHistory[stockinput])       -- accepts nil history
+            bidqty = cf.round(bidqty)
+            local bidprice = marketplace.determineCommodityPrice(person.beliefRange[stockinput])
+            marketplace.createBid(stockinput, bidqty, bidprice, person.guid)
+        end
+
+        -- make an ask (sell)
+        local stockoutput = person.occupationstockoutput        -- stock type
+        if stockoutput ~= nil and person.stock[stockoutput] > 7 then
+           local maxqtytosell = person.stock[stockoutput]
+           local askqty = marketplace.determineQty(maxqtytosell, person.stockHistory[stockoutput]) -- commodity, maxQty, commodityKnowledge
+           askqty = cf.round(askqty)
+
+           -- determine ask price
+           local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
+
+           -- register the ask
+           marketplace.createAsk(stockoutput, askqty, askprice, person.guid)
+        end
+
+        --! need something about buying luxuries (wants)
+    end
+
+    -- resolve bids/asks after all persons have had a chance to update orders
+    marketplace.resolveOrders()
+
 end
 
 return people

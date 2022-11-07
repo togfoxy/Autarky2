@@ -5,6 +5,8 @@ inspect = require 'lib.inspect'
 res = require 'lib.resolution_solution'
 -- https://github.com/Vovkiv/resolution_solution
 
+marketplace = require 'lib.Marketplace.marketplace'
+
 cf = require 'lib.commonfunctions'
 fun = require 'functions'
 require 'draw'
@@ -33,8 +35,9 @@ function love.keyreleased( key, scancode )
 				MAP[row][col].owner = person.guid
 				person.workrow = row
 				person.workcol = col
-				person.occupationstock = enum.stockFood
                 person.occupationstockgain = love.math.random(15,25) / 10	-- (1.5 -> 2.5)
+				person.occupationstockinput = nil
+				person.occupationstockoutput = enum.stockFood		--! this is probably redundant and same as occupationstock
 
 			end
 		end
@@ -115,7 +118,6 @@ function love.update(dt)
 				people.assignDestination(WORLD_HOURS)
 			end
 
-
 			if WORLD_HOURS == 18 then
 				people.assignDestination(WORLD_HOURS)
 			end
@@ -124,9 +126,7 @@ function love.update(dt)
 				fun.RecordHistory(WORLD_DAYS)		-- record key stats for graphs etc. Do before the day ticker increments
 				WORLD_HOURS = WORLD_HOURS - 24
 				WORLD_DAYS = WORLD_DAYS + 1
-
 				-- do once per day
-
 			end
 		end
 
@@ -139,6 +139,11 @@ function love.update(dt)
 		if WORLD_HOURS == 19 then
 			print("Nom")		--!
 			people.eat()
+		end
+
+		if WORLD_HOURS == 20 then
+			-- market time
+			people.doMarketplace()
 		end
 	end
 	res.update()
