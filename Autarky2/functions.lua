@@ -76,6 +76,7 @@ function functions.initialiseMap()
 
     HISTORY[enum.historyFood] = {}
     HISTORY[enum.historyHealth] = {}
+    HISTORY[enum.historyWealth] = {}
 end
 
 function functions.getTileXY(row, col)
@@ -96,18 +97,24 @@ function functions.getDrawXY(person)
 end
 
 function functions.RecordHistory(day)
+    --## initialise any new HISTORY tables in fun.initialiseMap()
+    --## ensure you add a new enum in constants.lua
     local personcount = #PERSONS
     local foodsum = 0
     local healthsum = 0
+    local wealthsum = 0
 
     -- get some stats
     for k, person in pairs(PERSONS) do
+        --! need to make this smarter and scalable
         foodsum = foodsum + person.stock[enum.stockFood]
         healthsum = healthsum + person.stock[enum.stockHealth]
+        wealthsum = wealthsum + person.stock[enum.stockWealth]
     end
 
     table.insert(HISTORY[enum.historyFood], foodsum/personcount)
     table.insert(HISTORY[enum.historyHealth], healthsum/personcount)
+    table.insert(HISTORY[enum.historyWealth], wealthsum/personcount)
 end
 
 function functions.getEmptyTile()
