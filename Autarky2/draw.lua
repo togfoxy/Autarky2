@@ -92,6 +92,22 @@ function draw.graphs()
         love.graphics.points(drawx, yvalue)
     end
 
+    -- wealth
+    drawx = drawx + 125
+    drawy = 50
+    love.graphics.print("Avg wealth", drawx, drawy)
+    drawy = drawy + 25
+    love.graphics.line(drawx, drawy, drawx, drawy + 100)
+    love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
+    drawy = drawy + 100
+    for i = 1, #HISTORY[enum.historyWealth] do
+        drawx = drawx + 1
+        local yvalue = drawy - HISTORY[enum.historyWealth][i]
+        love.graphics.points(drawx, yvalue)
+    end
+
+
+
 end
 
 return draw

@@ -220,7 +220,7 @@ function marketplace.resolveOrders()
             print("* Processing commodity ID: " .. commodity)
             print("*******************")
 
-            while #bidtable[commodity] ~= nil and #asktable[commodity] ~= nil and
+            while bidtable[commodity] ~= nil and asktable[commodity] ~= nil and
             #bidtable[commodity] ~= 0 and #asktable[commodity] ~= 0 do
                 -- the [1] indicates the first item (top of sorted table)
                 -- the [2] indicates the bid/ask price (not qty)

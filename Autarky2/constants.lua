@@ -62,6 +62,7 @@ function constants.load()
 
     enum.historyFood = 1
     enum.historyHealth = 2
+    enum.historyWealth = 3
 
 
 

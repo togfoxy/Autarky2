@@ -2,7 +2,7 @@ people = {}
 
 function people.initialise()
 
-    local numofppl = 10
+    local numofppl = 2
 
     for i = 1, numofppl do
         PERSONS[i] = {}
@@ -226,6 +226,17 @@ function people.pay()
     end
 end
 
+function people.get(guid)
+    -- given a guid, find and return the correct person
+    -- returns nil if not found
+    for k, person in pairs(PERSONS) do
+        if person.guid == guid then
+            return person
+        end
+    end
+    return nil
+end
+
 function people.doMarketplace()
     -- determine if they need to buy/sell
     for k, person in pairs(PERSONS) do
@@ -247,7 +258,7 @@ function people.doMarketplace()
             marketplace.createBid(enum.stockFood, bidqty, bidprice, person.guid)
         end
 
-        -- make a bid (buy)     --! if there are lots of bids and they are all succesful then agent could be in debt
+        -- make a bid (buy)     -- if there are lots of bids and they are all succesful then agent could be in debt
         local stockinput = person.occupationstockinput      -- stock type
         local wealth = person.stock[enum.stockWealth]
         if stockinput ~= nil and stockinput < 7 then
@@ -281,14 +292,24 @@ function people.doMarketplace()
     results = {}
     results = marketplace.resolveOrders()
 
-    if results ~= nil then
-        --! do something
-        print("----------------------")
-        print("Market results")
-        print(inspect(results))
-        print("----------------------")
-    end
+    -- print("----------------------")
+    -- print("Market results")
+    -- print(inspect(results))
+    -- print("----------------------")
 
+    for k, outcome in pairs(results) do
+        -- charge the buyer and ensure that succeeds
+        local buyer = people.get(outcome.buyerguid)
+        local seller = people.get(outcome.sellerguid)
+        if buyer.stock[enum.stockWealth] >= outcome.transactionTotalPrice then
+            -- funding assured - finalise the transaction
+            buyer.stock[enum.stockWealth] = buyer.stock[enum.stockWealth] - outcome.transactionTotalPrice
+            seller.stock[enum.stockWealth] = seller.stock[enum.stockWealth] + outcome.transactionTotalPrice
+
+            buyer.stock[outcome.commodityID] = buyer.stock[outcome.commodityID] + outcome.transactionTotalQty
+            seller.stock[outcome.commodityID] = seller.stock[outcome.commodityID] - outcome.transactionTotalQty
+        end
+    end
 end
 
 return people
