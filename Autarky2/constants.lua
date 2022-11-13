@@ -60,10 +60,6 @@ function constants.load()
     enum.spriteBlueWoman = 1
     enum.spriteRedWoman = 2
 
-    enum.historyFood = 1
-    enum.historyHealth = 2
-    enum.historyWealth = 3
-
 
 
 
