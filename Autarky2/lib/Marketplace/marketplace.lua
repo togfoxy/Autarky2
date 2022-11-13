@@ -18,7 +18,11 @@ function marketplace.determineCommodityPrice(beliefRange)
         min = beliefRange[1]
         max = beliefRange[2]
     end
-    assert(min <= max)
+
+    if min > max then
+        local str = "Assert failed: " .. min, max
+        error(str)
+    end
     return love.math.random(min, max)       --! only does whole numbers
 end
 
@@ -146,8 +150,7 @@ local function adjustBiddersBeliefs(summary)
     local bidqty = summary.bidqty or 0
     local askqty = summary.askqty
     local stockqty = summary.currentInventory
-    local transactionprice = summary.transactiontotal
-    local avgprice = summary.history  --! that ain't gunna work!!
+    local transactionprice = summary.transactionprice
     local bidprice = summary.bidprice
     local askprice = summary.askprice
     local avgprice = fun.getAvgPrice(buyer.stockHistory[commodity])
@@ -160,10 +163,10 @@ local function adjustBiddersBeliefs(summary)
         -- move range inwards
         local adjustamt = highestbelief * 0.10
 
--- print("alpha")
--- print(commodity, adjustamt)
--- print(inspect(beliefRange))
--- print(beliefRange[1])
+        -- print("alpha")
+        -- print(commodity, adjustamt)
+        -- print(inspect(beliefRange))
+        -- print(beliefRange[1])
 
         beliefRange[1] = beliefRange[1] + adjustamt
         beliefRange[2] = beliefRange[2] - adjustamt
@@ -197,17 +200,44 @@ local function adjustBiddersBeliefs(summary)
         beliefRange[1] = beliefRange[1] - adjustamt
         beliefRange[2] = beliefRange[2] - adjustamt
     end
+    if beliefRange[1] < 0.5 then beliefRange[1] = 0.5 end
 
     table.insert(buyer.beliefRangeHistory, {beliefRange[1], beliefRange[2]})
-
-
---PERSONS[i].beliefRangeHistory = {}          --  .beliefRangeHistory[enum.stockFood][1] = (1,10})
-
-
 end
 
-local function adjustAskersBeliefs()
+local function adjustAskersBeliefs(summary)
 
+    local transactionqty = summary.transactionqty
+    local askqty = summary.askqty
+    local seller = summary.seller
+    local askprice = summary.askprice
+    local transactionprice = summary.transactionprice
+    local commodity = summary.commodity
+    local beliefRange = seller.beliefRange[commodity]        -- because the commodity is used as an input, this becomes beliefRange = {1,10}
+
+    local weight = transactionqty / askqty
+    local avgprice = fun.getAvgPrice(seller.stockHistory[commodity])
+    local displacement = weight * avgprice
+    if transactionqty == 0 then
+        local adjustamt = displacement * (1/6)
+        beliefRange[1] = beliefRange[1] - adjustamt
+        beliefRange[2] = beliefRange[2] - adjustamt
+    elseif weight < 0.75 then
+        local adjustamt = displacement * (1/7)
+        beliefRange[1] = beliefRange[1] - adjustamt
+        beliefRange[2] = beliefRange[2] - adjustamt
+    elseif askprice < transactionprice then
+        local overbid = transactionprice - askprice
+        local adjustamt = 1.2 * weight * overbid
+        beliefRange[1] = beliefRange[1] + adjustamt
+        beliefRange[2] = beliefRange[2] + adjustamt
+    else
+        local adjustamt = (1/5) * avgprice
+        beliefRange[1] = beliefRange[1] - adjustamt
+        beliefRange[2] = beliefRange[2] - adjustamt
+    end
+    if beliefRange[1] < 0.5 then beliefRange[1] = 0.5 end
+    table.insert(seller.beliefRangeHistory, {beliefRange[1], beliefRange[2]})
 end
 
 function marketplace.resolveOrders()
@@ -234,9 +264,6 @@ function marketplace.resolveOrders()
         table.sort(commodity, function (k1, k2) return k1[2] < k2[2] end)
         -- print(inspect(commodity))
     end
-
-    -- print(inspect(bidtable))
-    -- print(inspect(bidtable["sugar"]))
 
     for commodity, commoditybook in pairs(bidtable) do
         -- commodity = enum.stockX
@@ -315,36 +342,27 @@ function marketplace.resolveOrders()
                     table.remove(bidtable[commodity], 1)
                 end
 
-print("Bravo")
-print(inspect(buyer.beliefRange))
+                print("Bravo")
+                print(inspect(buyer.beliefRange))
 
                 -- adjust beliefs
                 local summary = {}
-                if transactionamt > 0 then
-                    summary.commodity = commodity
-                    summary.buyer = buyer
-                    summary.beliefRange = buyer.beliefRange
-                    summary.bidprice = bidprice
-                    summary.askprice = askprice
-                    summary.bidqty = bidqty or 0
-                    summary.askqty = askqty or 0
-                    summary.transactionqty = transactionamt
-                    summary.transactiontotal = transactionprice * transactionamt
-                    summary.currentInventory = buyer.stock[commodity]
-                    summary.history = buyer.stockHistory[commodity]
-                else
-                    summary.commodity = commodity
-                    summary.buyer = buyer
-                    summary.bidprice = bidprice
-                    summary.askprice = askprice
-                    summary.bidqty = bidqty
-                    summary.askqty = askqty
-                    summary.transactionqty = transactionamt
-                    summary.transactiontotal = transactionprice * transactionamt
-                    summary.currentInventory = buyer.stock[commodity]
-                    summary.history = buyer.stockHistory[commodity]
-                end
+                summary.commodity = commodity
+                summary.buyer = buyer
+                summary.beliefRange = buyer.beliefRange
+                summary.bidprice = bidprice
+                summary.askprice = askprice
+                summary.bidqty = bidqty or 0
+                summary.askqty = askqty or 0
+                summary.transactionqty = transactionamt
+                summary.transactionprice = transactionprice
+                summary.currentInventory = buyer.stock[commodity]
+                summary.history = buyer.stockHistory[commodity]
+
                 adjustBiddersBeliefs(summary)
+
+                summary.seller = seller
+                adjustAskersBeliefs(summary)
 
                 -- print("**********************")
                 -- print("All bids (qty, price):")

@@ -285,6 +285,9 @@ function people.doMarketplace()
            askqty = cf.round(askqty)
 
            -- determine ask price
+           print("charlie")
+           print(stockoutput)
+           print(inspect(person.beliefRange[stockoutput]))
            local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
 
            -- register the ask
