@@ -287,10 +287,14 @@ function marketplace.resolveOrders()
                     -- update the memory for the buyer
                     table.insert(buyer.stockHistory[commodity], transactionprice)
 
+print("+++ stock history for agent 1 +++")
+print(inspect((buyer.stockHistory[commodity])))
+print("+++++++++++++++++++++++++++++++++")
+
                     -- update the memory for the seller
+                    table.insert(seller.stockHistory[commodity], transactionprice)
 
                     -- global history is updated in the love.main()
-
 
                     -- remove bid if qty satisfied
                     if bidtable[commodity][1][1] <= 0 then
@@ -300,13 +304,6 @@ function marketplace.resolveOrders()
                     if asktable[commodity][1][1] <= 0 then
                         table.remove(asktable[commodity], 1)
                     end
-
-                    -- record this in memory for each agent
-                    -- buyer is set up above and taken from bid table
-                    table.insert(buyer.stockHistory[commodity], transactionprice)
-
-                    table.insert(seller.stockHistory[commodity], transactionprice)
-
                 else
                     print("Price not agreed. Trade fails")
                     -- remove bid as bid price is too low to be satisfied
