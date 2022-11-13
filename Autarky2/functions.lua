@@ -74,9 +74,9 @@ function functions.initialiseMap()
     MARKETROW = marketrow
     MARKETCOL = marketcol
 
-    HISTORY[enum.historyFood] = {}
-    HISTORY[enum.historyHealth] = {}
-    HISTORY[enum.historyWealth] = {}
+    HISTORY[enum.stockFood] = {}
+    HISTORY[enum.stockHealth] = {}
+    HISTORY[enum.stockWealth] = {}
 end
 
 function functions.getTileXY(row, col)
@@ -112,9 +112,9 @@ function functions.RecordHistory(day)
         wealthsum = wealthsum + person.stock[enum.stockWealth]
     end
 
-    table.insert(HISTORY[enum.historyFood], foodsum/personcount)
-    table.insert(HISTORY[enum.historyHealth], healthsum/personcount)
-    table.insert(HISTORY[enum.historyWealth], wealthsum/personcount)
+    table.insert(HISTORY[enum.stockFood], foodsum/personcount)
+    table.insert(HISTORY[enum.stockHealth], healthsum/personcount)
+    table.insert(HISTORY[enum.stockWealth], wealthsum/personcount)
 end
 
 function functions.getEmptyTile()
@@ -143,5 +143,15 @@ function functions.getEmptyTile()
     end
     return row, col
 end
+
+function functions.getAvgPrice(stockhistory)
+    -- stockhistory = table of stock prices
+    local total = 0
+    for i = 1, #stockhistory do
+        total = total + stockhistory[i]
+    end
+    return total / #stockhistory
+end
+
 
 return functions

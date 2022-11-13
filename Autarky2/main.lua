@@ -123,10 +123,10 @@ function love.update(dt)
 			end
 
 			if WORLD_HOURS >= 24 then
+				-- do once per day
 				fun.RecordHistory(WORLD_DAYS)		-- record key stats for graphs etc. Do before the day ticker increments
 				WORLD_HOURS = WORLD_HOURS - 24
 				WORLD_DAYS = WORLD_DAYS + 1
-				-- do once per day
 			end
 		end
 

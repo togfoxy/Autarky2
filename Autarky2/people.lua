@@ -25,10 +25,16 @@ function people.initialise()
         PERSONS[i].stock = {}
         PERSONS[i].stock[enum.stockFood] = love.math.random(0,10)                 -- days
         PERSONS[i].stock[enum.stockHealth] = 100
-        PERSONS[i].stock[enum.stockWealth] = 10
+        PERSONS[i].stock[enum.stockWealth] = 100
 
-        PERSONS[i].beliefRange = {}                     -- eg PERSONS[i].beliefRange[enum.stockFood] = {1,10}
-        PERSONS[i].stockHistory = {}
+        PERSONS[i].beliefRange = {}     -- eg PERSONS[i].beliefRange[enum.stockFood] = {1,10}
+        PERSONS[i].beliefRange[enum.stockFood] = {}
+        PERSONS[i].beliefRange[enum.stockFood] = {1, 10}    --! will need to do this for all stock types
+
+        PERSONS[i].beliefRangeHistory = {}          --  .beliefRangeHistory[enum.stockFood][1] = (1,10})
+
+        PERSONS[i].stockHistory = {}    -- this is the stock price history known to this agent (not global)
+        PERSONS[i].stockHistory[enum.stockFood] = {}     --! need to repeat this for all stock
 
     end
 end

@@ -24,12 +24,13 @@ end
 
 local function determineMeanPrice(commodityKnowledge)
     -- returns three values
+    -- commodityKnowledge = a table of previous prices for the given commodity
 
     local countprice
     local minprice
     local maxprice
     local meanprice
-    local sumprice
+    local sumprice = 0
 
     countprice = #commodityKnowledge
     for i = 1, #commodityKnowledge do
@@ -124,64 +125,89 @@ function marketplace.createAsk(commodity, sellAtMostQty, askPrice, playerID)
     table.insert(asktable[commodity], ask)
 end
 
-local function adjustBiddersBeliefs()
+local function adjustBiddersBeliefs(summary)
 
     -- belief ranges are stored as following:
     -- persons[i].beliefRange["sugar"] = {1,10}
+    -- beliefRange["sugar"][1] = low belief
+    -- beliefRange["sugar"][2] = high belief
 
-    -- local highestbelief = beliefRange[commodity][2]
-    local bidqty
-    local transactionqty
-    local transactionprice
-    local maxqty        -- the most qty of this commodity this person can hold
-    local askprice
-    local meanprice     -- for this commodity based on what this person knows
+    -- bidqty = amount hoped to buy
+    -- askqty = amount seller asked to sell
+    -- transactionqty = amount actually bought
+    -- stockqty = actual inventory
+    -- avgprice = the average price for this stock according to persons knowledge
 
-    -- if most of the bid was filled then shrink the range
-    -- if at least 50% of offer filled then
-    --     local adjustamt = highestbelief * 0.10
-    --     beliefRange[commodity][1] = beliefRange[commodity][1] + adjustamt
-    --     beliefRange[commodity][2] = beliefRange[commodity][2] - adjustamt
-    -- else
-    --     -- bid not even half filled so raise the top of the range
-    --     local adjustamt = highestbelief * 0.10
-    --     beliefRange[commodity][2] = beliefRange[commodity][2] + adjustamt
-    -- end
-    --
-    -- -- if bid not completely filled and low on inventory then raise the range higher
-    -- if < 100% of offer filled and inventory <= 25% capacity then
-    --     local adjustamt = math.abs(transactionprice - known average price (mean))
-    --     beliefRange[commodity][1] = beliefRange[commodity][1] + adjustamt
-    --     beliefRange[commodity][2] = beliefRange[commodity][2] + adjustamt
-    -- elseif
-    --     -- bid was higher than the transaction price (i.e. trade was successful) then move range down
-    --     local adjustamt = (askprice - transactionprice) * 1.1
-    --     beliefRange[commodity][1] = beliefRange[commodity][1] - adjustamt
-    --     beliefRange[commodity][2] = beliefRange[commodity][2] - adjustamt
-    -- elseif
-    --     -- askqty > bidqty and askprice > known mean price then
-    --     local adjustamt = math.abs(askprice - known mean price) * 1. 1
-    --     beliefRange[commodity][1] = beliefRange[commodity][1] - adjustamt
-    --     beliefRange[commodity][2] = beliefRange[commodity][2] - adjustamt
-    -- elseif
-    --     -- bidqty was not satisfied then move range up
-    --     local adjustamt = (known mean price) * 0.20
-    --     beliefRange[commodity][1] = beliefRange[commodity][1] + adjustamt
-    --     beliefRange[commodity][2] = beliefRange[commodity][2] + adjustamt
-    -- else
-    --     local adjustamt = (known mean price) * 0.20
-    --     beliefRange[commodity][1] = beliefRange[commodity][1] - adjustamt
-    --     beliefRange[commodity][2] = beliefRange[commodity][2] - adjustamt
-    -- end
+    local buyer = summary.buyer
+    local commodity = summary.commodity
+    local beliefRange = buyer.beliefRange[commodity]        -- because the commodity is used as an input, this becomes beliefRange = {1,10}
+    local highestbelief = buyer.beliefRange[commodity][2]
+    local transactionqty = summary.transactionqty
+    local bidqty = summary.bidqty or 0
+    local askqty = summary.askqty
+    local stockqty = summary.currentInventory
+    local transactionprice = summary.transactiontotal
+    local avgprice = summary.history  --! that ain't gunna work!!
+    local bidprice = summary.bidprice
+    local askprice = summary.askprice
+    local avgprice = fun.getAvgPrice(buyer.stockHistory[commodity])
+
+    if bidqty == nil then bidqty = 0 end
+    if askqty == nil then askqty = 0 end
+
+    -- begin algorithm
+    if transactionqty >= (bidqty / 2) then
+        -- move range inwards
+        local adjustamt = highestbelief * 0.10
+
+-- print("alpha")
+-- print(commodity, adjustamt)
+-- print(inspect(beliefRange))
+-- print(beliefRange[1])
+
+        beliefRange[1] = beliefRange[1] + adjustamt
+        beliefRange[2] = beliefRange[2] - adjustamt
+    else
+        -- bid not even half satisfied (supply shortage so raise the upper belief range
+        local adjustamt = highestbelief * 0.10
+        beliefRange[2] = beliefRange[2] + adjustamt
+    end
+
+    -- if bid not completely filled and low on inventory then raise the range higher
+    if transactionqty < (bidqty / 2) and stockqty <= 3 then     --! the 3 is an arbitrary value
+        local adjustamt = math.abs(transactionprice - avgprice)
+        beliefRange[1] = beliefRange[1] + adjustamt
+        beliefRange[2] = beliefRange[2] + adjustamt
+    elseif bidprice > transactionprice then
+        -- bid was higher than the transaction price (i.e. trade was successful but paid too much) then move range down
+        local adjustamt = (bidprice - transactionprice) * 1.1
+        beliefRange[1] = beliefRange[1] - adjustamt
+        beliefRange[2] = beliefRange[2] - adjustamt
+    elseif askqty > bidqty and bidprice > avgprice then
+        local adjustamt = math.abs(askprice - avgprice) * 1.1
+        beliefRange[1] = beliefRange[1] - adjustamt
+        beliefRange[2] = beliefRange[2] - adjustamt
+    elseif bidqty > askqty then
+        -- bidqty was not satisfied so move range up
+        local adjustamt = (avgprice) * 0.20
+        beliefRange[1] = beliefRange[1] + adjustamt
+        beliefRange[2] = beliefRange[2] + adjustamt
+    else
+        local adjustamt = (avgprice) * 0.20
+        beliefRange[1] = beliefRange[1] - adjustamt
+        beliefRange[2] = beliefRange[2] - adjustamt
+    end
+
+    table.insert(buyer.beliefRangeHistory, {beliefRange[1], beliefRange[2]})
+
+
+--PERSONS[i].beliefRangeHistory = {}          --  .beliefRangeHistory[enum.stockFood][1] = (1,10})
+
+
 end
 
 local function adjustAskersBeliefs()
 
-end
-
-local function adjustBeliefs()
-    adjustBiddersBeliefs()
-    adjustAskersBeliefs()
 end
 
 function marketplace.resolveOrders()
@@ -213,27 +239,34 @@ function marketplace.resolveOrders()
     -- print(inspect(bidtable["sugar"]))
 
     for commodity, commoditybook in pairs(bidtable) do
-        print(commodity, inspect(commoditybook))
-
+        -- commodity = enum.stockX
         for k, v in pairs(commoditybook) do
-            print("*******************")
-            print("* Processing commodity ID: " .. commodity)
-            print("*******************")
+            -- print("*******************")
+            -- print("* Processing commodity ID: " .. commodity)
+            -- print("*******************")
 
             while bidtable[commodity] ~= nil and asktable[commodity] ~= nil and
             #bidtable[commodity] ~= 0 and #asktable[commodity] ~= 0 do
-                -- the [1] indicates the first item (top of sorted table)
+                local bidprice, askprice, bidqty, askqty, buyer
+                local outcome = {}
+                local transactionprice, transactionamt = 0,0
+
+                buyer = people.get(bidtable[commodity][1][3])        -- get the person object
+                seller = people.get(asktable[commodity][1][3])
+
+                -- the [1] indicates the first item in the table (top of sorted table)
                 -- the [2] indicates the bid/ask price (not qty)
-                local bidprice = bidtable[commodity][1][2]
+                -- the qty traded is determined if and only if a price is agreed
+                bidprice = bidtable[commodity][1][2]
                 print("Bid price is $" .. bidprice)
-                local askprice = asktable[commodity][1][2]
+                askprice = asktable[commodity][1][2]
                 print("Ask price is $" .. askprice)
 
                 if bidprice >= askprice then
-                    local transactionprice = (bidprice + askprice) / 2      --! this is a float
+                    transactionprice = (bidprice + askprice) / 2      --! this is a float
                     print("Price agreed at $" .. transactionprice)
-                    local bidqty = bidtable[commodity][1][1]
-                    local askqty = asktable[commodity][1][1]
+                    bidqty = bidtable[commodity][1][1]
+                    askqty = asktable[commodity][1][1]
                     print("Bid qty = " .. bidqty .. " and ask qty = " .. askqty)
                     if askqty >= bidqty then
                         -- purchase fully satisfied
@@ -243,19 +276,30 @@ function marketplace.resolveOrders()
                     end
 
                     -- adjust bidqty/askqty by math.min
-                    local transactionamt = math.min(bidqty, askqty)
+                    transactionamt = math.min(bidqty, askqty)
                     bidtable[commodity][1][1] = bidtable[commodity][1][1] - transactionamt
                     asktable[commodity][1][1] = asktable[commodity][1][1] - transactionamt
 
-                    --! record the transaction somewhere
-                    local outcome = {}
+                    -- record the transaction before we clear the bid/ask table
                     -- [3] is the players guid specifed during createBid/createAsk
                     outcome.buyerguid = bidtable[commodity][1][3]
                     outcome.sellerguid = asktable[commodity][1][3]
                     outcome.commodityID = commodity
                     outcome.transactionTotalPrice = transactionprice * transactionamt
                     outcome.transactionTotalQty = transactionamt
-                    table.insert(results, outcome)
+                    table.insert(results, outcome)  -- results is returned to the parent function
+
+                    -- update the memory for the buyer
+                    table.insert(buyer.stockHistory[commodity], transactionprice)
+
+                    -- print("+++ stock history for agent 1 +++")
+                    -- print(inspect((buyer.stockHistory[commodity])))
+                    -- print("+++++++++++++++++++++++++++++++++")
+
+                    -- update the memory for the seller
+                    table.insert(seller.stockHistory[commodity], transactionprice)
+
+                    -- global history is updated in the love.main()
 
                     -- remove bid if qty satisfied
                     if bidtable[commodity][1][1] <= 0 then
@@ -265,35 +309,57 @@ function marketplace.resolveOrders()
                     if asktable[commodity][1][1] <= 0 then
                         table.remove(asktable[commodity], 1)
                     end
-
-                    -- loop
-
                 else
                     print("Price not agreed. Trade fails")
                     -- remove bid as bid price is too low to be satisfied
                     table.remove(bidtable[commodity], 1)
                 end
 
-    -- print("**********************")
-    -- print("All bids (qty, price):")
-    -- print(inspect(bidtable))
-    -- print("All asks (qty, price):")
-    -- print(inspect(asktable))
-    -- print("**********************")
-    -- print(asktable[3] == {})
-    -- print(asktable[3] == nil)
-    -- print(#asktable[3])
-    -- print("~~~~~~~~~~~~~~~~~~~~~~")
+print("Bravo")
+print(inspect(buyer.beliefRange))
 
+                -- adjust beliefs
+                local summary = {}
+                if transactionamt > 0 then
+                    summary.commodity = commodity
+                    summary.buyer = buyer
+                    summary.beliefRange = buyer.beliefRange
+                    summary.bidprice = bidprice
+                    summary.askprice = askprice
+                    summary.bidqty = bidqty or 0
+                    summary.askqty = askqty or 0
+                    summary.transactionqty = transactionamt
+                    summary.transactiontotal = transactionprice * transactionamt
+                    summary.currentInventory = buyer.stock[commodity]
+                    summary.history = buyer.stockHistory[commodity]
+                else
+                    summary.commodity = commodity
+                    summary.buyer = buyer
+                    summary.bidprice = bidprice
+                    summary.askprice = askprice
+                    summary.bidqty = bidqty
+                    summary.askqty = askqty
+                    summary.transactionqty = transactionamt
+                    summary.transactiontotal = transactionprice * transactionamt
+                    summary.currentInventory = buyer.stock[commodity]
+                    summary.history = buyer.stockHistory[commodity]
+                end
+                adjustBiddersBeliefs(summary)
 
+                -- print("**********************")
+                -- print("All bids (qty, price):")
+                -- print(inspect(bidtable))
+                -- print("All asks (qty, price):")
+                -- print(inspect(asktable))
+                -- print("**********************")
+                -- print(asktable[3] == {})
+                -- print(asktable[3] == nil)
+                -- print(#asktable[3])
+                -- print("~~~~~~~~~~~~~~~~~~~~~~")
 
             end
-            print(commodity, "Bids left: " .. inspect(commoditybook))
         end
     end
-
-    --! adjust beliefs
-    adjustBeliefs()
 
     -- clear bids and asks so it is ready for next round
     bidtable = {}

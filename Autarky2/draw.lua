@@ -70,9 +70,9 @@ function draw.graphs()
     love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
     drawy = drawy + 100
 
-    for i = 1, #HISTORY[enum.historyFood] do
+    for i = 1, #HISTORY[enum.stockFood] do
         drawx = drawx + 1
-        local yvalue = drawy - HISTORY[enum.historyFood][i]
+        local yvalue = drawy - HISTORY[enum.stockFood][i]
         love.graphics.points(drawx, yvalue)
     end
 
@@ -86,9 +86,9 @@ function draw.graphs()
     love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
     drawy = drawy + 100
 
-    for i = 1, #HISTORY[enum.historyHealth] do
+    for i = 1, #HISTORY[enum.stockHealth] do
         drawx = drawx + 1
-        local yvalue = drawy - HISTORY[enum.historyHealth][i]
+        local yvalue = drawy - HISTORY[enum.stockHealth][i]
         love.graphics.points(drawx, yvalue)
     end
 
@@ -100,9 +100,9 @@ function draw.graphs()
     love.graphics.line(drawx, drawy, drawx, drawy + 100)
     love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
     drawy = drawy + 100
-    for i = 1, #HISTORY[enum.historyWealth] do
+    for i = 1, #HISTORY[enum.stockWealth] do
         drawx = drawx + 1
-        local yvalue = drawy - HISTORY[enum.historyWealth][i]
+        local yvalue = drawy - HISTORY[enum.stockWealth][i]
         love.graphics.points(drawx, yvalue)
     end
 
