@@ -127,6 +127,9 @@ function love.update(dt)
 				fun.RecordHistory(WORLD_DAYS)		-- record key stats for graphs etc. Do before the day ticker increments
 				WORLD_HOURS = WORLD_HOURS - 24
 				WORLD_DAYS = WORLD_DAYS + 1
+
+				print("Person 1 belief history")
+				print(inspect(PERSONS[1].beliefRangeHistory))
 			end
 		end
 

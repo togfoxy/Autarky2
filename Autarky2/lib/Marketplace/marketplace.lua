@@ -248,9 +248,9 @@ local function adjustAskersBeliefs(summary)
     local avgprice = fun.getAvgPrice(seller.stockHistory[commodity])
 
 
-print("yankee")
-print(beliefRange[1])
-print(beliefRange[2])
+    -- print("yankee")
+    -- print(beliefRange[1])
+    -- print(beliefRange[2])
 
     -- begin algorithm
     local weight = 1 - (transactionqty - askqty)
@@ -262,32 +262,32 @@ print(beliefRange[2])
         local adjustamt = displacement * (1/6)
         beliefRange[1] = beliefRange[1] - adjustamt
         beliefRange[2] = beliefRange[2] - adjustamt
-        print("xray")
-        print(transactionqty, askqty, weight, avgprice, displacement, adjustamt)
-        print(beliefRange[1])
-        print(beliefRange[2])
+        -- print("xray")
+        -- print(transactionqty, askqty, weight, avgprice, displacement, adjustamt)
+        -- print(beliefRange[1])
+        -- print(beliefRange[2])
     else
         if transactionqty < (askqty * 0.75) then
             local adjustamt = displacement * (1/7)
             beliefRange[1] = beliefRange[1] - adjustamt
             beliefRange[2] = beliefRange[2] - adjustamt
-            print("victor")
-            print(beliefRange[1])
-            print(beliefRange[2])
+            -- print("victor")
+            -- print(beliefRange[1])
+            -- print(beliefRange[2])
         else
             local adjustamt = avgprice * 0.2
             if bidqty > askqty then
                 beliefRange[1] = beliefRange[1] + adjustamt
                 beliefRange[2] = beliefRange[2] + adjustamt
-                print("whiskey")
-                print(beliefRange[1])
-                print(beliefRange[2])
+                -- print("whiskey")
+                -- print(beliefRange[1])
+                -- print(beliefRange[2])
             else
                 beliefRange[1] = beliefRange[1] - adjustamt
                 beliefRange[2] = beliefRange[2] - adjustamt
-                print("lima")
-                print(beliefRange[1])
-                print(beliefRange[2])
+                -- print("lima")
+                -- print(beliefRange[1])
+                -- print(beliefRange[2])
             end
         end
     end
@@ -300,9 +300,9 @@ print(beliefRange[2])
 
     table.insert(seller.beliefRangeHistory, {beliefRange[1], beliefRange[2]})
 
-print("zulu")
-print(beliefRange[1])
-print(beliefRange[2])
+    -- print("zulu")
+    -- print(beliefRange[1])
+    -- print(beliefRange[2])
 
     assert(beliefRange[1] > 0)
     assert(beliefRange[2] > 0)

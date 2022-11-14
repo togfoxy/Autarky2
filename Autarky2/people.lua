@@ -2,7 +2,7 @@ people = {}
 
 function people.initialise()
 
-    local numofppl = 2
+    local numofppl = 6
 
     for i = 1, numofppl do
         PERSONS[i] = {}
@@ -32,6 +32,7 @@ function people.initialise()
         PERSONS[i].beliefRange[enum.stockFood] = {1, 10}    --! will need to do this for all stock types
 
         PERSONS[i].beliefRangeHistory = {}          --  .beliefRangeHistory[enum.stockFood][1] = (1,10})
+        PERSONS[i].beliefRangeHistory[1] = {1, 10}
 
         PERSONS[i].stockHistory = {}    -- this is the stock price history known to this agent (not global)
         PERSONS[i].stockHistory[enum.stockFood] = {5}     --! need to repeat this for all stock
