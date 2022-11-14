@@ -23,7 +23,9 @@ function marketplace.determineCommodityPrice(beliefRange)
         local str = "Assert failed: " .. min, max
         error(str)
     end
-    return love.math.random(min, max)       --! only does whole numbers
+    local result = love.math.random(min, max)   -- only does whole numbers
+    if result < 0.5 then result = 0.5 end
+    return result
 end
 
 local function determineMeanPrice(commodityKnowledge)
@@ -49,7 +51,7 @@ local function determineMeanPrice(commodityKnowledge)
     end
     local meanprice
     if countprice == 0 then
-        meanprice = 5       --! might need to build in a default average at some point
+        meanprice = 5       -- might need to build in a default average at some point
     else
         meanprice = sumprice / countprice
     end
@@ -83,7 +85,7 @@ function marketplace.determineQty(maxQty, commodityKnowledge)
 
     -- determine key prices for this commodity
     minprice, maxprice, meanprice = determineMeanPrice(commodityKnowledge)
-    if maxprice == nil then maxprice = 10 end   --! need to treat mean price the same as min/max price
+    if maxprice == nil then maxprice = 10 end
     if minprice == nil then minprice = 1 end
 
     -- determine where the mean sits in the observed range
@@ -153,7 +155,7 @@ local function adjustBiddersBeliefs(summary)
     local transactionprice = summary.transactionprice
     local bidprice = summary.bidprice
     local askprice = summary.askprice
-    local avgprice = fun.getAvgPrice(buyer.stockHistory[commodity])
+    local avgprice = fun.getAvgPrice(buyer.stockPriceHistory[commodity])
 
     if bidqty == nil then bidqty = 0 end
     if askqty == nil then askqty = 0 end
@@ -245,7 +247,7 @@ local function adjustAskersBeliefs(summary)
     local transactionprice = summary.transactionprice
     local commodity = summary.commodity
     local beliefRange = seller.beliefRange[commodity]        -- because the commodity is used as an input, this becomes beliefRange = {1,10}
-    local avgprice = fun.getAvgPrice(seller.stockHistory[commodity])
+    local avgprice = fun.getAvgPrice(seller.stockPriceHistory[commodity])
 
 
     -- print("yankee")
@@ -359,7 +361,8 @@ function marketplace.resolveOrders()
                 print("Ask price is $" .. askprice)
 
                 if bidprice >= askprice then
-                    transactionprice = (bidprice + askprice) / 2      --! this is a float
+                    transactionprice = (bidprice + askprice) / 2      -- this is a float
+                    transactionprice = cf.round(transactionprice, 1)
                     print("Price agreed at $" .. transactionprice)
                     bidqty = bidtable[commodity][1][1]
                     askqty = asktable[commodity][1][1]
@@ -386,14 +389,14 @@ function marketplace.resolveOrders()
                     table.insert(results, outcome)  -- results is returned to the parent function
 
                     -- update the memory for the buyer
-                    table.insert(buyer.stockHistory[commodity], transactionprice)
+                    table.insert(buyer.stockPriceHistory[commodity], transactionprice)
 
                     -- print("+++ stock history for agent 1 +++")
-                    -- print(inspect((buyer.stockHistory[commodity])))
+                    -- print(inspect((buyer.stockPriceHistory[commodity])))
                     -- print("+++++++++++++++++++++++++++++++++")
 
                     -- update the memory for the seller
-                    table.insert(seller.stockHistory[commodity], transactionprice)
+                    table.insert(seller.stockPriceHistory[commodity], transactionprice)
 
                     -- global history is updated in the love.main()
 
@@ -423,7 +426,7 @@ function marketplace.resolveOrders()
                 summary.transactionqty = transactionamt
                 summary.transactionprice = transactionprice
                 summary.currentInventory = buyer.stock[commodity]
-                summary.history = buyer.stockHistory[commodity]
+                summary.history = buyer.stockPriceHistory[commodity]
                 adjustBiddersBeliefs(summary)
 
                 print("Bravo: buyer belief range after adjustment")

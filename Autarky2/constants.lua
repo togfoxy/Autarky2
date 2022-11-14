@@ -21,7 +21,6 @@ function constants.load()
     SPRITES = {}
     QUADS = {}
 
-    NUMBER_OF_STOCK_TYPES = 1
     HISTORY = {}
 
     WORLD_HOURS = 5
@@ -46,14 +45,20 @@ function constants.load()
     enum = {}
     enum.well = 1       -- this is for image and structure type
     enum.market = 2
+
+    -- stock types
+    NUMBER_OF_STOCK_TYPES = 3
     enum.stockHealth = 1
     enum.stockWealth = 2
+
+    --# update NUMBER_OF_STOCK_TYPES constant when adding new stock types
 
     enum.farm = 3
     enum.jobFarmer = 3      -- job and icon need to have the same number
     enum.iconFarmer = 103   -- offset the icon by 100
     enum.stockFood = 3
 
+    enum.stockLogs = 4
 
 
     -- sprites and quads

@@ -5,7 +5,7 @@ inspect = require 'lib.inspect'
 res = require 'lib.resolution_solution'
 -- https://github.com/Vovkiv/resolution_solution
 
-marketplace = require 'lib.Marketplace.marketplace'
+marketplace = require 'lib.marketplace'
 
 cf = require 'lib.commonfunctions'
 fun = require 'functions'
@@ -37,8 +37,7 @@ function love.keyreleased( key, scancode )
 				person.workcol = col
                 person.occupationstockgain = love.math.random(15,25) / 10	-- (1.5 -> 2.5)
 				person.occupationstockinput = nil
-				person.occupationstockoutput = enum.stockFood		--! this is probably redundant and same as occupationstock
-
+				person.occupationstockoutput = enum.stockFood
 			end
 		end
 	end
@@ -140,7 +139,7 @@ function love.update(dt)
 
 		-- dinner time
 		if WORLD_HOURS == 18 then
-			print("Nom")		--!
+			print("Nom")
 			people.eat()
 		end
 

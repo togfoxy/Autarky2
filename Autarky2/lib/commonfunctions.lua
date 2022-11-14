@@ -87,7 +87,7 @@ function ScaleVector(x,y,fctor)
 	-- Receive a vector (0,0, -> x,y) and scale/multiply it by factor
 	-- returns a new vector (assuming origin)
 	return x * fctor, y * fctor
-	--! should create a vector module
+	-- should create a vector module one day
 end
 function AddVectorToPoint(x,y,headingdegrees,distance)
 	-- x/y = a point in space
