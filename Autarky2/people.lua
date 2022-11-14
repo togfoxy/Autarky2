@@ -249,7 +249,7 @@ end
 function people.doMarketplace()
     -- determine if they need to buy/sell
     for k, person in pairs(PERSONS) do
-        if person.stock[enum.stockFood] < 7 then
+        if person.stock[enum.stockFood] < 7 and person.occupation ~= enum.jobFarmer then
             -- try to buy food
             local wealth = person.stock[enum.stockWealth]
 
@@ -265,6 +265,9 @@ function people.doMarketplace()
 
             -- register the bid
             marketplace.createBid(enum.stockFood, bidqty, bidprice, person.guid)
+
+            -- set destination = market
+            fun.getRandomMarketXY(person)
         end
 
         -- make a bid (buy)     -- if there are lots of bids and they are all succesful then agent could be in debt
@@ -278,6 +281,9 @@ function people.doMarketplace()
             local bidqty = marketplace.determineQty(maxqtytobuy, person.stockHistory[stockinput])       -- accepts nil history
             bidqty = cf.round(bidqty)
             marketplace.createBid(stockinput, bidqty, bidprice, person.guid)
+
+            -- set destination = market
+            fun.getRandomMarketXY(person)
         end
 
         -- make an ask (sell)
@@ -292,6 +298,9 @@ function people.doMarketplace()
 
            -- register the ask
            marketplace.createAsk(stockoutput, askqty, askprice, person.guid)
+
+           -- set destination = market
+           fun.getRandomMarketXY(person)
         end
 
         --! need something about buying luxuries (wants)

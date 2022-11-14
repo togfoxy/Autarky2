@@ -153,5 +153,17 @@ function functions.getAvgPrice(stockhistory)
     return total / #stockhistory
 end
 
+function functions.getRandomMarketXY(person)
+    -- get a row/col and and x/y when moving to the market
+    -- only use when it's known the person needs to go to market
+
+    person.destrow = MARKETROW
+    person.destcol = MARKETCOL
+    local min = 0 + (PERSONS_RADIUS * 2)
+    local max = TILE_SIZE - (PERSONS_RADIUS * 2)
+    person.destx = love.math.random(min, max)
+    person.desty = love.math.random(min, max)
+end
+
 
 return functions

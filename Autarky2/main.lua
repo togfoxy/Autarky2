@@ -118,7 +118,7 @@ function love.update(dt)
 				people.assignDestination(WORLD_HOURS)
 			end
 
-			if WORLD_HOURS == 18 then
+			if WORLD_HOURS == 20 then
 				people.assignDestination(WORLD_HOURS)
 			end
 
@@ -139,12 +139,12 @@ function love.update(dt)
 		end
 
 		-- dinner time
-		if WORLD_HOURS == 19 then
+		if WORLD_HOURS == 18 then
 			print("Nom")		--!
 			people.eat()
 		end
 
-		if WORLD_HOURS == 20 then
+		if WORLD_HOURS == 19 then
 			-- market time
 			people.doMarketplace()
 		end
