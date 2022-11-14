@@ -28,14 +28,23 @@ function people.initialise()
         PERSONS[i].stock[enum.stockWealth] = 100
 
         PERSONS[i].beliefRange = {}     -- eg PERSONS[i].beliefRange[enum.stockFood] = {1,10}
-        PERSONS[i].beliefRange[enum.stockFood] = {}
-        PERSONS[i].beliefRange[enum.stockFood] = {1, 10}    --! will need to do this for all stock types
-
         PERSONS[i].beliefRangeHistory = {}          --  .beliefRangeHistory[enum.stockFood][1] = (1,10})
-        PERSONS[i].beliefRangeHistory[1] = {1, 10}
 
-        PERSONS[i].stockHistory = {}    -- this is the stock price history known to this agent (not global)
-        PERSONS[i].stockHistory[enum.stockFood] = {5}     --! need to repeat this for all stock
+        PERSONS[i].stockPriceHistory = {}    -- this is the stock price history known to this agent (not global)
+        PERSONS[i].stockPriceHistory[enum.stockFood] = {5}     --! need to repeat this for all stock
+
+        for i = 1, NUMBER_OF_STOCK_TYPES do
+            for k, person in pairs(PERSONS) do
+                person.beliefRange[i] = {}
+                person.beliefRange[i] = {1,10}
+
+                person.beliefRangeHistory[i] = {}
+                person.beliefRangeHistory[i] = {1, 10}
+
+                person.stockPriceHistory[i] = {}
+                person.stockPriceHistory[i] = {5}
+            end
+        end
 
 
 
@@ -260,7 +269,7 @@ function people.doMarketplace()
             local maxqtycanafford = wealth / bidprice
             local maxqtycanhold = 14 - person.stock[enum.stockFood]
             local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
-            local bidqty = marketplace.determineQty(maxqtytobuy, person.stockHistory[enum.stockFood])       -- accepts nil history
+            local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[enum.stockFood])       -- accepts nil history
             bidqty = cf.round(bidqty)
 
             -- register the bid
@@ -278,7 +287,7 @@ function people.doMarketplace()
             local maxqtycanafford = wealth / bidprice
             local maxqtycanhold = 14 - person.stock[stockinput]
             local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
-            local bidqty = marketplace.determineQty(maxqtytobuy, person.stockHistory[stockinput])       -- accepts nil history
+            local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[stockinput])       -- accepts nil history
             bidqty = cf.round(bidqty)
             marketplace.createBid(stockinput, bidqty, bidprice, person.guid)
 
@@ -290,7 +299,7 @@ function people.doMarketplace()
         local stockoutput = person.occupationstockoutput        -- stock type
         if stockoutput ~= nil and person.stock[stockoutput] > 7 then
            local maxqtytosell = person.stock[stockoutput]
-           local askqty = marketplace.determineQty(maxqtytosell, person.stockHistory[stockoutput]) -- commodity, maxQty, commodityKnowledge
+           local askqty = marketplace.determineQty(maxqtytosell, person.stockPriceHistory[stockoutput]) -- commodity, maxQty, commodityKnowledge
            askqty = cf.round(askqty)
 
            -- determine ask price

@@ -104,17 +104,16 @@ function functions.RecordHistory(day)
     local healthsum = 0
     local wealthsum = 0
 
-    -- get some stats
-    for k, person in pairs(PERSONS) do
-        --! need to make this smarter and scalable
-        foodsum = foodsum + person.stock[enum.stockFood]
-        healthsum = healthsum + person.stock[enum.stockHealth]
-        wealthsum = wealthsum + person.stock[enum.stockWealth]
+    -- calculate average stock qty across the whole population
+    -- used to report graphs to the player
+    for i = 1, NUMBER_OF_STOCK_TYPES do
+        local sum = 0
+        for _, person in pairs(PERSONS) do
+            sum = sum + person.stock[i]
+        end
+        local avg = sum / #PERSONS
+        table.insert(HISTORY[i], avg)
     end
-
-    table.insert(HISTORY[enum.stockFood], foodsum/personcount)
-    table.insert(HISTORY[enum.stockHealth], healthsum/personcount)
-    table.insert(HISTORY[enum.stockWealth], wealthsum/personcount)
 end
 
 function functions.getEmptyTile()
@@ -144,13 +143,13 @@ function functions.getEmptyTile()
     return row, col
 end
 
-function functions.getAvgPrice(stockhistory)
-    -- stockhistory = table of stock prices
+function functions.getAvgPrice(stockPriceHistory)
+    -- stockPriceHistory = table of stock prices
     local total = 0
-    for i = 1, #stockhistory do
-        total = total + stockhistory[i]
+    for i = 1, #stockPriceHistory do
+        total = total + stockPriceHistory[i]
     end
-    return total / #stockhistory
+    return total / #stockPriceHistory
 end
 
 function functions.getRandomMarketXY(person)
