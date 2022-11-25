@@ -15,6 +15,7 @@ function constants.load()
     GAME_LOG_DRAWX = SCREEN_WIDTH - 275
     MAP = {}
     SHOW_GRAPH = false
+    MARKET_RESOLVED = false
 
     SCREEN_STACK = {}
     IMAGES = {}
@@ -47,18 +48,29 @@ function constants.load()
     enum.market = 2
 
     -- stock types
-    NUMBER_OF_STOCK_TYPES = 3
+
     enum.stockHealth = 1
     enum.stockWealth = 2
 
-    --# update NUMBER_OF_STOCK_TYPES constant when adding new stock types
 
-    enum.farm = 3
+
+    enum.structureFarm = 3
     enum.jobFarmer = 3      -- job and icon need to have the same number
     enum.iconFarmer = 103   -- offset the icon by 100
     enum.stockFood = 3
 
+    enum.structureLogs = 4
     enum.stockLogs = 4
+    enum.jobWoodsman = 4
+    enum.iconWoodsman = 104
+
+    enum.jobHealer = 5
+    enum.stockHerbs = 5
+    enum.structureHealer = 5
+    enum.iconHealer = 105
+
+    --# update NUMBER_OF_STOCK_TYPES constant when adding new stock types
+    NUMBER_OF_STOCK_TYPES = 5
 
 
     -- sprites and quads

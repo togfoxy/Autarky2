@@ -4,7 +4,9 @@ function functions.loadImages()
 	-- structure tiles
     IMAGES[enum.well] = love.graphics.newImage("assets/images/well_50x45.png")
     IMAGES[enum.market] = love.graphics.newImage("assets/images/market_50x50.png")
-    IMAGES[enum.farm] = love.graphics.newImage("assets/images/appletree_50x50.png")
+    IMAGES[enum.structureFarm] = love.graphics.newImage("assets/images/appletree_50x50.png")
+    IMAGES[enum.structureLogs] = love.graphics.newImage("assets/images/woodsman.png")
+    IMAGES[enum.structureHealer] = love.graphics.newImage("assets/images/healerhouse.png")
 
     -- quads
     SPRITES[enum.spriteBlueWoman] = love.graphics.newImage("assets/images/Civilian Female Walk Blue.png")
@@ -15,7 +17,8 @@ function functions.loadImages()
 
     -- icons
     IMAGES[enum.iconFarmer] = love.graphics.newImage("assets/images/appleicon64x64.png")
-
+    IMAGES[enum.iconWoodsman] = love.graphics.newImage("assets/images/axeicon64x64.png")
+    IMAGES[enum.iconHealer] = love.graphics.newImage("assets/images/healericon64x64.png")
 end
 
 function functions.initialiseMap()

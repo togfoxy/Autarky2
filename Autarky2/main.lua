@@ -31,7 +31,7 @@ function love.keyreleased( key, scancode )
 
 				person.occupation = enum.jobFarmer
 				local row, col = fun.getEmptyTile()
-				MAP[row][col].structure = enum.farm
+				MAP[row][col].structure = enum.structureFarm
 				MAP[row][col].owner = person.guid
 				person.workrow = row
 				person.workcol = col
@@ -41,11 +41,50 @@ function love.keyreleased( key, scancode )
 			end
 		end
 	end
+	if key == "w" then
+		-- woodsman
+		for k, person in pairs(PERSONS) do
+			if person.isSelected and person.occupation == nil then
+				person.isSelected = false
+				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1
+
+				person.occupation = enum.jobWoodsman
+				local row, col = fun.getEmptyTile()
+				MAP[row][col].structure = enum.structureLogs
+				MAP[row][col].owner = person.guid
+				person.workrow = row
+				person.workcol = col
+                person.occupationstockgain = love.math.random(5,12) / 10	-- (0.5 -> 1.2)
+				person.occupationstockinput = nil
+				person.occupationstockoutput = enum.stockLogs
+			end
+		end
+	end
+	if key == "h" then
+		--healer
+		for k, person in pairs(PERSONS) do
+			if person.isSelected and person.occupation == nil then
+				person.isSelected = false
+				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1
+
+				person.occupation = enum.jobHealer
+				local row, col = fun.getEmptyTile()
+				MAP[row][col].structure = enum.structureHealer
+				MAP[row][col].owner = person.guid
+				person.workrow = row
+				person.workcol = col
+                --! person.occupationstockgain = love.math.random(5,10) / 10	-- (0.5 -> 1.0)
+				person.occupationstockgain = love.math.random(2,5)
+				person.occupationstockinput = nil
+				person.occupationstockoutput = enum.stockHerbs
+			end
+		end
+
+
+	end
 end
 
 function love.mousepressed( x, y, button, istouch, presses )
-
-
 	local gamex, gamey = res.toGame(x, y)
 	if button == 1 then
 		-- select the villager if clicked, else select the tile (further down)
@@ -123,12 +162,16 @@ function love.update(dt)
 
 			if WORLD_HOURS >= 24 then
 				-- do once per day
+				people.heal()
 				fun.RecordHistory(WORLD_DAYS)		-- record key stats for graphs etc. Do before the day ticker increments
 				WORLD_HOURS = WORLD_HOURS - 24
 				WORLD_DAYS = WORLD_DAYS + 1
 
-				print("Person 1 belief history")
-				print(inspect(PERSONS[1].beliefRangeHistory))
+				MARKET_RESOLVED = false 			-- reset this every midnight
+
+				-- print("Person 1 belief history (food and herbs)")
+				-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockFood]))
+				-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockHerbs]))
 			end
 		end
 
@@ -145,7 +188,10 @@ function love.update(dt)
 
 		if WORLD_HOURS == 19 then
 			-- market time
-			people.doMarketplace()
+			if not MARKET_RESOLVED then
+				people.doMarketplace()
+				MARKET_RESOLVED = true
+			end
 		end
 	end
 	res.update()

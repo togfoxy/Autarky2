@@ -23,9 +23,6 @@ function people.initialise()
 
         PERSONS[i].occupation = nil
         PERSONS[i].stock = {}
-        PERSONS[i].stock[enum.stockFood] = love.math.random(0,10)                 -- days
-        PERSONS[i].stock[enum.stockHealth] = 100
-        PERSONS[i].stock[enum.stockWealth] = 100
 
         PERSONS[i].beliefRange = {}     -- eg PERSONS[i].beliefRange[enum.stockFood] = {1,10}
         PERSONS[i].beliefRangeHistory = {}          --  .beliefRangeHistory[enum.stockFood][1] = (1,10})
@@ -33,19 +30,33 @@ function people.initialise()
         PERSONS[i].stockPriceHistory = {}    -- this is the stock price history known to this agent (not global)
         PERSONS[i].stockPriceHistory[enum.stockFood] = {5}     --! need to repeat this for all stock
 
-        for i = 1, NUMBER_OF_STOCK_TYPES do
-            for k, person in pairs(PERSONS) do
-                person.beliefRange[i] = {}
-                person.beliefRange[i] = {1,10}
 
-                person.beliefRangeHistory[i] = {}
-                person.beliefRangeHistory[i] = {1, 10}
 
-                person.stockPriceHistory[i] = {}
-                person.stockPriceHistory[i] = {5}
-            end
+    end
+    for j = 1, NUMBER_OF_STOCK_TYPES do
+
+        HISTORY[j] = {}
+
+        for _, person in pairs(PERSONS) do
+
+            person.stock[j] = 0
+
+            person.beliefRange[j] = {}
+            person.beliefRange[j] = {1,10}
+
+            person.beliefRangeHistory[j] = {}
+            person.beliefRangeHistory[j] = {1, 10}
+
+            person.stockPriceHistory[j] = {}
+            person.stockPriceHistory[j] = {5}
+
+            -- this happens AFTER the above loop to override and set correct initial values
+            person.stock[enum.stockFood] = love.math.random(0,10)                 -- days
+            person.stock[enum.stockHealth] = 100
+            person.stock[enum.stockWealth] = 100
+
+
         end
-
 
 
     end
@@ -60,6 +71,8 @@ local function drawDebug(person)
     txt = txt .. "Food: " .. person.stock[enum.stockFood] .. "\n"
     txt = txt .. "Health: " .. person.stock[enum.stockHealth] .. "\n"
     txt = txt .. "Wealth: " .. person.stock[enum.stockWealth] .. "\n"
+    txt = txt .. "Logs: " .. person.stock[enum.stockLogs] .. "\n"
+    txt = txt .. "Herbs: " .. person.stock[enum.stockHerbs] .. "\n"
 
     love.graphics.setColor(1,1,1,1)
     love.graphics.print(txt, drawx, drawy, 0, 1, 1, 0, 0)
@@ -216,6 +229,7 @@ function people.eat()
         if person.stock[enum.stockFood] < 0 then
             person.stock[enum.stockFood] = 0
             person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - 15      -- %
+            -- check NUMBER_OF_STOCK_TYPES is correct if next line fails
             if person.stock[enum.stockHealth] <= 0 then
                 people.dies(person)
             end
@@ -227,6 +241,9 @@ function people.dies(person)
     for i = #PERSONS, 1, -1 do
         if PERSONS[i] == person then
             table.remove(PERSONS, i)
+
+            --! need to remove the person's structure if there is one.
+
             print("Person died. Check for errors.")
         end
     end
@@ -239,6 +256,14 @@ function people.pay()
                 local stocktype = person.occupationstockoutput
                 local stockgain = person.occupationstockgain
                 person.stock[stocktype] = person.stock[stocktype] + stockgain
+
+                if love.math.random(1,10) == 1 then
+                    -- person is hurt while working
+                    person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - love.math.random(1,10)
+                    if person.stock[enum.stockHealth] <= 0 then
+                        people.dies(person)
+                    end
+                end
             end
         end
     end
@@ -255,15 +280,46 @@ function people.get(guid)
     return nil
 end
 
+local function makeBid(person, stocknumber)
+    -- convenient sub-procedure to help doMarketplace()
+    -- input: a single person
+    -- input: stocknumber (e.g enum.stockFood)
+    -- output: none
+
+    local wealth = person.stock[enum.stockWealth]
+    --! should rename stocknumber to commodity for consistency
+    -- determine bid price
+    local bidprice = marketplace.determineCommodityPrice(person.beliefRange[stocknumber])
+
+    -- determine bid qty
+    local maxqtycanafford = cf.round(wealth / bidprice)
+    local maxqtycanhold = 14 - person.stock[stocknumber]
+    local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
+    local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[stocknumber])       -- accepts nil history
+    bidqty = cf.round(bidqty)
+
+    -- register the bid
+    marketplace.createBid(stocknumber, bidqty, bidprice, person.guid)
+
+    -- set destination = market
+    fun.getRandomMarketXY(person)
+
+    if stocknumber == enum.stockHerbs then
+        print("Alpha: trying to buy herbs for $" .. bidprice)
+    end
+end
+
 function people.doMarketplace()
     -- determine if they need to buy/sell
     for k, person in pairs(PERSONS) do
+        -- food
         if person.stock[enum.stockFood] < 7 and person.occupation ~= enum.jobFarmer then
             -- try to buy food
             local wealth = person.stock[enum.stockWealth]
 
             -- determine bid price
             local bidprice = marketplace.determineCommodityPrice(person.beliefRange[enum.stockFood])
+            bidprice = cf.round(bidprice, 2)
 
             -- determine bid qty
             local maxqtycanafford = wealth / bidprice
@@ -279,11 +335,18 @@ function people.doMarketplace()
             fun.getRandomMarketXY(person)
         end
 
+        -- buy herbs
+        if person.stock[enum.stockHealth] < 90 and person.occupation ~= enum.jobHealer then
+            makeBid(person, enum.stockHerbs)    -- also sets destination = market
+        end
+
+        -- generic stock input (if relevant)
         -- make a bid (buy)     -- if there are lots of bids and they are all succesful then agent could be in debt
         local stockinput = person.occupationstockinput      -- stock type
         local wealth = person.stock[enum.stockWealth]
         if stockinput ~= nil and stockinput < 7 then
             local bidprice = marketplace.determineCommodityPrice(person.beliefRange[stockinput])
+            bidprice = cf.round(bidprice)
             local maxqtycanafford = wealth / bidprice
             local maxqtycanhold = 14 - person.stock[stockinput]
             local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
@@ -295,6 +358,7 @@ function people.doMarketplace()
             fun.getRandomMarketXY(person)
         end
 
+        -- generic stock sell
         -- make an ask (sell)
         local stockoutput = person.occupationstockoutput        -- stock type
         if stockoutput ~= nil and person.stock[stockoutput] > 7 then
@@ -304,12 +368,16 @@ function people.doMarketplace()
 
            -- determine ask price
            local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
-
+           askprice = cf.round(askprice)
            -- register the ask
            marketplace.createAsk(stockoutput, askqty, askprice, person.guid)
 
            -- set destination = market
            fun.getRandomMarketXY(person)
+
+           if stockoutput == enum.stockHerbs then
+               print("Tried to sell herbs for $" .. askprice)
+           end
         end
 
         --! need something about buying luxuries (wants)
@@ -319,10 +387,10 @@ function people.doMarketplace()
     results = {}
     results = marketplace.resolveOrders()
 
-    -- print("----------------------")
-    -- print("Market results")
-    -- print(inspect(results))
-    -- print("----------------------")
+    print("----------------------")
+    print("Market results")
+    print(inspect(results))
+    print("----------------------")
 
     for k, outcome in pairs(results) do
         -- charge the buyer and ensure that succeeds
@@ -338,5 +406,21 @@ function people.doMarketplace()
         end
     end
 end
+
+function people.heal()
+    -- cycle through each person and heal if they are wounded and have Herbs
+    for _, person in pairs(PERSONS) do
+        person.stock[enum.stockHealth] = person.stock[enum.stockHealth] + 1
+        if person.stock[enum.stockHealth] < 100 and person.stock[enum.stockHerbs] > 0 then
+            -- heal
+            local damage = 100 - person.stock[enum.stockHealth]
+            local healamt = math.min(damage, person.stock[enum.stockHerbs])
+            person.stock[enum.stockHealth] = person.stock[enum.stockHealth] + healamt
+            person.stock[enum.stockHerbs] = person.stock[enum.stockHerbs] - healamt
+        end
+        if person.stock[enum.stockHealth] > 100 then person.stock[enum.stockHealth] = 100 end
+    end
+end
+
 
 return people
