@@ -228,7 +228,7 @@ local function adjustBiddersBeliefs(summary)
     if beliefRange[1] < 0.5 then beliefRange[1] = 0.5 end
     if beliefRange[2] < beliefRange[1] then beliefRange[2] = beliefRange[1] end
 
-    table.insert(buyer.beliefRangeHistory, {beliefRange[1], beliefRange[2]})
+    table.insert(buyer.beliefRangeHistory[commodity], {beliefRange[1], beliefRange[2]})
 
     assert(beliefRange[1] > 0)
     assert(beliefRange[2] > 0)
@@ -300,7 +300,7 @@ local function adjustAskersBeliefs(summary)
     if beliefRange[1] < 0.5 then beliefRange[1] = 0.5 end
     if beliefRange[2] < beliefRange[1] then beliefRange[2] = beliefRange[1] end
 
-    table.insert(seller.beliefRangeHistory, {beliefRange[1], beliefRange[2]})
+    table.insert(seller.beliefRangeHistory[commodity], {beliefRange[1], beliefRange[2]})
 
     -- print("zulu")
     -- print(beliefRange[1])
@@ -315,12 +315,12 @@ function marketplace.resolveOrders()
     -- bidtable and asktable are local to this module and are populated by calling
     -- createBid and createAsk before calling this function
 
-    -- print("**********************")
-    -- print("All bids (qty, price):")
-    -- print(inspect(bidtable))
-    -- print("All asks (qty, price):")
-    -- print(inspect(asktable))
-    -- print("**********************")
+    print("**********************")
+    print("All bids (qty, price):")
+    print(inspect(bidtable))
+    print("All asks (qty, price):")
+    print(inspect(asktable))
+    print("**********************")
 
     local results = {}
 
@@ -356,22 +356,22 @@ function marketplace.resolveOrders()
                 -- the [2] indicates the bid/ask price (not qty)
                 -- the qty traded is determined if and only if a price is agreed
                 bidprice = bidtable[commodity][1][2]
-                print("Bid price is $" .. bidprice)
+                -- print("Bid price is $" .. bidprice)
                 askprice = asktable[commodity][1][2]
-                print("Ask price is $" .. askprice)
+                -- print("Ask price is $" .. askprice)
 
                 if bidprice >= askprice then
                     transactionprice = (bidprice + askprice) / 2      -- this is a float
                     transactionprice = cf.round(transactionprice, 1)
-                    print("Price agreed at $" .. transactionprice)
+                    -- print("Price agreed at $" .. transactionprice)
                     bidqty = bidtable[commodity][1][1]
                     askqty = asktable[commodity][1][1]
-                    print("Bid qty = " .. bidqty .. " and ask qty = " .. askqty)
+                    -- print("Bid qty = " .. bidqty .. " and ask qty = " .. askqty)
                     if askqty >= bidqty then
                         -- purchase fully satisfied
-                        print("Bid qty fully satisified")
+                        -- print("Bid qty fully satisified")
                     else
-                        print("Bid qty partially satisfied")
+                        -- print("Bid qty partially satisfied")
                     end
 
                     -- adjust bidqty/askqty by math.min
@@ -409,7 +409,7 @@ function marketplace.resolveOrders()
                         table.remove(asktable[commodity], 1)
                     end
                 else
-                    print("Price not agreed. Trade fails")
+                    -- print("Price not agreed. Trade fails")
                     -- remove bid as bid price is too low to be satisfied
                     table.remove(bidtable[commodity], 1)
                 end
@@ -429,13 +429,13 @@ function marketplace.resolveOrders()
                 summary.history = buyer.stockPriceHistory[commodity]
                 adjustBiddersBeliefs(summary)
 
-                print("Bravo: buyer belief range after adjustment")
-                print(inspect(buyer.beliefRange))
+                -- print("Bravo: buyer belief range after adjustment")
+                -- print(inspect(buyer.beliefRange))
 
                 summary.seller = seller
                 adjustAskersBeliefs(summary)
-                print("delta: seller belief range after adjustment")
-                print(inspect(seller.beliefRange))
+                -- print("delta: seller belief range after adjustment")
+                -- print(inspect(seller.beliefRange))
 
 
             end
