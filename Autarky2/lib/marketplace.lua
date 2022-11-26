@@ -384,6 +384,7 @@ function marketplace.resolveOrders()
                     outcome.buyerguid = bidtable[commodity][1][3]
                     outcome.sellerguid = asktable[commodity][1][3]
                     outcome.commodityID = commodity
+                    outcome.agreedprice = transactionprice
                     outcome.transactionTotalPrice = transactionprice * transactionamt
                     outcome.transactionTotalQty = transactionamt
                     table.insert(results, outcome)  -- results is returned to the parent function
