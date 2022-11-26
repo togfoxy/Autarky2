@@ -2,7 +2,7 @@ people = {}
 
 function people.initialise()
 
-    local numofppl = 7
+    local numofppl = 5
 
     for i = 1, numofppl do
         PERSONS[i] = {}
@@ -22,37 +22,33 @@ function people.initialise()
         PERSONS[i].isSelected = false
 
         PERSONS[i].occupation = nil
+        PERSONS[i].houserow = nil
+        PERSONS[i].housecol = nil
+
         PERSONS[i].stock = {}
-
-        PERSONS[i].beliefRange = {}     -- eg PERSONS[i].beliefRange[enum.stockFood] = {1,10}
+        PERSONS[i].beliefRange = {}                 -- eg PERSONS[i].beliefRange[enum.stockFood] = {1,10}
         PERSONS[i].beliefRangeHistory = {}          --  .beliefRangeHistory[enum.stockFood][1] = (1,10})
+        PERSONS[i].stockPriceHistory = {}           -- this is the stock price history known to this agent (not global)
+        for j = 1, NUMBER_OF_STOCK_TYPES do
+            PERSONS[i].stock[j] = 0
 
-        PERSONS[i].stockPriceHistory = {}    -- this is the stock price history known to this agent (not global)
-        PERSONS[i].stockPriceHistory[enum.stockFood] = {5}     --! need to repeat this for all stock
-    end
-    for j = 1, NUMBER_OF_STOCK_TYPES do
-        for _, person in pairs(PERSONS) do
+            PERSONS[i].beliefRange[j] = {}
+            PERSONS[i].beliefRange[j] = {1,10}
 
-            person.stock[j] = 0
+            PERSONS[i].beliefRangeHistory[j] = {}
+            PERSONS[i].beliefRangeHistory[j] = {1, 10}
 
-            person.beliefRange[j] = {}
-            person.beliefRange[j] = {1,10}
-
-            person.beliefRangeHistory[j] = {}
-            person.beliefRangeHistory[j] = {1, 10}
-
-            person.stockPriceHistory[j] = {}
-            person.stockPriceHistory[j] = {5}
-
-            -- this happens AFTER the above loop to override and set correct initial values
-            person.stock[enum.stockFood] = love.math.random(0,10)                 -- days
-            person.stock[enum.stockHealth] = 100
-            person.stock[enum.stockWealth] = 100
-
+            PERSONS[i].stockPriceHistory[j] = {}
+            PERSONS[i].stockPriceHistory[j] = {5}
 
         end
+        -- this happens AFTER the above loop to override and set correct initial values
+        PERSONS[i].stock[enum.stockFood] = love.math.random(7,7)                 -- days
+        PERSONS[i].stock[enum.stockHealth] = 100
+        PERSONS[i].stock[enum.stockWealth] = 1000
     end
 end
+
 
 local function drawDebug(person)
     local drawx, drawy = fun.getTileXY(person.row, person.col)
@@ -132,6 +128,16 @@ function people.assignDestination(hour)
                 --! currently random
                 person.destrow = person.workrow
                 person.destcol = person.workcol
+            end
+        elseif hour == 20 then
+            -- go to house if have one
+            if person.houserow ~= nil and person.housecol ~= nil then
+                person.destrow = person.houserow
+                person.destcol = person.housecol
+            else
+                --! currently random
+                person.destrow = love.math.random(1, NUMBER_OF_ROWS)
+                person.destcol = love.math.random(1, NUMBER_OF_COLS)
             end
         else
             --! currently random
@@ -238,8 +244,7 @@ function people.dies(person, reason)
     for col = 1, NUMBER_OF_COLS do
 		for row = 1,NUMBER_OF_ROWS do
             if MAP[row][col].owner == person.guid then
-                MAP[row][col].structure = nil
-                MAP[row][col].owner = nil
+                structures.kill(row, col)
             end
         end
     end
@@ -276,7 +281,7 @@ function people.pay()
 
                 if love.math.random(1,10) == 1 then
                     -- person is hurt while working
-                    person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - love.math.random(1,10)
+                    person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - love.math.random(15,25)
                     if person.stock[enum.stockHealth] <= 0 then
                         people.dies(person, "no health")
                     end
@@ -298,11 +303,15 @@ function people.get(guid)
     return nil
 end
 
-local function makeBid(person, stocknumber)
+local function makeBid(person, stocknumber, maxqty)
     -- convenient sub-procedure to help doMarketplace()
     -- input: a single person
     -- input: stocknumber (e.g enum.stockFood)
+    -- input: maxqty - optional - to override the default algorithm
     -- output: none
+
+    -- default the optional parameter
+    if maxqty == nil then maxqty = 9999 end
 
     local wealth = person.stock[enum.stockWealth]
     --! should rename stocknumber to commodity for consistency
@@ -312,7 +321,7 @@ local function makeBid(person, stocknumber)
     -- determine bid qty
     local maxqtycanafford = cf.round(wealth / bidprice)
     local maxqtycanhold = 14 - person.stock[stocknumber]
-    local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
+    local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold, maxqty)
     local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[stocknumber])       -- accepts nil history
     bidqty = cf.round(bidqty)
 
@@ -321,14 +330,12 @@ local function makeBid(person, stocknumber)
 
     -- set destination = market
     fun.getRandomMarketXY(person)
-
---     if stocknumber == enum.stockHerbs then
---         print("Alpha: trying to buy herbs for $" .. bidprice)
---     end
 end
 
 function people.doMarketplace()
     -- determine if they need to buy/sell
+
+    local avgHousePrice = fun.getHistoricAvgPrice(enum.stockHouse)
     for k, person in pairs(PERSONS) do
         -- food
         if person.stock[enum.stockFood] < 7 and person.occupation ~= enum.jobFarmer then
@@ -358,6 +365,14 @@ function people.doMarketplace()
             makeBid(person, enum.stockHerbs)    -- also sets destination = market
         end
 
+        -- buy house
+        if person.houserow == nil and person.housecol == nil then
+            if person.stock[enum.stockHouse] < 1 then
+                -- try to buy house
+                makeBid(person, enum.stockHouse, 1)
+            end
+        end
+
         -- generic stock input (if relevant)
         -- make a bid (buy)     -- if there are lots of bids and they are all succesful then agent could be in debt
         local stockinput = person.occupationstockinput      -- stock type
@@ -379,7 +394,7 @@ function people.doMarketplace()
         -- generic stock sell
         -- make an ask (sell)
         local stockoutput = person.occupationstockoutput        -- stock type
-        if stockoutput ~= nil and person.stock[stockoutput] > 7 then
+        if stockoutput ~= nil and person.stock[stockoutput] >= STOCK_QTY_SELLPOINT[stockoutput] then
            local maxqtytosell = person.stock[stockoutput]
            local askqty = marketplace.determineQty(maxqtytosell, person.stockPriceHistory[stockoutput]) -- commodity, maxQty, commodityKnowledge
            askqty = cf.round(askqty)
@@ -431,7 +446,13 @@ end
 function people.heal()
     -- cycle through each person and heal if they are wounded and have Herbs
     for _, person in pairs(PERSONS) do
-        person.stock[enum.stockHealth] = person.stock[enum.stockHealth] + 1
+        -- people with houses heal faster
+        if person.houserow ~= nil and person.housecol ~= nil then
+            person.stock[enum.stockHealth] = person.stock[enum.stockHealth] + 1
+        else
+            person.stock[enum.stockHealth] = person.stock[enum.stockHealth] + 0.5
+        end
+
         if person.stock[enum.stockHealth] < 100 and person.stock[enum.stockHerbs] > 0 then
             -- heal
             local damage = 100 - person.stock[enum.stockHealth]
@@ -440,6 +461,26 @@ function people.heal()
             person.stock[enum.stockHerbs] = person.stock[enum.stockHerbs] - healamt
         end
         if person.stock[enum.stockHealth] > 100 then person.stock[enum.stockHealth] = 100 end
+    end
+end
+
+function people.buildHouse()
+    -- checks if has house structure
+    -- if not, checks for house stock
+    -- if house stock, then build structure
+
+    --! can consolidate with people.heal() for performance gains
+
+    for _, person in pairs(PERSONS) do
+        if person.houserow == nil and person.housecol == nil then
+            if person.stock[enum.stockHouse] >= 1 then
+                local row,col = structures.create(enum.structureHouse, person.guid)
+                person.houserow = row
+                person.housecol = col
+
+                person.stock[enum.stockHouse] = person.stock[enum.stockHouse] - 1
+            end
+        end
     end
 end
 

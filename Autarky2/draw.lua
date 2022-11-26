@@ -106,7 +106,7 @@ function draw.graphs()
     -- food price
     drawx = 50
     drawy = 200
-    love.graphics.print("Food prices", drawx, drawy)
+    love.graphics.print("Food prices (x 10)", drawx, drawy)
     drawy = drawy + 25
 
     love.graphics.line(drawx, drawy, drawx, drawy + 100)
@@ -115,7 +115,7 @@ function draw.graphs()
 
     for i = 1, #HISTORY_PRICE[enum.stockFood] do
         drawx = drawx + 1
-        local yvalue = drawy - HISTORY_PRICE[enum.stockFood][i]
+        local yvalue = drawy - (HISTORY_PRICE[enum.stockFood][i] * 10)
         love.graphics.points(drawx, yvalue)
     end
 

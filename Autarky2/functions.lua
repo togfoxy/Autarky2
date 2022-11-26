@@ -8,6 +8,8 @@ function functions.loadImages()
     IMAGES[enum.structureLogs] = love.graphics.newImage("assets/images/woodsman.png")
     IMAGES[enum.structureHealer] = love.graphics.newImage("assets/images/healerhouse.png")
     IMAGES[enum.structureBuilder] = love.graphics.newImage("assets/images/builderhouse.png")
+    IMAGES[enum.structureHouse] = love.graphics.newImage("assets/images/house3.png")
+
     -- quads
     SPRITES[enum.spriteBlueWoman] = love.graphics.newImage("assets/images/Civilian Female Walk Blue.png")
     QUADS[enum.spriteBlueWoman] = cf.fromImageToQuads(SPRITES[enum.spriteBlueWoman], 15, 32)
@@ -81,6 +83,9 @@ function functions.initialiseMap()
     for i = 1, NUMBER_OF_STOCK_TYPES do
         HISTORY_STOCK[i] = {}   -- the average stock held by each person each day
         HISTORY_PRICE[i] = {}   -- the average price of each stock recorded at the market
+
+        -- this should be set in constants.lua but will default to '5' if not
+        if STOCK_QTY_SELLPOINT[i] == nil then STOCK_QTY_SELLPOINT[i] = 5 end
     end
 end
 
@@ -120,8 +125,6 @@ function functions.RecordHistoryStock()
         local avg = sum / #PERSONS
         table.insert(HISTORY_STOCK[i], avg)
     end
-
-    --! buyer.stockPriceHistory[commodity]
 end
 
 function functions.getEmptyTile()
@@ -152,12 +155,24 @@ function functions.getEmptyTile()
 end
 
 function functions.getAvgPrice(stockPriceHistory)
+    -- returns the average price for a commodity according to a single person (not global nor accurate/actual)
     -- stockPriceHistory = table of stock prices
     local total = 0
     for i = 1, #stockPriceHistory do
         total = total + stockPriceHistory[i]
     end
     return total / #stockPriceHistory
+end
+
+function functions.getHistoricAvgPrice(commodity)
+    -- get the actual historic average transaction price for provided commodity
+
+    local sum = 0
+    for i = 1, #HISTORY_PRICE[commodity] do
+        sum = sum + HISTORY_PRICE[commodity][i]
+    end
+    local avgprice = (sum / #HISTORY_PRICE[commodity])
+    return avgprice
 end
 
 function functions.getRandomMarketXY(person)

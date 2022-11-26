@@ -40,6 +40,7 @@ function constants.load()
     MARKETROW = 0
     MARKETCOL = 0
 
+
     -- ********************
     -- enums
     -- ********************
@@ -52,8 +53,6 @@ function constants.load()
 
     enum.stockHealth = 1
     enum.stockWealth = 2
-
-
 
     enum.structureFarm = 3
     enum.jobFarmer = 3      -- job and icon need to have the same number
@@ -78,7 +77,17 @@ function constants.load()
     --# update NUMBER_OF_STOCK_TYPES constant when adding new stock types
     --# update functions.loadImages() x 2
     --# update main.keyreleased()
+    --# provide a sell point down below or it will default to 5
     NUMBER_OF_STOCK_TYPES = 6
+
+    enum.structureHouse = 201   -- if no job/stock then start at 200
+
+    -- agents will sell when their output stock reaches this value
+    STOCK_QTY_SELLPOINT = {}
+    STOCK_QTY_SELLPOINT[enum.stockFood] = 7
+    STOCK_QTY_SELLPOINT[enum.stockLogs] = 1
+    STOCK_QTY_SELLPOINT[enum.stockHerbs] = 2
+    STOCK_QTY_SELLPOINT[enum.stockHouse] = 1
 
 
     -- sprites and quads

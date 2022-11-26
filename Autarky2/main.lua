@@ -12,6 +12,7 @@ fun = require 'functions'
 require 'draw'
 require 'constants'
 require 'people'
+require 'structures'
 
 GAME_VERSION = "0.01"
 
@@ -30,12 +31,10 @@ function love.keyreleased( key, scancode )
 				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1		-- not sure if this will be used
 
 				person.occupation = enum.jobFarmer
-				local row, col = fun.getEmptyTile()
-				MAP[row][col].structure = enum.structureFarm
-				MAP[row][col].owner = person.guid
+				local row, col = structures.create(enum.structureFarm, person.guid)
 				person.workrow = row
 				person.workcol = col
-                person.occupationstockgain = love.math.random(15,25) / 10	-- (1.5 -> 2.5)
+                person.occupationstockgain = love.math.random(40,60) / 10	-- (4.0 -> 6.0)
 				person.occupationstockinput = nil
 				person.occupationstockoutput = enum.stockFood
 			end
@@ -49,9 +48,7 @@ function love.keyreleased( key, scancode )
 				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1
 
 				person.occupation = enum.jobWoodsman
-				local row, col = fun.getEmptyTile()
-				MAP[row][col].structure = enum.structureLogs
-				MAP[row][col].owner = person.guid
+				local row, col = structures.create(enum.structureLogs, person.guid)
 				person.workrow = row
 				person.workcol = col
                 person.occupationstockgain = love.math.random(5,12) / 10	-- (0.5 -> 1.2)
@@ -68,12 +65,10 @@ function love.keyreleased( key, scancode )
 				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1
 
 				person.occupation = enum.jobHealer
-				local row, col = fun.getEmptyTile()
-				MAP[row][col].structure = enum.structureHealer
-				MAP[row][col].owner = person.guid
+				local row, col = structures.create(enum.structureHealer, person.guid)
 				person.workrow = row
 				person.workcol = col
-                person.occupationstockgain = love.math.random(5,10) / 10	-- (0.5 -> 1.0)
+                person.occupationstockgain = love.math.random(20,40) / 10	-- (1.0 -> 2.0)
 				person.occupationstockinput = nil
 				person.occupationstockoutput = enum.stockHerbs
 			end
@@ -87,9 +82,7 @@ function love.keyreleased( key, scancode )
 				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1
 
 				person.occupation = enum.jobBuilder
-				local row, col = fun.getEmptyTile()
-				MAP[row][col].structure = enum.structureBuilder
-				MAP[row][col].owner = person.guid
+				local row, col = structures.create(enum.structureBuilder, person.guid)
 				person.workrow = row
 				person.workcol = col
 				person.occupationstockinput = enum.stockLogs
@@ -179,7 +172,10 @@ function love.update(dt)
 			if WORLD_HOURS >= 24 then
 				-- do once per day
 				people.heal()
+				structures.age()
+				people.buildHouse()
 				fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
+
 				WORLD_HOURS = WORLD_HOURS - 24
 				WORLD_DAYS = WORLD_DAYS + 1
 
