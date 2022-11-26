@@ -22,9 +22,10 @@ function constants.load()
     SPRITES = {}
     QUADS = {}
 
-    HISTORY = {}
+    HISTORY_STOCK = {}
+    HISTORY_PRICE = {}
 
-    WORLD_HOURS = 5
+    WORLD_HOURS = 0
     WORLD_DAYS = 0
     TICKER = 0          -- dt or seconds (in fractions)
 
@@ -69,8 +70,15 @@ function constants.load()
     enum.structureHealer = 5
     enum.iconHealer = 105
 
+    enum.jobBuilder = 6
+    enum.stockHouse = 6
+    enum.structureBuilder = 6
+    enum.iconBuilder = 106
+
     --# update NUMBER_OF_STOCK_TYPES constant when adding new stock types
-    NUMBER_OF_STOCK_TYPES = 5
+    --# update functions.loadImages() x 2
+    --# update main.keyreleased()
+    NUMBER_OF_STOCK_TYPES = 6
 
 
     -- sprites and quads

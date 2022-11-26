@@ -73,14 +73,30 @@ function love.keyreleased( key, scancode )
 				MAP[row][col].owner = person.guid
 				person.workrow = row
 				person.workcol = col
-                --! person.occupationstockgain = love.math.random(5,10) / 10	-- (0.5 -> 1.0)
-				person.occupationstockgain = love.math.random(2,5)
+                person.occupationstockgain = love.math.random(5,10) / 10	-- (0.5 -> 1.0)
 				person.occupationstockinput = nil
 				person.occupationstockoutput = enum.stockHerbs
 			end
 		end
+	end
+	if key == "b" then
+		-- house builder
+		for k, person in pairs(PERSONS) do
+			if person.isSelected and person.occupation == nil then
+				person.isSelected = false
+				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1
 
-
+				person.occupation = enum.jobBuilder
+				local row, col = fun.getEmptyTile()
+				MAP[row][col].structure = enum.structureBuilder
+				MAP[row][col].owner = person.guid
+				person.workrow = row
+				person.workcol = col
+				person.occupationstockinput = enum.stockLogs
+				person.occupationstockoutput = enum.stockHouse
+				person.occupationconversionrate = 5					-- this many inputs needed to make one output
+			end
+		end
 	end
 end
 
@@ -128,7 +144,7 @@ function love.load()
 	fun.loadImages()
 
 	-- make this last to capture the initial state of the world
-	fun.RecordHistory(WORLD_DAYS)
+	fun.RecordHistoryStock()
 end
 
 function love.draw()
@@ -163,7 +179,7 @@ function love.update(dt)
 			if WORLD_HOURS >= 24 then
 				-- do once per day
 				people.heal()
-				fun.RecordHistory(WORLD_DAYS)		-- record key stats for graphs etc. Do before the day ticker increments
+				fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
 				WORLD_HOURS = WORLD_HOURS - 24
 				WORLD_DAYS = WORLD_DAYS + 1
 

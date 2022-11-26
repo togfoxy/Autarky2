@@ -36,12 +36,6 @@ function draw.world()
             --! need to draw tiles one day
             -- love.graphics.print(MAP[row][col].tileType, drawx + 7, drawy + 7)
 
-            -- draw structures
-            -- if MAP[row][col].structure == enum.well then
-            --     love.graphics.setColor(1,1,1,1 * alpha)
-            --     love.graphics.draw(IMAGES[enum.well], drawx, drawy, 0, 1, 1)
-            -- end
-
             if MAP[row][col].structure ~= nil then
                 local structureid = MAP[row][col].structure
                 love.graphics.setColor(1,1,1,1 * alpha)
@@ -60,53 +54,102 @@ end
 function draw.graphs()
 
     love.graphics.setColor(1,1,1,1)
+
+    -- *************** first row ****************
     -- food
     local drawx = 50
     local drawy = 50
-    love.graphics.print("Avg food", drawx, drawy)
+    love.graphics.print("Avg food owned", drawx, drawy)
     drawy = drawy + 25
 
     love.graphics.line(drawx, drawy, drawx, drawy + 100)
     love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
     drawy = drawy + 100
 
-    for i = 1, #HISTORY[enum.stockFood] do
+    for i = 1, #HISTORY_STOCK[enum.stockFood] do
         drawx = drawx + 1
-        local yvalue = drawy - HISTORY[enum.stockFood][i]
+        local yvalue = drawy - HISTORY_STOCK[enum.stockFood][i]
         love.graphics.points(drawx, yvalue)
     end
 
     -- health
     drawx = drawx + 125
     drawy = 50
-    love.graphics.print("Avg health", drawx, drawy)
+    love.graphics.print("Avg health owned", drawx, drawy)
     drawy = drawy + 25
 
     love.graphics.line(drawx, drawy, drawx, drawy + 100)
     love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
     drawy = drawy + 100
 
-    for i = 1, #HISTORY[enum.stockHealth] do
+    for i = 1, #HISTORY_STOCK[enum.stockHealth] do
         drawx = drawx + 1
-        local yvalue = drawy - HISTORY[enum.stockHealth][i]
+        local yvalue = drawy - HISTORY_STOCK[enum.stockHealth][i]
         love.graphics.points(drawx, yvalue)
     end
 
     -- wealth
     drawx = drawx + 125
     drawy = 50
-    love.graphics.print("Avg wealth", drawx, drawy)
+    love.graphics.print("Avg wealth owned", drawx, drawy)
     drawy = drawy + 25
     love.graphics.line(drawx, drawy, drawx, drawy + 100)
     love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
     drawy = drawy + 100
-    for i = 1, #HISTORY[enum.stockWealth] do
+    for i = 1, #HISTORY_STOCK[enum.stockWealth] do
         drawx = drawx + 1
-        local yvalue = drawy - HISTORY[enum.stockWealth][i]
+        local yvalue = drawy - HISTORY_STOCK[enum.stockWealth][i]
         love.graphics.points(drawx, yvalue)
     end
 
+    -- *************** second row ****************
+    -- food price
+    drawx = 50
+    drawy = 200
+    love.graphics.print("Food prices", drawx, drawy)
+    drawy = drawy + 25
 
+    love.graphics.line(drawx, drawy, drawx, drawy + 100)
+    love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
+    drawy = drawy + 100
+
+    for i = 1, #HISTORY_PRICE[enum.stockFood] do
+        drawx = drawx + 1
+        local yvalue = drawy - HISTORY_PRICE[enum.stockFood][i]
+        love.graphics.points(drawx, yvalue)
+    end
+
+    -- log prices
+    drawx = drawx + 125
+    drawy = 200
+    love.graphics.print("Log prices", drawx, drawy)
+    drawy = drawy + 25
+
+    love.graphics.line(drawx, drawy, drawx, drawy + 100)
+    love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
+    drawy = drawy + 100
+
+    for i = 1, #HISTORY_PRICE[enum.stockLogs] do
+        drawx = drawx + 1
+        local yvalue = drawy - HISTORY_PRICE[enum.stockLogs][i]
+        love.graphics.points(drawx, yvalue)
+    end
+
+    -- herb prices
+    drawx = drawx + 125
+    drawy = 200
+    love.graphics.print("Herb prices", drawx, drawy)
+    drawy = drawy + 25
+
+    love.graphics.line(drawx, drawy, drawx, drawy + 100)
+    love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
+    drawy = drawy + 100
+
+    for i = 1, #HISTORY_PRICE[enum.stockHerbs] do
+        drawx = drawx + 1
+        local yvalue = drawy - HISTORY_PRICE[enum.stockHerbs][i]
+        love.graphics.points(drawx, yvalue)
+    end
 
 end
 

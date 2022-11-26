@@ -7,7 +7,7 @@ function functions.loadImages()
     IMAGES[enum.structureFarm] = love.graphics.newImage("assets/images/appletree_50x50.png")
     IMAGES[enum.structureLogs] = love.graphics.newImage("assets/images/woodsman.png")
     IMAGES[enum.structureHealer] = love.graphics.newImage("assets/images/healerhouse.png")
-
+    IMAGES[enum.structureBuilder] = love.graphics.newImage("assets/images/builderhouse.png")
     -- quads
     SPRITES[enum.spriteBlueWoman] = love.graphics.newImage("assets/images/Civilian Female Walk Blue.png")
     QUADS[enum.spriteBlueWoman] = cf.fromImageToQuads(SPRITES[enum.spriteBlueWoman], 15, 32)
@@ -19,6 +19,7 @@ function functions.loadImages()
     IMAGES[enum.iconFarmer] = love.graphics.newImage("assets/images/appleicon64x64.png")
     IMAGES[enum.iconWoodsman] = love.graphics.newImage("assets/images/axeicon64x64.png")
     IMAGES[enum.iconHealer] = love.graphics.newImage("assets/images/healericon64x64.png")
+    IMAGES[enum.iconBuilder] = love.graphics.newImage("assets/images/hammericon64x64.png")
 end
 
 function functions.initialiseMap()
@@ -77,9 +78,10 @@ function functions.initialiseMap()
     MARKETROW = marketrow
     MARKETCOL = marketcol
 
-    HISTORY[enum.stockFood] = {}
-    HISTORY[enum.stockHealth] = {}
-    HISTORY[enum.stockWealth] = {}
+    for i = 1, NUMBER_OF_STOCK_TYPES do
+        HISTORY_STOCK[i] = {}   -- the average stock held by each person each day
+        HISTORY_PRICE[i] = {}   -- the average price of each stock recorded at the market
+    end
 end
 
 function functions.getTileXY(row, col)
@@ -99,7 +101,8 @@ function functions.getDrawXY(person)
     return drawx + x, drawy + y
 end
 
-function functions.RecordHistory(day)
+function functions.RecordHistoryStock()
+    -- captures average stock inventory for all inventories
     --## initialise any new HISTORY tables in fun.initialiseMap()
     --## ensure you add a new enum in constants.lua
     local personcount = #PERSONS
@@ -115,8 +118,10 @@ function functions.RecordHistory(day)
             sum = sum + person.stock[i]
         end
         local avg = sum / #PERSONS
-        table.insert(HISTORY[i], avg)
+        table.insert(HISTORY_STOCK[i], avg)
     end
+
+    --! buyer.stockPriceHistory[commodity]
 end
 
 function functions.getEmptyTile()

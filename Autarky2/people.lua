@@ -2,7 +2,7 @@ people = {}
 
 function people.initialise()
 
-    local numofppl = 6
+    local numofppl = 7
 
     for i = 1, numofppl do
         PERSONS[i] = {}
@@ -29,14 +29,8 @@ function people.initialise()
 
         PERSONS[i].stockPriceHistory = {}    -- this is the stock price history known to this agent (not global)
         PERSONS[i].stockPriceHistory[enum.stockFood] = {5}     --! need to repeat this for all stock
-
-
-
     end
     for j = 1, NUMBER_OF_STOCK_TYPES do
-
-        HISTORY[j] = {}
-
         for _, person in pairs(PERSONS) do
 
             person.stock[j] = 0
@@ -57,8 +51,6 @@ function people.initialise()
 
 
         end
-
-
     end
 end
 
@@ -73,6 +65,7 @@ local function drawDebug(person)
     txt = txt .. "Wealth: " .. person.stock[enum.stockWealth] .. "\n"
     txt = txt .. "Logs: " .. person.stock[enum.stockLogs] .. "\n"
     txt = txt .. "Herbs: " .. person.stock[enum.stockHerbs] .. "\n"
+    txt = txt .. "Houses: " .. person.stock[enum.stockHouse] .. "\n"
 
     love.graphics.setColor(1,1,1,1)
     love.graphics.print(txt, drawx, drawy, 0, 1, 1, 0, 0)
@@ -231,39 +224,64 @@ function people.eat()
             person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - 15      -- %
             -- check NUMBER_OF_STOCK_TYPES is correct if next line fails
             if person.stock[enum.stockHealth] <= 0 then
-                people.dies(person)
+                people.dies(person, "starvation")
             end
         end
     end
 end
 
-function people.dies(person)
+function people.dies(person, reason)
+    -- removes the person and their structure (if applicable)
+    -- input: person, singular
+    -- input: reason = text string for reason for death
+
+    for col = 1, NUMBER_OF_COLS do
+		for row = 1,NUMBER_OF_ROWS do
+            if MAP[row][col].owner == person.guid then
+                MAP[row][col].structure = nil
+                MAP[row][col].owner = nil
+            end
+        end
+    end
+
     for i = #PERSONS, 1, -1 do
         if PERSONS[i] == person then
             table.remove(PERSONS, i)
-
-            --! need to remove the person's structure if there is one.
-
-            print("Person died. Check for errors.")
+            print("Person died. Reason = " .. reason)
         end
     end
 end
 
 function people.pay()
+    -- pay ppl in stock for hard labour
     for k, person in pairs(PERSONS) do
         if person.occupation ~= nil then
             if person.occupationstockoutput ~= nil then
-                local stocktype = person.occupationstockoutput
-                local stockgain = person.occupationstockgain
-                person.stock[stocktype] = person.stock[stocktype] + stockgain
+                if person.occupationstockinput == nil then    -- primary producer
+                    local stocktype = person.occupationstockoutput
+                    local stockgain = person.occupationstockgain
+                    person.stock[stocktype] = person.stock[stocktype] + stockgain
+
+                elseif person.occupationstockinput ~= nil then
+                    -- a service provider that converts stock from one type to another
+                    local stockinputtype = person.occupationstockinput
+                    local stockoutputtype = person.occupationstockoutput
+                    local stockconversionrate = person.occupationconversionrate
+                    if person.stock[stockinputtype] >= stockconversionrate then
+                        -- convert stock
+                        person.stock[stockinputtype] = person.stock[stockinputtype] - stockconversionrate
+                        person.stock[stockoutputtype] = person.stock[stockoutputtype] + 1
+                    end
+                end
 
                 if love.math.random(1,10) == 1 then
                     -- person is hurt while working
                     person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - love.math.random(1,10)
                     if person.stock[enum.stockHealth] <= 0 then
-                        people.dies(person)
+                        people.dies(person, "no health")
                     end
                 end
+
             end
         end
     end
@@ -304,9 +322,9 @@ local function makeBid(person, stocknumber)
     -- set destination = market
     fun.getRandomMarketXY(person)
 
-    if stocknumber == enum.stockHerbs then
-        print("Alpha: trying to buy herbs for $" .. bidprice)
-    end
+--     if stocknumber == enum.stockHerbs then
+--         print("Alpha: trying to buy herbs for $" .. bidprice)
+--     end
 end
 
 function people.doMarketplace()
@@ -396,6 +414,9 @@ function people.doMarketplace()
         -- charge the buyer and ensure that succeeds
         local buyer = people.get(outcome.buyerguid)
         local seller = people.get(outcome.sellerguid)
+        -- capture the agreed price for stat purposes
+        table.insert(HISTORY_PRICE[outcome.commodityID], outcome.agreedprice)
+
         if buyer.stock[enum.stockWealth] >= outcome.transactionTotalPrice then
             -- funding assured - finalise the transaction
             buyer.stock[enum.stockWealth] = buyer.stock[enum.stockWealth] - outcome.transactionTotalPrice
