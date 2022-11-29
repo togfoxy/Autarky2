@@ -118,12 +118,11 @@ end
 
 function love.load()
 
-	love.window.setMode(800,600,{fullscreen=true, display=1, resizable=true, borderless=false})
-	SCREEN_WIDTH = love.graphics.getWidth()
-	SCREEN_HEIGHT = love.graphics.getHeight()
-	love.window.setMode(SCREEN_WIDTH,SCREEN_HEIGHT,{fullscreen=false, display=1, resizable=true, borderless=false})
-
+	love.window.setMode(800, 600, {resizable = true, display = 1})
 	res.setGame(1920, 1080)
+
+	SCREEN_WIDTH = 1920
+	SCREEN_HEIGHT = 1080
 
 	constants.load()
 
