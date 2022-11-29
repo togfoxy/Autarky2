@@ -170,13 +170,14 @@ end
 
 function functions.getHistoricAvgPrice(commodity)
     -- get the actual historic average transaction price for provided commodity
+    -- retuns a number with two decimal places
 
     local sum = 0
     for i = 1, #HISTORY_PRICE[commodity] do
         sum = sum + HISTORY_PRICE[commodity][i]
     end
     local avgprice = (sum / #HISTORY_PRICE[commodity])
-    return avgprice
+    return cf.round(avgprice, 2)
 end
 
 function functions.getRandomMarketXY(person)

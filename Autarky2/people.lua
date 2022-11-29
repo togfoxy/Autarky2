@@ -498,5 +498,22 @@ function people.payTaxes()
     end
 end
 
+function people.claimSocialSecurity()
+    -- if wealth == 0 and food == 0 then pay the average price of food
+    --! there is a chance that the avg price of food is not enough to actually buy food. Check for balance
+    --! might be better to pay the agent food then pay the farmer the avg price
+    local avgfoodprice = fun.getHistoricAvgPrice(enum.stockFood)
+
+    for _, person in pairs(PERSONS) do
+        if person.stock[enum.stockWealth] < avgfoodprice and person.stock[enum.stockFood] <= 0 then
+            if TREASURY >= avgfoodprice then
+                TREASURY = TREASURY - avgfoodprice
+                person.stock[enum.stockWealth] = person.stock[enum.stockWealth] + avgfoodprice
+                print("Paid social security benefits: " .. avgfoodprice)
+            end
+        end
+    end
+end
+
 
 return people

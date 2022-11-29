@@ -172,6 +172,7 @@ function love.update(dt)
 				structures.age()
 				people.buildHouse()
 				people.payTaxes()
+				people.claimSocialSecurity()
 				fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
 				fun.RecordHistoryTreasury()
 
