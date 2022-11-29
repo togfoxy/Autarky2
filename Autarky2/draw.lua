@@ -47,7 +47,8 @@ function draw.world()
 
     -- draw world hours
     love.graphics.setColor(1,1,1,1)
-    love.graphics.print("Time: " .. WORLD_HOURS .. " Day: " .. WORLD_DAYS, 10, 10)
+    local str = "Time: " .. WORLD_HOURS .. " Day: " .. WORLD_DAYS .. " Treasury: " .. TREASURY
+    love.graphics.print(str, 10, 10)
 
 end
 
@@ -99,6 +100,20 @@ function draw.graphs()
     for i = 1, #HISTORY_STOCK[enum.stockWealth] do
         drawx = drawx + 1
         local yvalue = drawy - HISTORY_STOCK[enum.stockWealth][i]
+        love.graphics.points(drawx, yvalue)
+    end
+
+    -- treasury
+    drawx = drawx + 125
+    drawy = 50
+    love.graphics.print("Treasury", drawx, drawy)
+    drawy = drawy + 25
+    love.graphics.line(drawx, drawy, drawx, drawy + 100)
+    love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
+    drawy = drawy + 100
+    for i = 1, #HISTORY_TREASURY do
+        drawx = drawx + 1
+        local yvalue = drawy - HISTORY_TREASURY[i]
         love.graphics.points(drawx, yvalue)
     end
 

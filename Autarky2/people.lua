@@ -45,7 +45,7 @@ function people.initialise()
         -- this happens AFTER the above loop to override and set correct initial values
         PERSONS[i].stock[enum.stockFood] = love.math.random(7,7)                 -- days
         PERSONS[i].stock[enum.stockHealth] = 100
-        PERSONS[i].stock[enum.stockWealth] = 1000
+        PERSONS[i].stock[enum.stockWealth] = 20
     end
 end
 
@@ -62,6 +62,7 @@ local function drawDebug(person)
     txt = txt .. "Logs: " .. person.stock[enum.stockLogs] .. "\n"
     txt = txt .. "Herbs: " .. person.stock[enum.stockHerbs] .. "\n"
     txt = txt .. "Houses: " .. person.stock[enum.stockHouse] .. "\n"
+    txt = txt .. "Tax owed: " .. person.stock[enum.stockTaxOwed] .. "\n"
 
     love.graphics.setColor(1,1,1,1)
     love.graphics.print(txt, drawx, drawy, 0, 1, 1, 0, 0)
@@ -279,7 +280,7 @@ function people.pay()
                     end
                 end
 
-                if love.math.random(1,10) == 1 then
+                if love.math.random(1,7) == 1 then
                     -- person is hurt while working
                     person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - love.math.random(15,25)
                     if person.stock[enum.stockHealth] <= 0 then
@@ -408,9 +409,9 @@ function people.doMarketplace()
            -- set destination = market
            fun.getRandomMarketXY(person)
 
-           if stockoutput == enum.stockHerbs then
-               print("Tried to sell herbs for $" .. askprice)
-           end
+           -- if stockoutput == enum.stockHerbs then
+           --     print("Tried to sell herbs for $" .. askprice)
+           -- end
         end
 
         --! need something about buying luxuries (wants)
@@ -439,6 +440,9 @@ function people.doMarketplace()
 
             buyer.stock[outcome.commodityID] = buyer.stock[outcome.commodityID] + outcome.transactionTotalQty
             seller.stock[outcome.commodityID] = seller.stock[outcome.commodityID] - outcome.transactionTotalQty
+
+            -- record tax owed. It won't be paid until later
+            buyer.stock[enum.stockTaxOwed] = cf.round(buyer.stock[enum.stockTaxOwed] + (outcome.transactionTotalPrice * SALES_TAX),2)
         end
     end
 end
@@ -479,6 +483,33 @@ function people.buildHouse()
                 person.housecol = col
 
                 person.stock[enum.stockHouse] = person.stock[enum.stockHouse] - 1
+            end
+        end
+    end
+end
+
+function people.payTaxes()
+    -- collect owed taxes
+    -- this might put the agent into debt
+    for _, person in pairs(PERSONS) do
+        TREASURY = TREASURY + person.stock[enum.stockTaxOwed]
+        person.stock[enum.stockWealth] = person.stock[enum.stockWealth] - person.stock[enum.stockTaxOwed]
+        person.stock[enum.stockTaxOwed] = 0
+    end
+end
+
+function people.claimSocialSecurity()
+    -- if wealth == 0 and food == 0 then pay the average price of food
+    --! there is a chance that the avg price of food is not enough to actually buy food. Check for balance
+    --! might be better to pay the agent food then pay the farmer the avg price
+    local avgfoodprice = fun.getHistoricAvgPrice(enum.stockFood)
+
+    for _, person in pairs(PERSONS) do
+        if person.stock[enum.stockWealth] < avgfoodprice and person.stock[enum.stockFood] <= 0 then
+            if TREASURY >= avgfoodprice then
+                TREASURY = TREASURY - avgfoodprice
+                person.stock[enum.stockWealth] = person.stock[enum.stockWealth] + avgfoodprice
+                print("Paid social security benefits: " .. avgfoodprice)
             end
         end
     end

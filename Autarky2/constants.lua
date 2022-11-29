@@ -3,7 +3,7 @@ constants = {}
 function constants.load()
     -- includes globals
 
-    GAME_VERSION = "0.18"
+    GAME_VERSION = "0.01"
 
     TILE_SIZE = 50
     UPPER_TERRAIN_HEIGHT = 6
@@ -24,10 +24,13 @@ function constants.load()
 
     HISTORY_STOCK = {}
     HISTORY_PRICE = {}
+    HISTORY_TREASURY = {}
 
     WORLD_HOURS = 0
     WORLD_DAYS = 0
     TICKER = 0          -- dt or seconds (in fractions)
+    SALES_TAX = 0.05
+    TREASURY = 0        -- govt coffers
 
     PERSONS = {}
     PERSONS_RADIUS = 7      -- for drawing and mouse click purposes
@@ -53,32 +56,33 @@ function constants.load()
 
     enum.stockHealth = 1
     enum.stockWealth = 2
+    enum.stockTaxOwed = 3
 
-    enum.structureFarm = 3
-    enum.jobFarmer = 3      -- job and icon need to have the same number
-    enum.iconFarmer = 103   -- offset the icon by 100
-    enum.stockFood = 3
+    enum.structureFarm = 11
+    enum.jobFarmer = 11     -- job and icon need to have the same number
+    enum.iconFarmer = 111  -- offset the icon by 100
+    enum.stockFood = 11
 
-    enum.structureLogs = 4
-    enum.stockLogs = 4
-    enum.jobWoodsman = 4
-    enum.iconWoodsman = 104
+    enum.structureLogs = 12
+    enum.stockLogs = 12
+    enum.jobWoodsman = 12
+    enum.iconWoodsman = 112
 
-    enum.jobHealer = 5
-    enum.stockHerbs = 5
-    enum.structureHealer = 5
-    enum.iconHealer = 105
+    enum.jobHealer = 13
+    enum.stockHerbs = 13
+    enum.structureHealer = 13
+    enum.iconHealer = 113
 
-    enum.jobBuilder = 6
-    enum.stockHouse = 6
-    enum.structureBuilder = 6
-    enum.iconBuilder = 106
+    enum.jobBuilder = 14
+    enum.stockHouse = 14
+    enum.structureBuilder = 14
+    enum.iconBuilder = 114
 
     --# update NUMBER_OF_STOCK_TYPES constant when adding new stock types
     --# update functions.loadImages() x 2
     --# update main.keyreleased()
     --# provide a sell point down below or it will default to 5
-    NUMBER_OF_STOCK_TYPES = 6
+    NUMBER_OF_STOCK_TYPES = 14      -- maximum value of enum.stock
 
     enum.structureHouse = 201   -- if no job/stock then start at 200
 

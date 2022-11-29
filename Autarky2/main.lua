@@ -14,8 +14,6 @@ require 'constants'
 require 'people'
 require 'structures'
 
-GAME_VERSION = "0.01"
-
 function love.keyreleased( key, scancode )
 	if key == "escape" then
 		cf.RemoveScreen(SCREEN_STACK)
@@ -118,12 +116,11 @@ end
 
 function love.load()
 
-	love.window.setMode(800,600,{fullscreen=true, display=1, resizable=true, borderless=false})
-	SCREEN_WIDTH = love.graphics.getWidth()
-	SCREEN_HEIGHT = love.graphics.getHeight()
-	love.window.setMode(SCREEN_WIDTH,SCREEN_HEIGHT,{fullscreen=false, display=1, resizable=true, borderless=false})
-
+	love.window.setMode(800, 600, {resizable = true, display = 1})
 	res.setGame(1920, 1080)
+
+	SCREEN_WIDTH = 1920
+	SCREEN_HEIGHT = 1080
 
 	constants.load()
 
@@ -174,7 +171,11 @@ function love.update(dt)
 				people.heal()
 				structures.age()
 				people.buildHouse()
+				people.payTaxes()
+				people.claimSocialSecurity()
 				fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
+				fun.RecordHistoryTreasury()
+
 
 				WORLD_HOURS = WORLD_HOURS - 24
 				WORLD_DAYS = WORLD_DAYS + 1
