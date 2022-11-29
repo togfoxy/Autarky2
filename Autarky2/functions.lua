@@ -4,7 +4,11 @@ function functions.loadImages()
 	-- structure tiles
     IMAGES[enum.well] = love.graphics.newImage("assets/images/well_50x45.png")
     IMAGES[enum.market] = love.graphics.newImage("assets/images/market_50x50.png")
-    IMAGES[enum.farm] = love.graphics.newImage("assets/images/appletree_50x50.png")
+    IMAGES[enum.structureFarm] = love.graphics.newImage("assets/images/appletree_50x50.png")
+    IMAGES[enum.structureLogs] = love.graphics.newImage("assets/images/woodsman.png")
+    IMAGES[enum.structureHealer] = love.graphics.newImage("assets/images/healerhouse.png")
+    IMAGES[enum.structureBuilder] = love.graphics.newImage("assets/images/builderhouse.png")
+    IMAGES[enum.structureHouse] = love.graphics.newImage("assets/images/house3.png")
 
     -- quads
     SPRITES[enum.spriteBlueWoman] = love.graphics.newImage("assets/images/Civilian Female Walk Blue.png")
@@ -15,7 +19,9 @@ function functions.loadImages()
 
     -- icons
     IMAGES[enum.iconFarmer] = love.graphics.newImage("assets/images/appleicon64x64.png")
-
+    IMAGES[enum.iconWoodsman] = love.graphics.newImage("assets/images/axeicon64x64.png")
+    IMAGES[enum.iconHealer] = love.graphics.newImage("assets/images/healericon64x64.png")
+    IMAGES[enum.iconBuilder] = love.graphics.newImage("assets/images/hammericon64x64.png")
 end
 
 function functions.initialiseMap()
@@ -74,9 +80,13 @@ function functions.initialiseMap()
     MARKETROW = marketrow
     MARKETCOL = marketcol
 
-    HISTORY[enum.stockFood] = {}
-    HISTORY[enum.stockHealth] = {}
-    HISTORY[enum.stockWealth] = {}
+    for i = 1, NUMBER_OF_STOCK_TYPES do
+        HISTORY_STOCK[i] = {}   -- the average stock held by each person each day
+        HISTORY_PRICE[i] = {}   -- the average price of each stock recorded at the market
+
+        -- this should be set in constants.lua but will default to '5' if not
+        if STOCK_QTY_SELLPOINT[i] == nil then STOCK_QTY_SELLPOINT[i] = 5 end
+    end
 end
 
 function functions.getTileXY(row, col)
@@ -96,7 +106,8 @@ function functions.getDrawXY(person)
     return drawx + x, drawy + y
 end
 
-function functions.RecordHistory(day)
+function functions.RecordHistoryStock()
+    -- captures average stock inventory for all inventories
     --## initialise any new HISTORY tables in fun.initialiseMap()
     --## ensure you add a new enum in constants.lua
     local personcount = #PERSONS
@@ -112,7 +123,7 @@ function functions.RecordHistory(day)
             sum = sum + person.stock[i]
         end
         local avg = sum / #PERSONS
-        table.insert(HISTORY[i], avg)
+        table.insert(HISTORY_STOCK[i], avg)
     end
 end
 
@@ -144,12 +155,24 @@ function functions.getEmptyTile()
 end
 
 function functions.getAvgPrice(stockPriceHistory)
+    -- returns the average price for a commodity according to a single person (not global nor accurate/actual)
     -- stockPriceHistory = table of stock prices
     local total = 0
     for i = 1, #stockPriceHistory do
         total = total + stockPriceHistory[i]
     end
     return total / #stockPriceHistory
+end
+
+function functions.getHistoricAvgPrice(commodity)
+    -- get the actual historic average transaction price for provided commodity
+
+    local sum = 0
+    for i = 1, #HISTORY_PRICE[commodity] do
+        sum = sum + HISTORY_PRICE[commodity][i]
+    end
+    local avgprice = (sum / #HISTORY_PRICE[commodity])
+    return avgprice
 end
 
 function functions.getRandomMarketXY(person)

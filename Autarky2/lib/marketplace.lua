@@ -157,6 +157,14 @@ local function adjustBiddersBeliefs(summary)
     local askprice = summary.askprice
     local avgprice = fun.getAvgPrice(buyer.stockPriceHistory[commodity])
 
+-- print("Summary:")
+-- print(inspect(summary))
+
+-- print("Buyers belief range before adjustment:")
+-- print(inspect(beliefRange))
+
+    local action
+
     if bidqty == nil then bidqty = 0 end
     if askqty == nil then askqty = 0 end
 
@@ -176,15 +184,19 @@ local function adjustBiddersBeliefs(summary)
             beliefRange[1] = beliefRange[1] + adjustamt
             beliefRange[2] = beliefRange[2] + adjustamt
         else
-            if bidprice > transactionprice then
+            if bidprice > transactionprice and transactionprice > 0 then
                 local adjustamt = (bidprice - transactionprice) * 1.1
                 beliefRange[1] = beliefRange[1] - adjustamt
                 beliefRange[2] = beliefRange[2] - adjustamt
+                -- print("alpha")
+                action = "alpha"
             else
                 if bidqty < askqty and bidprice > avgprice then
                     local adjustamt = (bidprice - avgprice) * 1.1
                     beliefRange[1] = beliefRange[1] - adjustamt
                     beliefRange[2] = beliefRange[2] - adjustamt
+                    -- print("bravo")
+                    action = "bravo"
                 else
                     if bidqty > askqty then
                         local adjustamt = avgprice * 0.20
@@ -194,29 +206,40 @@ local function adjustBiddersBeliefs(summary)
                         local adjustamt = avgprice * 0.20
                         beliefRange[1] = beliefRange[1] - adjustamt
                         beliefRange[2] = beliefRange[2] - adjustamt
+                        -- print("charlie")
+                        action = "charlie"
                     end
                 end
             end
         end
     else
-        if bidprice > transactionprice then
+        if bidprice > transactionprice and transactionprice > 0 then    -- success + overbid
             local adjustamt = (bidprice - transactionprice) * 1.1
             beliefRange[1] = beliefRange[1] - adjustamt
             beliefRange[2] = beliefRange[2] - adjustamt
+            -- print("delta. bidprice = $" .. bidprice .. ". Transaction price = $" .. transactionprice)
+            action = "delta"
         else
-            if bidqty < askqty and bidprice > avgprice then
+            -- bid has failed
+            if bidqty < askqty and bidprice > avgprice then     -- supply > demand and bid was higher than average
                 local adjustamt = (bidprice - avgprice) * 1.1
                 beliefRange[1] = beliefRange[1] - adjustamt
                 beliefRange[2] = beliefRange[2] - adjustamt
+                -- print("echo")
+                action = "echo"
             else
-                if bidqty > askqty then
+                -- demand > supply OR bid was too low
+                if bidqty > askqty then                             -- demand > supply
                     local adjustamt = avgprice * 0.20
                     beliefRange[1] = beliefRange[1] + adjustamt
                     beliefRange[2] = beliefRange[2] + adjustamt
                 else
+                    -- supply > demand and bid was too low
                     local adjustamt = avgprice * 0.20
-                    beliefRange[1] = beliefRange[1] - adjustamt
+                    -- beliefRange[1] = beliefRange[1] - adjustamt      -- this makes the belief tank so removing it for now
                     beliefRange[2] = beliefRange[2] - adjustamt
+                    -- print("foxtrot. Bid failed but anticipating over supply")
+                    action = "foxtrot"
                 end
             end
         end
@@ -228,7 +251,16 @@ local function adjustBiddersBeliefs(summary)
     if beliefRange[1] < 0.5 then beliefRange[1] = 0.5 end
     if beliefRange[2] < beliefRange[1] then beliefRange[2] = beliefRange[1] end
 
-    table.insert(buyer.beliefRangeHistory, {beliefRange[1], beliefRange[2]})
+    -- print("Buyers belief range after adjustment:")
+    -- print(inspect(beliefRange))
+
+
+    table.insert(buyer.beliefRangeHistory[commodity], {beliefRange[1], beliefRange[2]})
+
+    if beliefRange[1] == 0.5 and beliefRange[2] == 0.5 then
+        print("Belief has crashed. Printing summary:" .. action)
+        print(inspect(summary))
+    end
 
     assert(beliefRange[1] > 0)
     assert(beliefRange[2] > 0)
@@ -249,11 +281,6 @@ local function adjustAskersBeliefs(summary)
     local beliefRange = seller.beliefRange[commodity]        -- because the commodity is used as an input, this becomes beliefRange = {1,10}
     local avgprice = fun.getAvgPrice(seller.stockPriceHistory[commodity])
 
-
-    -- print("yankee")
-    -- print(beliefRange[1])
-    -- print(beliefRange[2])
-
     -- begin algorithm
     local weight = 1 - (transactionqty - askqty)
     local displacement = weight * avgprice
@@ -264,32 +291,19 @@ local function adjustAskersBeliefs(summary)
         local adjustamt = displacement * (1/6)
         beliefRange[1] = beliefRange[1] - adjustamt
         beliefRange[2] = beliefRange[2] - adjustamt
-        -- print("xray")
-        -- print(transactionqty, askqty, weight, avgprice, displacement, adjustamt)
-        -- print(beliefRange[1])
-        -- print(beliefRange[2])
     else
         if transactionqty < (askqty * 0.75) then
             local adjustamt = displacement * (1/7)
             beliefRange[1] = beliefRange[1] - adjustamt
             beliefRange[2] = beliefRange[2] - adjustamt
-            -- print("victor")
-            -- print(beliefRange[1])
-            -- print(beliefRange[2])
         else
             local adjustamt = avgprice * 0.2
             if bidqty > askqty then
                 beliefRange[1] = beliefRange[1] + adjustamt
                 beliefRange[2] = beliefRange[2] + adjustamt
-                -- print("whiskey")
-                -- print(beliefRange[1])
-                -- print(beliefRange[2])
             else
                 beliefRange[1] = beliefRange[1] - adjustamt
                 beliefRange[2] = beliefRange[2] - adjustamt
-                -- print("lima")
-                -- print(beliefRange[1])
-                -- print(beliefRange[2])
             end
         end
     end
@@ -300,27 +314,19 @@ local function adjustAskersBeliefs(summary)
     if beliefRange[1] < 0.5 then beliefRange[1] = 0.5 end
     if beliefRange[2] < beliefRange[1] then beliefRange[2] = beliefRange[1] end
 
-    table.insert(seller.beliefRangeHistory, {beliefRange[1], beliefRange[2]})
-
-    -- print("zulu")
-    -- print(beliefRange[1])
-    -- print(beliefRange[2])
-
-    assert(beliefRange[1] > 0)
-    assert(beliefRange[2] > 0)
-
+    table.insert(seller.beliefRangeHistory[commodity], {beliefRange[1], beliefRange[2]})
 end
 
 function marketplace.resolveOrders()
     -- bidtable and asktable are local to this module and are populated by calling
     -- createBid and createAsk before calling this function
 
-    -- print("**********************")
-    -- print("All bids (qty, price):")
-    -- print(inspect(bidtable))
-    -- print("All asks (qty, price):")
-    -- print(inspect(asktable))
-    -- print("**********************")
+    print("**********************")
+    print("All bids (qty, price):")
+    print(inspect(bidtable))
+    print("All asks (qty, price):")
+    print(inspect(asktable))
+    print("**********************")
 
     local results = {}
 
@@ -356,22 +362,22 @@ function marketplace.resolveOrders()
                 -- the [2] indicates the bid/ask price (not qty)
                 -- the qty traded is determined if and only if a price is agreed
                 bidprice = bidtable[commodity][1][2]
-                print("Bid price is $" .. bidprice)
+                -- print("Bid price is $" .. bidprice)
                 askprice = asktable[commodity][1][2]
-                print("Ask price is $" .. askprice)
+                -- print("Ask price is $" .. askprice)
 
                 if bidprice >= askprice then
                     transactionprice = (bidprice + askprice) / 2      -- this is a float
                     transactionprice = cf.round(transactionprice, 1)
-                    print("Price agreed at $" .. transactionprice)
+                    -- print("Price agreed at $" .. transactionprice)
                     bidqty = bidtable[commodity][1][1]
                     askqty = asktable[commodity][1][1]
-                    print("Bid qty = " .. bidqty .. " and ask qty = " .. askqty)
+                    -- print("Bid qty = " .. bidqty .. " and ask qty = " .. askqty)
                     if askqty >= bidqty then
                         -- purchase fully satisfied
-                        print("Bid qty fully satisified")
+                        -- print("Bid qty fully satisified")
                     else
-                        print("Bid qty partially satisfied")
+                        -- print("Bid qty partially satisfied")
                     end
 
                     -- adjust bidqty/askqty by math.min
@@ -384,6 +390,7 @@ function marketplace.resolveOrders()
                     outcome.buyerguid = bidtable[commodity][1][3]
                     outcome.sellerguid = asktable[commodity][1][3]
                     outcome.commodityID = commodity
+                    outcome.agreedprice = transactionprice
                     outcome.transactionTotalPrice = transactionprice * transactionamt
                     outcome.transactionTotalQty = transactionamt
                     table.insert(results, outcome)  -- results is returned to the parent function
@@ -409,7 +416,7 @@ function marketplace.resolveOrders()
                         table.remove(asktable[commodity], 1)
                     end
                 else
-                    print("Price not agreed. Trade fails")
+                    -- print("Price not agreed. Trade fails")
                     -- remove bid as bid price is too low to be satisfied
                     table.remove(bidtable[commodity], 1)
                 end
@@ -429,13 +436,13 @@ function marketplace.resolveOrders()
                 summary.history = buyer.stockPriceHistory[commodity]
                 adjustBiddersBeliefs(summary)
 
-                print("Bravo: buyer belief range after adjustment")
-                print(inspect(buyer.beliefRange))
+                -- print("Bravo: buyer belief range after adjustment")
+                -- print(inspect(buyer.beliefRange))
 
                 summary.seller = seller
                 adjustAskersBeliefs(summary)
-                print("delta: seller belief range after adjustment")
-                print(inspect(seller.beliefRange))
+                -- print("delta: seller belief range after adjustment")
+                -- print(inspect(seller.beliefRange))
 
 
             end

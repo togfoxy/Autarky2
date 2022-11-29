@@ -12,6 +12,7 @@ fun = require 'functions'
 require 'draw'
 require 'constants'
 require 'people'
+require 'structures'
 
 GAME_VERSION = "0.01"
 
@@ -30,22 +31,69 @@ function love.keyreleased( key, scancode )
 				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1		-- not sure if this will be used
 
 				person.occupation = enum.jobFarmer
-				local row, col = fun.getEmptyTile()
-				MAP[row][col].structure = enum.farm
-				MAP[row][col].owner = person.guid
+				local row, col = structures.create(enum.structureFarm, person.guid)
 				person.workrow = row
 				person.workcol = col
-                person.occupationstockgain = love.math.random(15,25) / 10	-- (1.5 -> 2.5)
+                person.occupationstockgain = love.math.random(40,60) / 10	-- (4.0 -> 6.0)
 				person.occupationstockinput = nil
 				person.occupationstockoutput = enum.stockFood
+			end
+		end
+	end
+	if key == "w" then
+		-- woodsman
+		for k, person in pairs(PERSONS) do
+			if person.isSelected and person.occupation == nil then
+				person.isSelected = false
+				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1
+
+				person.occupation = enum.jobWoodsman
+				local row, col = structures.create(enum.structureLogs, person.guid)
+				person.workrow = row
+				person.workcol = col
+                person.occupationstockgain = love.math.random(5,12) / 10	-- (0.5 -> 1.2)
+				person.occupationstockinput = nil
+				person.occupationstockoutput = enum.stockLogs
+			end
+		end
+	end
+	if key == "h" then
+		--healer
+		for k, person in pairs(PERSONS) do
+			if person.isSelected and person.occupation == nil then
+				person.isSelected = false
+				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1
+
+				person.occupation = enum.jobHealer
+				local row, col = structures.create(enum.structureHealer, person.guid)
+				person.workrow = row
+				person.workcol = col
+                person.occupationstockgain = love.math.random(20,40) / 10	-- (1.0 -> 2.0)
+				person.occupationstockinput = nil
+				person.occupationstockoutput = enum.stockHerbs
+			end
+		end
+	end
+	if key == "b" then
+		-- house builder
+		for k, person in pairs(PERSONS) do
+			if person.isSelected and person.occupation == nil then
+				person.isSelected = false
+				VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1
+
+				person.occupation = enum.jobBuilder
+				local row, col = structures.create(enum.structureBuilder, person.guid)
+				person.workrow = row
+				person.workcol = col
+				person.occupationstockinput = enum.stockLogs
+				person.occupationstockoutput = enum.stockHouse
+				person.occupationconversionrate = 5					-- this many inputs needed to make one output
 			end
 		end
 	end
 end
 
 function love.mousepressed( x, y, button, istouch, presses )
-
-
 	local gamex, gamey = res.toGame(x, y)
 	if button == 1 then
 		-- select the villager if clicked, else select the tile (further down)
@@ -89,7 +137,7 @@ function love.load()
 	fun.loadImages()
 
 	-- make this last to capture the initial state of the world
-	fun.RecordHistory(WORLD_DAYS)
+	fun.RecordHistoryStock()
 end
 
 function love.draw()
@@ -123,12 +171,19 @@ function love.update(dt)
 
 			if WORLD_HOURS >= 24 then
 				-- do once per day
-				fun.RecordHistory(WORLD_DAYS)		-- record key stats for graphs etc. Do before the day ticker increments
+				people.heal()
+				structures.age()
+				people.buildHouse()
+				fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
+
 				WORLD_HOURS = WORLD_HOURS - 24
 				WORLD_DAYS = WORLD_DAYS + 1
 
-				print("Person 1 belief history")
-				print(inspect(PERSONS[1].beliefRangeHistory))
+				MARKET_RESOLVED = false 			-- reset this every midnight
+
+				-- print("Person 1 belief history (food and herbs)")
+				-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockFood]))
+				-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockHerbs]))
 			end
 		end
 
@@ -145,7 +200,10 @@ function love.update(dt)
 
 		if WORLD_HOURS == 19 then
 			-- market time
-			people.doMarketplace()
+			if not MARKET_RESOLVED then
+				people.doMarketplace()
+				MARKET_RESOLVED = true
+			end
 		end
 	end
 	res.update()

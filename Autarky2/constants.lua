@@ -15,15 +15,17 @@ function constants.load()
     GAME_LOG_DRAWX = SCREEN_WIDTH - 275
     MAP = {}
     SHOW_GRAPH = false
+    MARKET_RESOLVED = false
 
     SCREEN_STACK = {}
     IMAGES = {}
     SPRITES = {}
     QUADS = {}
 
-    HISTORY = {}
+    HISTORY_STOCK = {}
+    HISTORY_PRICE = {}
 
-    WORLD_HOURS = 5
+    WORLD_HOURS = 0
     WORLD_DAYS = 0
     TICKER = 0          -- dt or seconds (in fractions)
 
@@ -38,6 +40,7 @@ function constants.load()
     MARKETROW = 0
     MARKETCOL = 0
 
+
     -- ********************
     -- enums
     -- ********************
@@ -47,18 +50,44 @@ function constants.load()
     enum.market = 2
 
     -- stock types
-    NUMBER_OF_STOCK_TYPES = 3
+
     enum.stockHealth = 1
     enum.stockWealth = 2
 
-    --# update NUMBER_OF_STOCK_TYPES constant when adding new stock types
-
-    enum.farm = 3
+    enum.structureFarm = 3
     enum.jobFarmer = 3      -- job and icon need to have the same number
     enum.iconFarmer = 103   -- offset the icon by 100
     enum.stockFood = 3
 
+    enum.structureLogs = 4
     enum.stockLogs = 4
+    enum.jobWoodsman = 4
+    enum.iconWoodsman = 104
+
+    enum.jobHealer = 5
+    enum.stockHerbs = 5
+    enum.structureHealer = 5
+    enum.iconHealer = 105
+
+    enum.jobBuilder = 6
+    enum.stockHouse = 6
+    enum.structureBuilder = 6
+    enum.iconBuilder = 106
+
+    --# update NUMBER_OF_STOCK_TYPES constant when adding new stock types
+    --# update functions.loadImages() x 2
+    --# update main.keyreleased()
+    --# provide a sell point down below or it will default to 5
+    NUMBER_OF_STOCK_TYPES = 6
+
+    enum.structureHouse = 201   -- if no job/stock then start at 200
+
+    -- agents will sell when their output stock reaches this value
+    STOCK_QTY_SELLPOINT = {}
+    STOCK_QTY_SELLPOINT[enum.stockFood] = 7
+    STOCK_QTY_SELLPOINT[enum.stockLogs] = 1
+    STOCK_QTY_SELLPOINT[enum.stockHerbs] = 2
+    STOCK_QTY_SELLPOINT[enum.stockHouse] = 1
 
 
     -- sprites and quads
