@@ -45,7 +45,7 @@ function people.initialise()
         -- this happens AFTER the above loop to override and set correct initial values
         PERSONS[i].stock[enum.stockFood] = love.math.random(7,7)                 -- days
         PERSONS[i].stock[enum.stockHealth] = 100
-        PERSONS[i].stock[enum.stockWealth] = 1000
+        PERSONS[i].stock[enum.stockWealth] = 20
     end
 end
 
@@ -62,6 +62,7 @@ local function drawDebug(person)
     txt = txt .. "Logs: " .. person.stock[enum.stockLogs] .. "\n"
     txt = txt .. "Herbs: " .. person.stock[enum.stockHerbs] .. "\n"
     txt = txt .. "Houses: " .. person.stock[enum.stockHouse] .. "\n"
+    txt = txt .. "Tax owed: " .. person.stock[enum.stockTaxOwed] .. "\n"
 
     love.graphics.setColor(1,1,1,1)
     love.graphics.print(txt, drawx, drawy, 0, 1, 1, 0, 0)
@@ -279,7 +280,7 @@ function people.pay()
                     end
                 end
 
-                if love.math.random(1,10) == 1 then
+                if love.math.random(1,7) == 1 then
                     -- person is hurt while working
                     person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - love.math.random(15,25)
                     if person.stock[enum.stockHealth] <= 0 then
@@ -408,9 +409,9 @@ function people.doMarketplace()
            -- set destination = market
            fun.getRandomMarketXY(person)
 
-           if stockoutput == enum.stockHerbs then
-               print("Tried to sell herbs for $" .. askprice)
-           end
+           -- if stockoutput == enum.stockHerbs then
+           --     print("Tried to sell herbs for $" .. askprice)
+           -- end
         end
 
         --! need something about buying luxuries (wants)
@@ -432,13 +433,16 @@ function people.doMarketplace()
         -- capture the agreed price for stat purposes
         table.insert(HISTORY_PRICE[outcome.commodityID], outcome.agreedprice)
 
-        if buyer.stock[enum.stockWealth] >= outcome.transactionTotalPrice then
+        if buyer.stock[enum.stockWealth] - buyer.stock[enum.stockTaxOwed] >= outcome.transactionTotalPrice then
             -- funding assured - finalise the transaction
             buyer.stock[enum.stockWealth] = buyer.stock[enum.stockWealth] - outcome.transactionTotalPrice
             seller.stock[enum.stockWealth] = seller.stock[enum.stockWealth] + outcome.transactionTotalPrice
 
             buyer.stock[outcome.commodityID] = buyer.stock[outcome.commodityID] + outcome.transactionTotalQty
             seller.stock[outcome.commodityID] = seller.stock[outcome.commodityID] - outcome.transactionTotalQty
+
+            -- apply tax. It might put the agent into debt
+            buyer.stock[enum.stockTaxOwed] = cf.round(buyer.stock[enum.stockTaxOwed] + (outcome.transactionTotalPrice * SALES_TAX),2)
         end
     end
 end

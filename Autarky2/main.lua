@@ -14,8 +14,6 @@ require 'constants'
 require 'people'
 require 'structures'
 
-GAME_VERSION = "0.01"
-
 function love.keyreleased( key, scancode )
 	if key == "escape" then
 		cf.RemoveScreen(SCREEN_STACK)
