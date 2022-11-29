@@ -433,7 +433,7 @@ function people.doMarketplace()
         -- capture the agreed price for stat purposes
         table.insert(HISTORY_PRICE[outcome.commodityID], outcome.agreedprice)
 
-        if buyer.stock[enum.stockWealth] - buyer.stock[enum.stockTaxOwed] >= outcome.transactionTotalPrice then
+        if buyer.stock[enum.stockWealth] >= outcome.transactionTotalPrice then
             -- funding assured - finalise the transaction
             buyer.stock[enum.stockWealth] = buyer.stock[enum.stockWealth] - outcome.transactionTotalPrice
             seller.stock[enum.stockWealth] = seller.stock[enum.stockWealth] + outcome.transactionTotalPrice
@@ -441,7 +441,7 @@ function people.doMarketplace()
             buyer.stock[outcome.commodityID] = buyer.stock[outcome.commodityID] + outcome.transactionTotalQty
             seller.stock[outcome.commodityID] = seller.stock[outcome.commodityID] - outcome.transactionTotalQty
 
-            -- apply tax. It might put the agent into debt
+            -- record tax owed. It won't be paid until later
             buyer.stock[enum.stockTaxOwed] = cf.round(buyer.stock[enum.stockTaxOwed] + (outcome.transactionTotalPrice * SALES_TAX),2)
         end
     end
@@ -485,6 +485,16 @@ function people.buildHouse()
                 person.stock[enum.stockHouse] = person.stock[enum.stockHouse] - 1
             end
         end
+    end
+end
+
+function people.payTaxes()
+    -- collect owed taxes
+    -- this might put the agent into debt
+    for _, person in pairs(PERSONS) do
+        TREASURY = TREASURY + person.stock[enum.stockTaxOwed]
+        person.stock[enum.stockWealth] = person.stock[enum.stockWealth] - person.stock[enum.stockTaxOwed]
+        person.stock[enum.stockTaxOwed] = 0
     end
 end
 

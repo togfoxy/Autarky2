@@ -171,7 +171,10 @@ function love.update(dt)
 				people.heal()
 				structures.age()
 				people.buildHouse()
+				people.payTaxes()
 				fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
+				fun.RecordHistoryTreasury()
+
 
 				WORLD_HOURS = WORLD_HOURS - 24
 				WORLD_DAYS = WORLD_DAYS + 1

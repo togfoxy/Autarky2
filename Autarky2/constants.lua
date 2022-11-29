@@ -24,11 +24,13 @@ function constants.load()
 
     HISTORY_STOCK = {}
     HISTORY_PRICE = {}
+    HISTORY_TREASURY = {}
 
     WORLD_HOURS = 0
     WORLD_DAYS = 0
     TICKER = 0          -- dt or seconds (in fractions)
-    SALES_TAX = 0.10
+    SALES_TAX = 0.05
+    TREASURY = 0        -- govt coffers
 
     PERSONS = {}
     PERSONS_RADIUS = 7      -- for drawing and mouse click purposes

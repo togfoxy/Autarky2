@@ -127,6 +127,10 @@ function functions.RecordHistoryStock()
     end
 end
 
+function functions.RecordHistoryTreasury()
+    table.insert(HISTORY_TREASURY, TREASURY)
+end
+
 function functions.getEmptyTile()
     local count = 0
     local row, col
