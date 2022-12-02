@@ -21,6 +21,8 @@ Press 'g' to see a range of graphs to help you monitor the economy
 
 Hold 'CTRL' key to see debug information for each villager
 
+(There is no camera function just yet - coming soon)
+
 
 Daily cycle
 ===========
