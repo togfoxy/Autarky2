@@ -52,6 +52,36 @@ function draw.world()
 
 end
 
+function draw.daynight()
+    -- draw night time
+    local alpha
+
+    if WORLD_HOURS >= 0 and WORLD_HOURS <= 4 then
+        alpha = 0.6
+    elseif WORLD_HOURS == 5 then
+        alpha = 0.5
+    elseif WORLD_HOURS == 6 then
+        alpha = 0.4
+    elseif WORLD_HOURS == 7 then
+        alpha = 0.3
+    elseif WORLD_HOURS == 8 then
+        alpha = 0.2
+    elseif WORLD_HOURS >= 9 and WORLD_HOURS <= 17 then
+        alpha = 0.0
+    elseif WORLD_HOURS == 18 then
+        alpha = 0.3
+    elseif WORLD_HOURS == 19 then
+        alpha = 0.4
+    elseif WORLD_HOURS == 20 then
+        alpha = 0.5
+    elseif WORLD_HOURS >= 21 then
+        alpha = 0.6
+    end
+
+    love.graphics.setColor(0,0,0,alpha)
+    love.graphics.rectangle("fill", 0,0, SCREEN_WIDTH, SCREEN_HEIGHT)
+end
+
 function draw.graphs()
 
     love.graphics.setColor(1,1,1,1)

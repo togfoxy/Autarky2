@@ -145,8 +145,10 @@ end
 function love.draw()
     res.start()
 
-    draw.world()
+	draw.world()	-- draw the world before the people
 	people.draw()
+	draw.daynight()
+
 	if SHOW_GRAPH then
 		draw.graphs()
 	end
