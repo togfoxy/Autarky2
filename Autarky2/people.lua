@@ -5,48 +5,57 @@ function people.initialise()
     local numofppl = 5
 
     for i = 1, numofppl do
-        PERSONS[i] = {}
-        PERSONS[i].guid = cf.getGUID()
-        PERSONS[i].row = love.math.random(1, NUMBER_OF_ROWS)
-        PERSONS[i].col = love.math.random(1, NUMBER_OF_COLS)
-        PERSONS[i].destrow = PERSONS[i].row
-        PERSONS[i].destcol = PERSONS[i].col
+        people.createPerson()
+     end
+end
 
-        -- add a bit of a border to ensure the person stays inside the tile
-        local min = 0 + (PERSONS_RADIUS * 2)
-        local max = TILE_SIZE - (PERSONS_RADIUS * 2)
-        PERSONS[i].x = love.math.random(min, max)
-        PERSONS[i].y = love.math.random(min, max)
-        PERSONS[i].destx = PERSONS[i].x
-        PERSONS[i].desty = PERSONS[i].y
-        PERSONS[i].isSelected = false
+function people.createPerson()
+    -- create one person, give it a random location and initial all tables
 
-        PERSONS[i].occupation = nil
-        PERSONS[i].houserow = nil
-        PERSONS[i].housecol = nil
+    local thisperson = {}
+    thisperson = {}
+    thisperson.guid = cf.getGUID()
+    thisperson.row = love.math.random(1, NUMBER_OF_ROWS)
+    thisperson.col = love.math.random(1, NUMBER_OF_COLS)
+    thisperson.destrow = thisperson.row
+    thisperson.destcol = thisperson.col
 
-        PERSONS[i].stock = {}
-        PERSONS[i].beliefRange = {}                 -- eg PERSONS[i].beliefRange[enum.stockFood] = {1,10}
-        PERSONS[i].beliefRangeHistory = {}          --  .beliefRangeHistory[enum.stockFood][1] = (1,10})
-        PERSONS[i].stockPriceHistory = {}           -- this is the stock price history known to this agent (not global)
-        for j = 1, NUMBER_OF_STOCK_TYPES do
-            PERSONS[i].stock[j] = 0
+    -- add a bit of a border to ensure the person stays inside the tile
+    local min = 0 + (PERSONS_RADIUS * 2)
+    local max = TILE_SIZE - (PERSONS_RADIUS * 2)
+    thisperson.x = love.math.random(min, max)
+    thisperson.y = love.math.random(min, max)
+    thisperson.destx = thisperson.x
+    thisperson.desty = thisperson.y
+    thisperson.isSelected = false
 
-            PERSONS[i].beliefRange[j] = {}
-            PERSONS[i].beliefRange[j] = {1,10}
+    thisperson.occupation = nil
+    thisperson.houserow = nil
+    thisperson.housecol = nil
 
-            PERSONS[i].beliefRangeHistory[j] = {}
-            PERSONS[i].beliefRangeHistory[j] = {1, 10}
+    thisperson.stock = {}
+    thisperson.beliefRange = {}                 -- eg PERSONS[i].beliefRange[enum.stockFood] = {1,10}
+    thisperson.beliefRangeHistory = {}          --  .beliefRangeHistory[enum.stockFood][1] = (1,10})
+    thisperson.stockPriceHistory = {}           -- this is the stock price history known to this agent (not global)
+    for j = 1, NUMBER_OF_STOCK_TYPES do
+        thisperson.stock[j] = 0
 
-            PERSONS[i].stockPriceHistory[j] = {}
-            PERSONS[i].stockPriceHistory[j] = {5}
+        thisperson.beliefRange[j] = {}
+        thisperson.beliefRange[j] = {1,10}
 
-        end
-        -- this happens AFTER the above loop to override and set correct initial values
-        PERSONS[i].stock[enum.stockFood] = love.math.random(7,7)                 -- days
-        PERSONS[i].stock[enum.stockHealth] = 100
-        PERSONS[i].stock[enum.stockWealth] = 20
+        thisperson.beliefRangeHistory[j] = {}
+        thisperson.beliefRangeHistory[j] = {1, 10}
+
+        thisperson.stockPriceHistory[j] = {}
+        thisperson.stockPriceHistory[j] = {5}
     end
+
+    -- this happens AFTER the above loop to override and set correct initial values
+    thisperson.stock[enum.stockFood] = love.math.random(7,7)                 -- days
+    thisperson.stock[enum.stockHealth] = 100
+    thisperson.stock[enum.stockWealth] = 20
+
+    table.insert(PERSONS, thisperson)
 end
 
 

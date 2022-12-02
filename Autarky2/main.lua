@@ -22,6 +22,11 @@ function love.keyreleased( key, scancode )
 		SHOW_GRAPH = not SHOW_GRAPH
 	end
 
+	if key == "kp+" then
+		-- add a new villager
+		people.createPerson()
+	end
+
 	if key == "f" then
 		for k,person in pairs(PERSONS) do
 			if person.isSelected and person.occupation == nil then
