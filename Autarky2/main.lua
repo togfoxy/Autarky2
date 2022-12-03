@@ -133,11 +133,15 @@ end
 
 function love.mousepressed( x, y, button, istouch, presses )
 	local gamex, gamey = res.toGame(x, y)
+	-- local wx, wy = cam:toWorld(gamex, gamey)	-- converts screen x/y to world x/y
+	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
+
 	if button == 1 then
 		-- select the villager if clicked, else select the tile (further down)
 		for k, person in pairs(PERSONS) do
 			local x2, y2 = fun.getDrawXY(person)
-			local dist = math.abs(cf.GetDistance(gamex, gamey, x2, y2))
+			-- local dist = math.abs(cf.GetDistance(gamex, gamey, x2, y2))
+			local dist = math.abs(cf.GetDistance(wx, wy, x2, y2))
 
 			if dist <= PERSONS_RADIUS then
 				if person.isSelected then
@@ -266,7 +270,7 @@ function love.update(dt)
 			end
 		end
 	end
-	
+
 	cam:setPos(TRANSLATEX,	TRANSLATEY)
 	cam:setZoom(ZOOMFACTOR)
 	res.update()

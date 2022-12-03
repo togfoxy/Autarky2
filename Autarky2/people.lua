@@ -99,6 +99,9 @@ function people.draw()
         if person.isSelected then
             quad = QUADS[enum.spriteRedWoman][2]
             spritenumber = enum.spriteRedWoman
+
+            love.graphics.circle("line", drawx, drawy + 7, PERSONS_RADIUS + 5)
+
         else
             quad = QUADS[enum.spriteBlueWoman][2]
             spritenumber = enum.spriteBlueWoman
