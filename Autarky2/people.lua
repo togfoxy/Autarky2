@@ -99,6 +99,9 @@ function people.draw()
         if person.isSelected then
             quad = QUADS[enum.spriteRedWoman][2]
             spritenumber = enum.spriteRedWoman
+
+            love.graphics.circle("line", drawx, drawy + 7, PERSONS_RADIUS + 5)
+
         else
             quad = QUADS[enum.spriteBlueWoman][2]
             spritenumber = enum.spriteBlueWoman
@@ -263,6 +266,7 @@ function people.dies(person, reason)
         if PERSONS[i] == person then
             table.remove(PERSONS, i)
             print("Person died. Reason = " .. reason)
+            PERSONS_LEFT = PERSONS_LEFT + 1
         end
     end
 end
@@ -522,6 +526,23 @@ function people.claimSocialSecurity()
             end
         end
     end
+end
+
+function people.getOccupationCount()
+
+    local result = {}
+    result[enum.jobFarmer] = 0
+    result[enum.jobHealer] = 0
+    result[enum.jobBuilder] = 0
+    result[enum.jobWoodsman] = 0
+
+    for _, person in pairs(PERSONS) do
+        local occupation = person.occupation        -- e.g enum.jobFarmer
+        if occupation ~= nil then
+            result[occupation] = result[occupation] + 1
+        end
+    end
+    return result
 end
 
 

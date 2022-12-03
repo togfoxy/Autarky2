@@ -21,6 +21,12 @@ function love.keyreleased( key, scancode )
 	if key == "escape" then
 		cf.RemoveScreen(SCREEN_STACK)
 	end
+	if key == "space" then
+		-- pause
+		PAUSED = not PAUSED
+	end
+
+
 	if key == "g" then
 		SHOW_GRAPH = not SHOW_GRAPH
 	end
@@ -133,11 +139,15 @@ end
 
 function love.mousepressed( x, y, button, istouch, presses )
 	local gamex, gamey = res.toGame(x, y)
+	-- local wx, wy = cam:toWorld(gamex, gamey)	-- converts screen x/y to world x/y
+	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
+
 	if button == 1 then
 		-- select the villager if clicked, else select the tile (further down)
 		for k, person in pairs(PERSONS) do
 			local x2, y2 = fun.getDrawXY(person)
-			local dist = math.abs(cf.GetDistance(gamex, gamey, x2, y2))
+			-- local dist = math.abs(cf.GetDistance(gamex, gamey, x2, y2))
+			local dist = math.abs(cf.GetDistance(wx, wy, x2, y2))
 
 			if dist <= PERSONS_RADIUS then
 				if person.isSelected then
@@ -168,7 +178,7 @@ end
 
 function love.load()
 
-	love.window.setMode(800, 600, {resizable = true, display = 1})
+	love.window.setMode(800, 600, {resizable = true, display = 1, fullscreen = true})
 	res.setGame(1920, 1080)
 
 	SCREEN_WIDTH = 1920
@@ -210,63 +220,66 @@ end
 
 function love.update(dt)
 
-	local movement = people.moveToDestination(dt)
+	if not PAUSED then
 
-	TICKER = TICKER + dt
-	if TICKER >= 1 then
-		TICKER = TICKER - 1
-		if not movement then
-			WORLD_HOURS = WORLD_HOURS + 1
-			if WORLD_HOURS == 8 then
-				people.assignDestination(WORLD_HOURS)
+		local movement = people.moveToDestination(dt)
+
+		TICKER = TICKER + dt
+		if TICKER >= 1 then
+			TICKER = TICKER - 1
+			if not movement then
+				WORLD_HOURS = WORLD_HOURS + 1
+				if WORLD_HOURS == 8 then
+					people.assignDestination(WORLD_HOURS)
+				end
+
+				if WORLD_HOURS == 20 then
+					people.assignDestination(WORLD_HOURS)
+				end
+
+				if WORLD_HOURS >= 24 then
+					-- do once per day
+					people.heal()
+					structures.age()
+					people.buildHouse()
+					people.payTaxes()
+					people.claimSocialSecurity()
+					fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
+					fun.RecordHistoryTreasury()
+
+
+					WORLD_HOURS = WORLD_HOURS - 24
+					WORLD_DAYS = WORLD_DAYS + 1
+
+					MARKET_RESOLVED = false 			-- reset this every midnight
+
+					-- print("Person 1 belief history (food and herbs)")
+					-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockFood]))
+					-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockHerbs]))
+				end
 			end
 
-			if WORLD_HOURS == 20 then
-				people.assignDestination(WORLD_HOURS)
+			-- pay time
+			if WORLD_HOURS == 17 then
+				people.pay()
 			end
 
-			if WORLD_HOURS >= 24 then
-				-- do once per day
-				people.heal()
-				structures.age()
-				people.buildHouse()
-				people.payTaxes()
-				people.claimSocialSecurity()
-				fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
-				fun.RecordHistoryTreasury()
-
-
-				WORLD_HOURS = WORLD_HOURS - 24
-				WORLD_DAYS = WORLD_DAYS + 1
-
-				MARKET_RESOLVED = false 			-- reset this every midnight
-
-				-- print("Person 1 belief history (food and herbs)")
-				-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockFood]))
-				-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockHerbs]))
+			-- dinner time
+			if WORLD_HOURS == 18 then
+				print("Nom")
+				people.eat()
 			end
-		end
 
-		-- pay time
-		if WORLD_HOURS == 17 then
-			people.pay()
-		end
-
-		-- dinner time
-		if WORLD_HOURS == 18 then
-			print("Nom")
-			people.eat()
-		end
-
-		if WORLD_HOURS == 19 then
-			-- market time
-			if not MARKET_RESOLVED then
-				people.doMarketplace()
-				MARKET_RESOLVED = true
+			if WORLD_HOURS == 19 then
+				-- market time
+				if not MARKET_RESOLVED then
+					people.doMarketplace()
+					MARKET_RESOLVED = true
+				end
 			end
 		end
 	end
-	
+
 	cam:setPos(TRANSLATEX,	TRANSLATEY)
 	cam:setZoom(ZOOMFACTOR)
 	res.update()
