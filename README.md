@@ -21,7 +21,17 @@ Press 'g' to see a range of graphs to help you monitor the economy
 
 Hold 'CTRL' key to see debug information for each villager
 
-(There is no camera function just yet - coming soon)
+Press 'spacebar' to pause
+
+Camera controls
+===============
+Press arrow keys to pan
+
+Hold middle mouse button to pan
+
+Scroll middle mouse wheel to zoom
+
+Press 'keypad 5' to recentre camera
 
 
 Daily cycle
