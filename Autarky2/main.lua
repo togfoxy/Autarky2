@@ -5,6 +5,9 @@ inspect = require 'lib.inspect'
 res = require 'lib.resolution_solution'
 -- https://github.com/Vovkiv/resolution_solution
 
+Camera = require 'lib.cam11.cam11'
+-- https://notabug.org/pgimeno/cam11
+
 marketplace = require 'lib.marketplace'
 
 cf = require 'lib.commonfunctions'
@@ -94,6 +97,38 @@ function love.keyreleased( key, scancode )
 			end
 		end
 	end
+
+	if key == "kp5" then
+		ZOOMFACTOR = 1
+		TRANSLATEX = SCREEN_WIDTH / 2
+		TRANSLATEY = SCREEN_HEIGHT / 2
+	end
+end
+
+
+function love.keypressed( key, scancode, isrepeat )
+
+	local translatefactor = 5 * (ZOOMFACTOR * 2)		-- screen moves faster when zoomed in
+
+	local leftpressed = love.keyboard.isDown("left")
+	local rightpressed = love.keyboard.isDown("right")
+	local uppressed = love.keyboard.isDown("up")
+	local downpressed = love.keyboard.isDown("down")
+	local shiftpressed = love.keyboard.isDown("lshift") or love.keyboard.isDown("rshift")	-- either shift key will work
+
+	-- adjust translatex/y based on keypress combinations
+	if shiftpressed then translatefactor = translatefactor * 2 end	-- ensure this line is above the lines below
+	if leftpressed then TRANSLATEX = TRANSLATEX - translatefactor end
+	if rightpressed then TRANSLATEX = TRANSLATEX + translatefactor end
+	if uppressed then TRANSLATEY = TRANSLATEY - translatefactor end
+	if downpressed then TRANSLATEY = TRANSLATEY + translatefactor end
+end
+
+function love.mousemoved( x, y, dx, dy, istouch )
+	if love.mouse.isDown(3) then
+		TRANSLATEX = TRANSLATEX - dx
+		TRANSLATEY = TRANSLATEY - dy
+	end
 end
 
 function love.mousepressed( x, y, button, istouch, presses )
@@ -115,8 +150,20 @@ function love.mousepressed( x, y, button, istouch, presses )
 			end
 		end
 	end
--- print("******")
+	-- print("******")
+end
 
+
+function love.wheelmoved(x, y)
+	if y > 0 then
+		-- wheel moved up. Zoom in
+		ZOOMFACTOR = ZOOMFACTOR + 0.05
+	end
+	if y < 0 then
+		ZOOMFACTOR = ZOOMFACTOR - 0.05
+	end
+	if ZOOMFACTOR < 0.8 then ZOOMFACTOR = 0.8 end
+	if ZOOMFACTOR > 3 then ZOOMFACTOR = 3 end
 end
 
 function love.load()
@@ -131,6 +178,7 @@ function love.load()
 
     love.window.setTitle("Autarky2 " .. GAME_VERSION)
 	love.keyboard.setKeyRepeat(true)
+	love.keyboard.setKeyRepeat(true)
 
     cf.AddScreen("World", SCREEN_STACK)
 
@@ -140,10 +188,13 @@ function love.load()
 
 	-- make this last to capture the initial state of the world
 	fun.RecordHistoryStock()
+
+	cam = Camera.new(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 1)
 end
 
 function love.draw()
     res.start()
+	cam:attach()
 
 	draw.world()	-- draw the world before the people
 	people.draw()
@@ -153,6 +204,7 @@ function love.draw()
 		draw.graphs()
 	end
 
+	cam:detach()
     res.stop()
 end
 
@@ -214,5 +266,8 @@ function love.update(dt)
 			end
 		end
 	end
+	
+	cam:setPos(TRANSLATEX,	TRANSLATEY)
+	cam:setZoom(ZOOMFACTOR)
 	res.update()
 end

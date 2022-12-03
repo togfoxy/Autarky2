@@ -80,6 +80,16 @@ function draw.daynight()
 
     love.graphics.setColor(0,0,0,alpha)
     love.graphics.rectangle("fill", 0,0, SCREEN_WIDTH, SCREEN_HEIGHT)
+
+    if alpha > 0 then       --!
+        -- draw some lights
+        -- love.graphics.setColor(1,1,1,1)
+        -- love.graphics.points(100,100,200,200,300,300,400,400)
+    end
+
+
+
+
 end
 
 function draw.graphs()

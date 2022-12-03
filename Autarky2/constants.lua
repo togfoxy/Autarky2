@@ -12,6 +12,11 @@ function constants.load()
 
     LEFT_MARGIN = cf.round(TILE_SIZE / 1)
     TOP_MARGIN = cf.round(TILE_SIZE / 1)
+
+    TRANSLATEX = cf.round(SCREEN_WIDTH / 2)		-- starts the camera in the middle of the ocean
+    TRANSLATEY = cf.round(SCREEN_HEIGHT / 2)	-- need to round because this is working with pixels
+    ZOOMFACTOR = 1
+    
     GAME_LOG_DRAWX = SCREEN_WIDTH - 275
     MAP = {}
     SHOW_GRAPH = false
