@@ -47,8 +47,22 @@ function draw.world()
 
     -- draw world hours
     love.graphics.setColor(1,1,1,1)
-    local str = "Time: " .. WORLD_HOURS .. " Day: " .. WORLD_DAYS .. " Treasury: " .. TREASURY
+    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. " Treasury: " .. TREASURY .. " "
+    if PAUSED then str = str .. "PAUSED" end
     love.graphics.print(str, 10, 10)
+
+    -- draw villager counts
+    local occupationtable = people.getOccupationCount()
+    local str = "Farmers: " .. occupationtable[enum.jobFarmer] .. ". "
+    str = str .. "Healers: " .. occupationtable[enum.jobHealer] .. ". "
+    str = str .. "Woodsmen: " .. occupationtable[enum.jobWoodsman] .. ". "
+    str = str .. "Builders: " .. occupationtable[enum.jobBuilder] .. ". "
+    love.graphics.print(str, (SCREEN_WIDTH / 2) - 250, 10)
+
+    -- draw more counts on the far right margin
+    local str = "Villagers available: " .. #PERSONS .. " Villagers quit: " .. PERSONS_LEFT
+    love.graphics.print(str, SCREEN_WIDTH - 300, 10)
+
 
 end
 
@@ -79,7 +93,7 @@ function draw.daynight()
     end
 
     love.graphics.setColor(0,0,0,alpha)
-    love.graphics.rectangle("fill", 0,0, SCREEN_WIDTH, SCREEN_HEIGHT)
+    love.graphics.rectangle("fill", TILE_SIZE,TILE_SIZE, SCREEN_WIDTH, SCREEN_HEIGHT)
 
     if alpha > 0 then       --!
         -- draw some lights

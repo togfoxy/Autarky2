@@ -16,7 +16,7 @@ function constants.load()
     TRANSLATEX = cf.round(SCREEN_WIDTH / 2)		-- starts the camera in the middle of the ocean
     TRANSLATEY = cf.round(SCREEN_HEIGHT / 2)	-- need to round because this is working with pixels
     ZOOMFACTOR = 1
-    
+
     GAME_LOG_DRAWX = SCREEN_WIDTH - 275
     MAP = {}
     SHOW_GRAPH = false
@@ -34,6 +34,7 @@ function constants.load()
     WORLD_HOURS = 0
     WORLD_DAYS = 0
     TICKER = 0          -- dt or seconds (in fractions)
+    PAUSED = false
     SALES_TAX = 0.05
     TREASURY = 0        -- govt coffers
 
@@ -41,6 +42,7 @@ function constants.load()
     PERSONS_RADIUS = 7      -- for drawing and mouse click purposes
     MOVEMENT_RATE = 300       -- number of pixels person moves pers second (not per dt)
     VILLAGERS_SELECTED = 0
+    PERSONS_LEFT = 0            -- number of persons left the village (died)
 
     STRUCTURES = {}           -- any sort of tile improvement
     WELLROW = 0                 -- stored here for convenience and easy recall
