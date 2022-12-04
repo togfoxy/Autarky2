@@ -4,7 +4,7 @@ function draw.world()
     -- draw the map including structures
 
     local alpha
-    if SHOW_GRAPH then
+    if cf.CurrentScreenName(SCREEN_STACK) == "Graphs" then
          alpha = 0.25       -- a modifier (not the actual alpha)
     else
         alpha = 1
@@ -41,7 +41,6 @@ function draw.world()
                 love.graphics.setColor(1,1,1,1 * alpha)
                 love.graphics.draw(IMAGES[structureid], drawx, drawy, 0, 1, 1)
             end
-
         end
     end
 

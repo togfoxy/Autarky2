@@ -31,8 +31,11 @@ function love.keyreleased( key, scancode )
 
 
 	if key == "g" then
-		SHOW_GRAPH = not SHOW_GRAPH
+		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
+			cf.AddScreen("Graphs", SCREEN_STACK)
+		end
 	end
+
 	if key == "o" then
 		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
 			cf.AddScreen("Options", SCREEN_STACK)
@@ -213,7 +216,7 @@ function love.load()
 	-- button
     close_graph_button = gui:button('Close', {x = 225, y = 400, w = 128, h = gui.style.unit})
     close_graph_button.click = function(this, x, y, button)
-        SHOW_GRAPH = false
+		cf.RemoveScreen(SCREEN_STACK)
         end
 
 	tax_rate_up_button = gui:button('^', {x = 225, y = 400, w = 50, h = gui.style.unit})
@@ -239,24 +242,24 @@ function love.draw()
 
 	local currentscreen = cf.CurrentScreenName(SCREEN_STACK)
 
-	if currentscreen == "World" then
+	if currentscreen == "World" or currentscreen == "Graphs" then
 		cam:attach()
 
 		draw.world()	-- draw the world before the people
 		people.draw()
 		draw.daynight()
 
-		if SHOW_GRAPH then
+		tax_rate_up_button:hide()
+		tax_rate_down_button:hide()
+		close_options_button:hide()
+
+
+		if currentscreen == "Graphs" then
 			draw.graphs()
 			close_graph_button:show()
 		else
 			close_graph_button:hide()
 		end
-
-		tax_rate_up_button:hide()
-		tax_rate_down_button:hide()
-		close_options_button:hide()
-
 		cam:detach()
 	elseif currentscreen == "Options" then
 		tax_rate_up_button:show()

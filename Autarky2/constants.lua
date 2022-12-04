@@ -3,7 +3,7 @@ constants = {}
 function constants.load()
     -- includes globals
 
-    GAME_VERSION = "0.02"
+    GAME_VERSION = "0.03"
 
     TILE_SIZE = 50
     UPPER_TERRAIN_HEIGHT = 6
@@ -19,7 +19,6 @@ function constants.load()
 
     GAME_LOG_DRAWX = SCREEN_WIDTH - 275
     MAP = {}
-    SHOW_GRAPH = false
     SHOW_OPTIONS = false
     MARKET_RESOLVED = false
 

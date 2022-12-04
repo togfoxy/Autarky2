@@ -80,7 +80,7 @@ end
 function people.draw()
 
     local alpha
-    if SHOW_GRAPH then
+    if cf.CurrentScreenName(SCREEN_STACK) == "Graphs" then
          alpha = 0.25       -- a modifier (not the actual alpha)
     else
         alpha = 1
