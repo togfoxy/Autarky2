@@ -25,7 +25,7 @@ Press 'spacebar' to pause
 
 Camera controls
 ===============
-Press arrow keys to pan
+Press arrow keys to pan. SHIFT + arrow for faster pan
 
 Hold middle mouse button to pan
 
