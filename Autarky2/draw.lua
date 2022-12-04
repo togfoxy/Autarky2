@@ -46,7 +46,7 @@ function draw.world()
 
     -- draw world hours
     love.graphics.setColor(1,1,1,1)
-    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. " Treasury: " .. TREASURY .. " "
+    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. " Treasury: $" .. TREASURY .. " "
     if PAUSED then str = str .. "PAUSED" end
     love.graphics.print(str, 10, 10)
 

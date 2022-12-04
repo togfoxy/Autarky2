@@ -11,6 +11,16 @@ Camera = require 'lib.cam11.cam11'
 gspot = require 'lib.gspot.Gspot'
 -- https://notabug.org/pgimeno/Gspot
 
+bitser = require 'lib.bitser'
+-- https://github.com/gvx/bitser
+
+nativefs = require 'lib.nativefs'
+-- https://github.com/megagrump/nativefs
+
+lovelyToasts = require 'lib.lovelyToasts'
+-- https://github.com/Loucee/Lovely-Toasts
+
+
 marketplace = require 'lib.marketplace'
 
 cf = require 'lib.commonfunctions'
@@ -149,8 +159,6 @@ function love.mousemoved( x, y, dx, dy, istouch )
 end
 
 function love.mousepressed( x, y, button, istouch, presses )
-	local gamex, gamey = res.toGame(x, y)
-	-- local wx, wy = cam:toWorld(gamex, gamey)	-- converts screen x/y to world x/y
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 
 	gspot:mousepress(wx, wy, button)
@@ -159,7 +167,6 @@ function love.mousepressed( x, y, button, istouch, presses )
 		-- select the villager if clicked, else select the tile (further down)
 		for k, person in pairs(PERSONS) do
 			local x2, y2 = fun.getDrawXY(person)
-			-- local dist = math.abs(cf.GetDistance(gamex, gamey, x2, y2))
 			local dist = math.abs(cf.GetDistance(wx, wy, x2, y2))
 
 			if dist <= PERSONS_RADIUS then
@@ -175,6 +182,10 @@ function love.mousepressed( x, y, button, istouch, presses )
 	end
 end
 
+function love.mousereleased( x, y, button, istouch, presses )
+	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
+	lovelyToasts.mousereleased(wx, wy, button)
+end
 
 function love.wheelmoved(x, y)
 	if y > 0 then
@@ -215,9 +226,7 @@ function love.load()
 
 	gui.load()
 
-
-
-
+	lovelyToasts.options.tapToDismiss = true
 end
 
 function love.draw()
@@ -253,6 +262,7 @@ function love.draw()
 		love.graphics.print(SALES_TAX, 300, 415)
 
 	end
+	lovelyToasts.draw()
 	gspot:draw()
     res.stop()
 end
@@ -327,6 +337,7 @@ function love.update(dt)
 		cam:setZoom(ZOOMFACTOR)
 	end
 
+	lovelyToasts.update(dt)
 	gspot:update(dt)
 	res.update()
 end

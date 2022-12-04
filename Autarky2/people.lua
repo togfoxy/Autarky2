@@ -504,10 +504,19 @@ end
 function people.payTaxes()
     -- collect owed taxes
     -- this might put the agent into debt
+    local taxcollected = 0
     for _, person in pairs(PERSONS) do
+        taxcollected = taxcollected + person.stock[enum.stockTaxOwed]
+
         TREASURY = TREASURY + person.stock[enum.stockTaxOwed]
         person.stock[enum.stockWealth] = person.stock[enum.stockWealth] - person.stock[enum.stockTaxOwed]
         person.stock[enum.stockTaxOwed] = 0
+    end
+    if taxcollected > 0 then
+        local x = SCREEN_WIDTH - 200
+        local y = love.math.random(100 ,SCREEN_HEIGHT - 100)
+        local str = "$" .. taxcollected .. " tax collected"
+        lovelyToasts.show(str, 10, nil, x, y)
     end
 end
 
