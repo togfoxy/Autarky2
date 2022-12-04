@@ -10,6 +10,10 @@ function functions.loadImages()
     IMAGES[enum.structureBuilder] = love.graphics.newImage("assets/images/builderhouse.png")
     IMAGES[enum.structureHouse] = love.graphics.newImage("assets/images/house3.png")
 
+    -- emoticons
+    EMOTICONS[enum.emoticonCash] = love.graphics.newImage("assets/images/emote_cash.png")
+    EMOTICONS[enum.emoticonSad] = love.graphics.newImage("assets/images/emote_faceSad.png")
+
     -- quads
     SPRITES[enum.spriteBlueWoman] = love.graphics.newImage("assets/images/Civilian Female Walk Blue.png")
     QUADS[enum.spriteBlueWoman] = cf.fromImageToQuads(SPRITES[enum.spriteBlueWoman], 15, 32)

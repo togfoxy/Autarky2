@@ -4,7 +4,7 @@ function draw.world()
     -- draw the map including structures
 
     local alpha
-    if SHOW_GRAPH then
+    if cf.CurrentScreenName(SCREEN_STACK) == "Graphs" then
          alpha = 0.25       -- a modifier (not the actual alpha)
     else
         alpha = 1
@@ -41,13 +41,12 @@ function draw.world()
                 love.graphics.setColor(1,1,1,1 * alpha)
                 love.graphics.draw(IMAGES[structureid], drawx, drawy, 0, 1, 1)
             end
-
         end
     end
 
     -- draw world hours
     love.graphics.setColor(1,1,1,1)
-    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. " Treasury: " .. TREASURY .. " "
+    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. " Treasury: $" .. TREASURY .. " "
     if PAUSED then str = str .. "PAUSED" end
     love.graphics.print(str, 10, 10)
 
@@ -219,7 +218,24 @@ function draw.graphs()
         local yvalue = drawy - HISTORY_PRICE[enum.stockHerbs][i]
         love.graphics.points(drawx, yvalue)
     end
+end
 
+function draw.imageQueue()
+
+    love.graphics.setColor(1,1,1,1)
+
+    for k, nextimage in pairs(IMAGE_QUEUE) do
+        local drawx = nextimage.x
+        local drawy = nextimage.y
+
+        if nextimage.imagetype == "emoticon" then
+            local offsetx = (TILE_SIZE * -1) * 0.33
+            local offsety = (TILE_SIZE / 2)
+            love.graphics.draw(EMOTICONS[nextimage.imagenumber], drawx, drawy, 0, 1, 1, offsetx, offsety)
+        else
+            error()
+        end
+    end
 end
 
 return draw

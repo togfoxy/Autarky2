@@ -80,7 +80,7 @@ end
 function people.draw()
 
     local alpha
-    if SHOW_GRAPH then
+    if cf.CurrentScreenName(SCREEN_STACK) == "Graphs" then
          alpha = 0.25       -- a modifier (not the actual alpha)
     else
         alpha = 1
@@ -431,7 +431,7 @@ function people.doMarketplace()
     end
 
     -- resolve bids/asks after all persons have had a chance to update orders
-    results = {}
+    results = {}        --! should this be local?
     results = marketplace.resolveOrders()
 
     print("----------------------")
@@ -457,6 +457,28 @@ function people.doMarketplace()
             -- record tax owed. It won't be paid until later
             buyer.stock[enum.stockTaxOwed] = cf.round(buyer.stock[enum.stockTaxOwed] + (outcome.transactionTotalPrice * SALES_TAX),2)
         end
+    end
+
+    if #results > 0 then
+        -- EMOTICONS
+        local myemote = {}
+        local x, y = fun.getTileXY(MARKETROW, MARKETCOL)
+        myemote.x = x
+        myemote.y = y
+        myemote.imagenumber = enum.emoticonCash
+        myemote.time = 5
+        myemote.imagetype = "emoticon"
+        table.insert(IMAGE_QUEUE, myemote)
+    else
+        --! need to make a sad face if and only if a bid/ask was not satisfied
+        -- local myemote = {}
+        -- local x, y = fun.getTileXY(MARKETROW, MARKETCOL)
+        -- myemote.x = x
+        -- myemote.y = y
+        -- myemote.imagenumber = enum.emoticonSad
+        -- myemote.time = 5
+        -- myemote.imagetype = "emoticon"
+        -- table.insert(IMAGE_QUEUE, myemote)
     end
 end
 
@@ -504,10 +526,19 @@ end
 function people.payTaxes()
     -- collect owed taxes
     -- this might put the agent into debt
+    local taxcollected = 0
     for _, person in pairs(PERSONS) do
+        taxcollected = taxcollected + person.stock[enum.stockTaxOwed]
+
         TREASURY = TREASURY + person.stock[enum.stockTaxOwed]
         person.stock[enum.stockWealth] = person.stock[enum.stockWealth] - person.stock[enum.stockTaxOwed]
         person.stock[enum.stockTaxOwed] = 0
+    end
+    if taxcollected > 0 then
+        local x = SCREEN_WIDTH - 200
+        local y = love.math.random(100 ,SCREEN_HEIGHT - 100)
+        local str = "$" .. taxcollected .. " tax collected"
+        lovelyToasts.show(str, 10, nil, x, y)
     end
 end
 

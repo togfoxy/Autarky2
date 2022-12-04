@@ -8,6 +8,19 @@ res = require 'lib.resolution_solution'
 Camera = require 'lib.cam11.cam11'
 -- https://notabug.org/pgimeno/cam11
 
+gspot = require 'lib.gspot.Gspot'
+-- https://notabug.org/pgimeno/Gspot
+
+bitser = require 'lib.bitser'
+-- https://github.com/gvx/bitser
+
+nativefs = require 'lib.nativefs'
+-- https://github.com/megagrump/nativefs
+
+lovelyToasts = require 'lib.lovelyToasts'
+-- https://github.com/Loucee/Lovely-Toasts
+
+
 marketplace = require 'lib.marketplace'
 
 cf = require 'lib.commonfunctions'
@@ -16,6 +29,7 @@ require 'draw'
 require 'constants'
 require 'people'
 require 'structures'
+require 'gui'
 
 function love.keyreleased( key, scancode )
 	if key == "escape" then
@@ -28,7 +42,15 @@ function love.keyreleased( key, scancode )
 
 
 	if key == "g" then
-		SHOW_GRAPH = not SHOW_GRAPH
+		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
+			cf.AddScreen("Graphs", SCREEN_STACK)
+		end
+	end
+
+	if key == "o" then
+		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
+			cf.AddScreen("Options", SCREEN_STACK)
+		end
 	end
 
 	if key == "kp+" then
@@ -111,7 +133,6 @@ function love.keyreleased( key, scancode )
 	end
 end
 
-
 function love.keypressed( key, scancode, isrepeat )
 
 	local translatefactor = 5 * (ZOOMFACTOR * 2)		-- screen moves faster when zoomed in
@@ -138,15 +159,14 @@ function love.mousemoved( x, y, dx, dy, istouch )
 end
 
 function love.mousepressed( x, y, button, istouch, presses )
-	local gamex, gamey = res.toGame(x, y)
-	-- local wx, wy = cam:toWorld(gamex, gamey)	-- converts screen x/y to world x/y
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
+
+	gspot:mousepress(wx, wy, button)
 
 	if button == 1 then
 		-- select the villager if clicked, else select the tile (further down)
 		for k, person in pairs(PERSONS) do
 			local x2, y2 = fun.getDrawXY(person)
-			-- local dist = math.abs(cf.GetDistance(gamex, gamey, x2, y2))
 			local dist = math.abs(cf.GetDistance(wx, wy, x2, y2))
 
 			if dist <= PERSONS_RADIUS then
@@ -160,9 +180,12 @@ function love.mousepressed( x, y, button, istouch, presses )
 			end
 		end
 	end
-	-- print("******")
 end
 
+function love.mousereleased( x, y, button, istouch, presses )
+	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
+	lovelyToasts.mousereleased(wx, wy, button)
+end
 
 function love.wheelmoved(x, y)
 	if y > 0 then
@@ -200,87 +223,129 @@ function love.load()
 	fun.RecordHistoryStock()
 
 	cam = Camera.new(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 1)
+
+	gui.load()
+
+	lovelyToasts.options.tapToDismiss = true
 end
 
 function love.draw()
     res.start()
-	cam:attach()
 
-	draw.world()	-- draw the world before the people
-	people.draw()
-	draw.daynight()
+	local currentscreen = cf.CurrentScreenName(SCREEN_STACK)
 
-	if SHOW_GRAPH then
-		draw.graphs()
+	if currentscreen == "World" or currentscreen == "Graphs" then
+		cam:attach()
+
+		draw.world()	-- draw the world before the people
+		people.draw()
+		draw.imageQueue()
+
+		draw.daynight()	-- draw day/night last
+
+		tax_rate_up_button:hide()
+		tax_rate_down_button:hide()
+		close_options_button:hide()
+
+		if currentscreen == "Graphs" then
+			draw.graphs()
+			close_graph_button:show()
+		else
+			close_graph_button:hide()
+		end
+		cam:detach()
+	elseif currentscreen == "Options" then
+		tax_rate_up_button:show()
+		tax_rate_down_button:show()
+		close_options_button:show()
+
+		love.graphics.setColor(1,1,1,1)
+		love.graphics.print(SALES_TAX, 300, 415)
 	end
 
-	cam:detach()
+	lovelyToasts.draw()
+	gspot:draw()
     res.stop()
 end
 
 function love.update(dt)
 
-	if not PAUSED then
+	local currentscreen = cf.CurrentScreenName(SCREEN_STACK)
 
-		local movement = people.moveToDestination(dt)
+	if currentscreen == "World" then
 
-		TICKER = TICKER + dt
-		if TICKER >= 1 then
-			TICKER = TICKER - 1
-			if not movement then
-				WORLD_HOURS = WORLD_HOURS + 1
-				if WORLD_HOURS == 8 then
-					people.assignDestination(WORLD_HOURS)
+		if not PAUSED then
+
+			local movement = people.moveToDestination(dt)
+
+			TICKER = TICKER + dt
+			if TICKER >= 1 then
+				TICKER = TICKER - 1
+				if not movement then
+					WORLD_HOURS = WORLD_HOURS + 1
+					if WORLD_HOURS == 8 then
+						people.assignDestination(WORLD_HOURS)
+					end
+
+					if WORLD_HOURS == 20 then
+						people.assignDestination(WORLD_HOURS)
+					end
+
+					if WORLD_HOURS >= 24 then
+						-- do once per day
+						people.heal()
+						structures.age()
+						people.buildHouse()
+						people.payTaxes()
+						people.claimSocialSecurity()
+						fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
+						fun.RecordHistoryTreasury()
+
+
+						WORLD_HOURS = WORLD_HOURS - 24
+						WORLD_DAYS = WORLD_DAYS + 1
+
+						MARKET_RESOLVED = false 			-- reset this every midnight
+
+						-- print("Person 1 belief history (food and herbs)")
+						-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockFood]))
+						-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockHerbs]))
+					end
 				end
 
-				if WORLD_HOURS == 20 then
-					people.assignDestination(WORLD_HOURS)
+				-- pay time
+				if WORLD_HOURS == 17 then
+					people.pay()
 				end
 
-				if WORLD_HOURS >= 24 then
-					-- do once per day
-					people.heal()
-					structures.age()
-					people.buildHouse()
-					people.payTaxes()
-					people.claimSocialSecurity()
-					fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
-					fun.RecordHistoryTreasury()
+				-- dinner time
+				if WORLD_HOURS == 18 then
+					print("Nom")
+					people.eat()
+				end
 
-
-					WORLD_HOURS = WORLD_HOURS - 24
-					WORLD_DAYS = WORLD_DAYS + 1
-
-					MARKET_RESOLVED = false 			-- reset this every midnight
-
-					-- print("Person 1 belief history (food and herbs)")
-					-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockFood]))
-					-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockHerbs]))
+				if WORLD_HOURS == 19 then
+					-- market time
+					if not MARKET_RESOLVED then
+						people.doMarketplace()
+						MARKET_RESOLVED = true
+					end
 				end
 			end
 
-			-- pay time
-			if WORLD_HOURS == 17 then
-				people.pay()
-			end
-
-			-- dinner time
-			if WORLD_HOURS == 18 then
-				print("Nom")
-				people.eat()
-			end
-
-			if WORLD_HOURS == 19 then
-				-- market time
-				if not MARKET_RESOLVED then
-					people.doMarketplace()
-					MARKET_RESOLVED = true
+			for i = #IMAGE_QUEUE, 1, -1 do
+				IMAGE_QUEUE[i].time = IMAGE_QUEUE[i].time - dt
+				if IMAGE_QUEUE[i].time <= 0 then
+					table.remove(IMAGE_QUEUE, i)
 				end
 			end
 		end
+
+		cam:setPos(TRANSLATEX,	TRANSLATEY)
+		cam:setZoom(ZOOMFACTOR)
 	end
 
-	cam:setPos(TRANSLATEX,	TRANSLATEY)
-	cam:setZoom(ZOOMFACTOR)
+	lovelyToasts.update(dt)
+	gspot:update(dt)
 	res.update()
 end

@@ -3,7 +3,7 @@ constants = {}
 function constants.load()
     -- includes globals
 
-    GAME_VERSION = "0.01"
+    GAME_VERSION = "0.03"
 
     TILE_SIZE = 50
     UPPER_TERRAIN_HEIGHT = 6
@@ -19,13 +19,15 @@ function constants.load()
 
     GAME_LOG_DRAWX = SCREEN_WIDTH - 275
     MAP = {}
-    SHOW_GRAPH = false
+    SHOW_OPTIONS = false
     MARKET_RESOLVED = false
 
     SCREEN_STACK = {}
     IMAGES = {}
     SPRITES = {}
     QUADS = {}
+    EMOTICONS = {}      -- holds emoticon images
+    IMAGE_QUEUE = {}
 
     HISTORY_STOCK = {}
     HISTORY_PRICE = {}
@@ -106,7 +108,9 @@ function constants.load()
     enum.spriteRedWoman = 2
 
 
-
+    -- emoticons
+    enum.emoticonCash = 1
+    enum.emoticonSad = 2
 
 end
 
