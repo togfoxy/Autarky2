@@ -12,6 +12,7 @@ function functions.loadImages()
 
     -- emoticons
     EMOTICONS[enum.emoticonCash] = love.graphics.newImage("assets/images/emote_cash.png")
+    EMOTICONS[enum.emoticonSad] = love.graphics.newImage("assets/images/emote_faceSad.png")
 
     -- quads
     SPRITES[enum.spriteBlueWoman] = love.graphics.newImage("assets/images/Civilian Female Walk Blue.png")

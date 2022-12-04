@@ -110,6 +110,7 @@ function constants.load()
 
     -- emoticons
     enum.emoticonCash = 1
+    enum.emoticonSad = 2
 
 end
 

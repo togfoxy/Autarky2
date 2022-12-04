@@ -469,6 +469,16 @@ function people.doMarketplace()
         myemote.time = 5
         myemote.imagetype = "emoticon"
         table.insert(IMAGE_QUEUE, myemote)
+    else
+        --! need to make a sad face if and only if a bid/ask was not satisfied
+        -- local myemote = {}
+        -- local x, y = fun.getTileXY(MARKETROW, MARKETCOL)
+        -- myemote.x = x
+        -- myemote.y = y
+        -- myemote.imagenumber = enum.emoticonSad
+        -- myemote.time = 5
+        -- myemote.imagetype = "emoticon"
+        -- table.insert(IMAGE_QUEUE, myemote)
     end
 end
 
