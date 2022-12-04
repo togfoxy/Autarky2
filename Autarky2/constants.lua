@@ -26,6 +26,8 @@ function constants.load()
     IMAGES = {}
     SPRITES = {}
     QUADS = {}
+    EMOTICONS = {}      -- holds emoticon images
+    IMAGE_QUEUE = {}
 
     HISTORY_STOCK = {}
     HISTORY_PRICE = {}
@@ -106,7 +108,8 @@ function constants.load()
     enum.spriteRedWoman = 2
 
 
-
+    -- emoticons
+    enum.emoticonCash = 1
 
 end
 

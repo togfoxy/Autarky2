@@ -218,9 +218,24 @@ function draw.graphs()
         local yvalue = drawy - HISTORY_PRICE[enum.stockHerbs][i]
         love.graphics.points(drawx, yvalue)
     end
+end
 
+function draw.imageQueue()
 
+    love.graphics.setColor(1,1,1,1)
 
+    for k, nextimage in pairs(IMAGE_QUEUE) do
+        local drawx = nextimage.x
+        local drawy = nextimage.y
+
+        if nextimage.imagetype == "emoticon" then
+            local offsetx = (TILE_SIZE * -1) * 0.33
+            local offsety = (TILE_SIZE / 2)
+            love.graphics.draw(EMOTICONS[nextimage.imagenumber], drawx, drawy, 0, 1, 1, offsetx, offsety)
+        else
+            error()
+        end
+    end
 end
 
 return draw

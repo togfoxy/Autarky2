@@ -239,12 +239,13 @@ function love.draw()
 
 		draw.world()	-- draw the world before the people
 		people.draw()
-		draw.daynight()
+		draw.imageQueue()
+
+		draw.daynight()	-- draw day/night last
 
 		tax_rate_up_button:hide()
 		tax_rate_down_button:hide()
 		close_options_button:hide()
-
 
 		if currentscreen == "Graphs" then
 			draw.graphs()
@@ -260,8 +261,8 @@ function love.draw()
 
 		love.graphics.setColor(1,1,1,1)
 		love.graphics.print(SALES_TAX, 300, 415)
-
 	end
+
 	lovelyToasts.draw()
 	gspot:draw()
     res.stop()
@@ -329,6 +330,13 @@ function love.update(dt)
 						people.doMarketplace()
 						MARKET_RESOLVED = true
 					end
+				end
+			end
+
+			for i = #IMAGE_QUEUE, 1, -1 do
+				IMAGE_QUEUE[i].time = IMAGE_QUEUE[i].time - dt
+				if IMAGE_QUEUE[i].time <= 0 then
+					table.remove(IMAGE_QUEUE, i)
 				end
 			end
 		end

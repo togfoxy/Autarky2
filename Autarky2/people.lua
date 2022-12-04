@@ -431,7 +431,7 @@ function people.doMarketplace()
     end
 
     -- resolve bids/asks after all persons have had a chance to update orders
-    results = {}
+    results = {}        --! should this be local?
     results = marketplace.resolveOrders()
 
     print("----------------------")
@@ -457,6 +457,18 @@ function people.doMarketplace()
             -- record tax owed. It won't be paid until later
             buyer.stock[enum.stockTaxOwed] = cf.round(buyer.stock[enum.stockTaxOwed] + (outcome.transactionTotalPrice * SALES_TAX),2)
         end
+    end
+
+    if #results > 0 then
+        -- EMOTICONS
+        local myemote = {}
+        local x, y = fun.getTileXY(MARKETROW, MARKETCOL)
+        myemote.x = x
+        myemote.y = y
+        myemote.imagenumber = enum.emoticonCash
+        myemote.time = 5
+        myemote.imagetype = "emoticon"
+        table.insert(IMAGE_QUEUE, myemote)
     end
 end
 
