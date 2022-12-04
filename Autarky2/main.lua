@@ -34,7 +34,9 @@ function love.keyreleased( key, scancode )
 		SHOW_GRAPH = not SHOW_GRAPH
 	end
 	if key == "o" then
-		cf.AddScreen("Options", SCREEN_STACK)
+		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
+			cf.AddScreen("Options", SCREEN_STACK)
+		end
 	end
 
 	if key == "kp+" then
@@ -222,8 +224,14 @@ function love.load()
 	tax_rate_down_button.click = function(this, x, y, button)
 		SALES_TAX = SALES_TAX - 0.05
 		if SALES_TAX < 0 then SALES_TAX = 0 end
-print("Hi")
 		end
+
+	close_options_button = gui:button('Close', {x = 400, y = 600, w = 128, h = gui.style.unit})
+    close_options_button.click = function(this, x, y, button)
+        cf.RemoveScreen(SCREEN_STACK)
+        end
+
+
 end
 
 function love.draw()
@@ -247,11 +255,13 @@ function love.draw()
 
 		tax_rate_up_button:hide()
 		tax_rate_down_button:hide()
+		close_options_button:hide()
 
 		cam:detach()
 	elseif currentscreen == "Options" then
 		tax_rate_up_button:show()
 		tax_rate_down_button:show()
+		close_options_button:show()
 
 		love.graphics.setColor(1,1,1,1)
 		love.graphics.print(SALES_TAX, 300, 415)
