@@ -8,7 +8,7 @@ res = require 'lib.resolution_solution'
 Camera = require 'lib.cam11.cam11'
 -- https://notabug.org/pgimeno/cam11
 
-gui = require 'lib.gspot.Gspot'
+gspot = require 'lib.gspot.Gspot'
 -- https://notabug.org/pgimeno/Gspot
 
 marketplace = require 'lib.marketplace'
@@ -19,6 +19,7 @@ require 'draw'
 require 'constants'
 require 'people'
 require 'structures'
+require 'gui'
 
 function love.keyreleased( key, scancode )
 	if key == "escape" then
@@ -122,7 +123,6 @@ function love.keyreleased( key, scancode )
 	end
 end
 
-
 function love.keypressed( key, scancode, isrepeat )
 
 	local translatefactor = 5 * (ZOOMFACTOR * 2)		-- screen moves faster when zoomed in
@@ -153,7 +153,7 @@ function love.mousepressed( x, y, button, istouch, presses )
 	-- local wx, wy = cam:toWorld(gamex, gamey)	-- converts screen x/y to world x/y
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 
-	gui:mousepress(wx, wy, button)
+	gspot:mousepress(wx, wy, button)
 
 	if button == 1 then
 		-- select the villager if clicked, else select the tile (further down)
@@ -213,26 +213,9 @@ function love.load()
 
 	cam = Camera.new(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 1)
 
-	-- button
-    close_graph_button = gui:button('Close', {x = 225, y = 400, w = 128, h = gui.style.unit})
-    close_graph_button.click = function(this, x, y, button)
-		cf.RemoveScreen(SCREEN_STACK)
-        end
+	gui.load()
 
-	tax_rate_up_button = gui:button('^', {x = 225, y = 400, w = 50, h = gui.style.unit})
-	tax_rate_up_button.click = function(this, x, y, button)
-		SALES_TAX = SALES_TAX + 0.05
-		end
-	tax_rate_down_button = gui:button('v', {x = 225, y = 425, w = 50, h = gui.style.unit})
-	tax_rate_down_button.click = function(this, x, y, button)
-		SALES_TAX = SALES_TAX - 0.05
-		if SALES_TAX < 0 then SALES_TAX = 0 end
-		end
 
-	close_options_button = gui:button('Close', {x = 400, y = 600, w = 128, h = gui.style.unit})
-    close_options_button.click = function(this, x, y, button)
-        cf.RemoveScreen(SCREEN_STACK)
-        end
 
 
 end
@@ -270,7 +253,7 @@ function love.draw()
 		love.graphics.print(SALES_TAX, 300, 415)
 
 	end
-	gui:draw()
+	gspot:draw()
     res.stop()
 end
 
@@ -344,6 +327,6 @@ function love.update(dt)
 		cam:setZoom(ZOOMFACTOR)
 	end
 
-	gui:update(dt)
+	gspot:update(dt)
 	res.update()
 end
