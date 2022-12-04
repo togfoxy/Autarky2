@@ -33,6 +33,9 @@ function love.keyreleased( key, scancode )
 	if key == "g" then
 		SHOW_GRAPH = not SHOW_GRAPH
 	end
+	if key == "o" then
+		cf.AddScreen("Options", SCREEN_STACK)
+	end
 
 	if key == "kp+" then
 		-- add a new villager
@@ -165,7 +168,6 @@ function love.mousepressed( x, y, button, istouch, presses )
 			end
 		end
 	end
-	-- print("******")
 end
 
 
@@ -207,100 +209,128 @@ function love.load()
 	cam = Camera.new(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 1)
 
 	-- button
-    button = gui:button('Close', {x = 400, y = 400, w = 128, h = gui.style.unit}) -- a button(label, pos, optional parent) gui.style.unit is a standard gui unit (default 16), used to keep the interface tidy
-    -- button.click = function(this, x, y) -- set element:click() to make it respond to gui's click event
-    button.click = function()
+    close_graph_button = gui:button('Close', {x = 225, y = 400, w = 128, h = gui.style.unit})
+    close_graph_button.click = function(this, x, y, button)
         SHOW_GRAPH = false
         end
 
+	tax_rate_up_button = gui:button('^', {x = 225, y = 400, w = 50, h = gui.style.unit})
+	tax_rate_up_button.click = function(this, x, y, button)
+		SALES_TAX = SALES_TAX + 0.05
+		end
+	tax_rate_down_button = gui:button('v', {x = 225, y = 425, w = 50, h = gui.style.unit})
+	tax_rate_down_button.click = function(this, x, y, button)
+		SALES_TAX = SALES_TAX - 0.05
+		if SALES_TAX < 0 then SALES_TAX = 0 end
+print("Hi")
+		end
 end
 
 function love.draw()
     res.start()
-	cam:attach()
 
-	draw.world()	-- draw the world before the people
-	people.draw()
-	draw.daynight()
+	local currentscreen = cf.CurrentScreenName(SCREEN_STACK)
 
-	if SHOW_GRAPH then
-		draw.graphs()
-		button:show()
-	else
-		button:hide()
+	if currentscreen == "World" then
+		cam:attach()
+
+		draw.world()	-- draw the world before the people
+		people.draw()
+		draw.daynight()
+
+		if SHOW_GRAPH then
+			draw.graphs()
+			close_graph_button:show()
+		else
+			close_graph_button:hide()
+		end
+
+		tax_rate_up_button:hide()
+		tax_rate_down_button:hide()
+
+		cam:detach()
+	elseif currentscreen == "Options" then
+		tax_rate_up_button:show()
+		tax_rate_down_button:show()
+
+		love.graphics.setColor(1,1,1,1)
+		love.graphics.print(SALES_TAX, 300, 415)
+
 	end
-
 	gui:draw()
-
-	cam:detach()
     res.stop()
 end
 
 function love.update(dt)
 
-	if not PAUSED then
+	local currentscreen = cf.CurrentScreenName(SCREEN_STACK)
 
-		local movement = people.moveToDestination(dt)
+	if currentscreen == "World" then
 
-		TICKER = TICKER + dt
-		if TICKER >= 1 then
-			TICKER = TICKER - 1
-			if not movement then
-				WORLD_HOURS = WORLD_HOURS + 1
-				if WORLD_HOURS == 8 then
-					people.assignDestination(WORLD_HOURS)
+		if not PAUSED then
+
+			local movement = people.moveToDestination(dt)
+
+			TICKER = TICKER + dt
+			if TICKER >= 1 then
+				TICKER = TICKER - 1
+				if not movement then
+					WORLD_HOURS = WORLD_HOURS + 1
+					if WORLD_HOURS == 8 then
+						people.assignDestination(WORLD_HOURS)
+					end
+
+					if WORLD_HOURS == 20 then
+						people.assignDestination(WORLD_HOURS)
+					end
+
+					if WORLD_HOURS >= 24 then
+						-- do once per day
+						people.heal()
+						structures.age()
+						people.buildHouse()
+						people.payTaxes()
+						people.claimSocialSecurity()
+						fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
+						fun.RecordHistoryTreasury()
+
+
+						WORLD_HOURS = WORLD_HOURS - 24
+						WORLD_DAYS = WORLD_DAYS + 1
+
+						MARKET_RESOLVED = false 			-- reset this every midnight
+
+						-- print("Person 1 belief history (food and herbs)")
+						-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockFood]))
+						-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockHerbs]))
+					end
 				end
 
-				if WORLD_HOURS == 20 then
-					people.assignDestination(WORLD_HOURS)
+				-- pay time
+				if WORLD_HOURS == 17 then
+					people.pay()
 				end
 
-				if WORLD_HOURS >= 24 then
-					-- do once per day
-					people.heal()
-					structures.age()
-					people.buildHouse()
-					people.payTaxes()
-					people.claimSocialSecurity()
-					fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
-					fun.RecordHistoryTreasury()
-
-
-					WORLD_HOURS = WORLD_HOURS - 24
-					WORLD_DAYS = WORLD_DAYS + 1
-
-					MARKET_RESOLVED = false 			-- reset this every midnight
-
-					-- print("Person 1 belief history (food and herbs)")
-					-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockFood]))
-					-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockHerbs]))
+				-- dinner time
+				if WORLD_HOURS == 18 then
+					print("Nom")
+					people.eat()
 				end
-			end
 
-			-- pay time
-			if WORLD_HOURS == 17 then
-				people.pay()
-			end
-
-			-- dinner time
-			if WORLD_HOURS == 18 then
-				print("Nom")
-				people.eat()
-			end
-
-			if WORLD_HOURS == 19 then
-				-- market time
-				if not MARKET_RESOLVED then
-					people.doMarketplace()
-					MARKET_RESOLVED = true
+				if WORLD_HOURS == 19 then
+					-- market time
+					if not MARKET_RESOLVED then
+						people.doMarketplace()
+						MARKET_RESOLVED = true
+					end
 				end
 			end
 		end
+
+		cam:setPos(TRANSLATEX,	TRANSLATEY)
+		cam:setZoom(ZOOMFACTOR)
 	end
 
 	gui:update(dt)
-
-	cam:setPos(TRANSLATEX,	TRANSLATEY)
-	cam:setZoom(ZOOMFACTOR)
 	res.update()
 end

@@ -20,6 +20,7 @@ function constants.load()
     GAME_LOG_DRAWX = SCREEN_WIDTH - 275
     MAP = {}
     SHOW_GRAPH = false
+    SHOW_OPTIONS = false
     MARKET_RESOLVED = false
 
     SCREEN_STACK = {}
