@@ -220,6 +220,8 @@ function draw.graphs()
         love.graphics.points(drawx, yvalue)
     end
 
+
+
 end
 
 return draw

@@ -8,6 +8,9 @@ res = require 'lib.resolution_solution'
 Camera = require 'lib.cam11.cam11'
 -- https://notabug.org/pgimeno/cam11
 
+gui = require 'lib.gspot.Gspot'
+-- https://notabug.org/pgimeno/Gspot
+
 marketplace = require 'lib.marketplace'
 
 cf = require 'lib.commonfunctions'
@@ -142,6 +145,8 @@ function love.mousepressed( x, y, button, istouch, presses )
 	-- local wx, wy = cam:toWorld(gamex, gamey)	-- converts screen x/y to world x/y
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 
+	gui:mousepress(wx, wy, button)
+
 	if button == 1 then
 		-- select the villager if clicked, else select the tile (further down)
 		for k, person in pairs(PERSONS) do
@@ -200,6 +205,14 @@ function love.load()
 	fun.RecordHistoryStock()
 
 	cam = Camera.new(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 1)
+
+	-- button
+    button = gui:button('Close', {x = 400, y = 400, w = 128, h = gui.style.unit}) -- a button(label, pos, optional parent) gui.style.unit is a standard gui unit (default 16), used to keep the interface tidy
+    -- button.click = function(this, x, y) -- set element:click() to make it respond to gui's click event
+    button.click = function()
+        SHOW_GRAPH = false
+        end
+
 end
 
 function love.draw()
@@ -212,7 +225,12 @@ function love.draw()
 
 	if SHOW_GRAPH then
 		draw.graphs()
+		button:show()
+	else
+		button:hide()
 	end
+
+	gui:draw()
 
 	cam:detach()
     res.stop()
@@ -279,6 +297,8 @@ function love.update(dt)
 			end
 		end
 	end
+
+	gui:update(dt)
 
 	cam:setPos(TRANSLATEX,	TRANSLATEY)
 	cam:setZoom(ZOOMFACTOR)
