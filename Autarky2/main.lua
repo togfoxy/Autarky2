@@ -52,6 +52,9 @@ function love.keyreleased( key, scancode )
 	if key == "s" then
 		file.saveGame()
 	end
+	if key == "l" then
+		file.loadGame()
+	end
 
 	if key == "g" then
 		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
