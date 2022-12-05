@@ -21,6 +21,9 @@ function constants.load()
     MAP = {}
     SHOW_OPTIONS = false
     MARKET_RESOLVED = false
+		
+	MOUSE_DOWN_X = nil
+	MOUSE_DOWN_Y = nil
 
     SCREEN_STACK = {}
     IMAGES = {}
