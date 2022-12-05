@@ -33,7 +33,9 @@ require 'gui'
 
 function love.keyreleased( key, scancode )
 	if key == "escape" then
-		cf.RemoveScreen(SCREEN_STACK)
+		if cf.CurrentScreenName(SCREEN_STACK) ~= "ExitGame" then
+			cf.RemoveScreen(SCREEN_STACK)
+		end
 	end
 	if key == "space" then
 		-- pause
@@ -130,6 +132,8 @@ function love.keyreleased( key, scancode )
 		ZOOMFACTOR = 1
 		TRANSLATEX = SCREEN_WIDTH / 2
 		TRANSLATEY = SCREEN_HEIGHT / 2
+
+		people.unselectAll()
 	end
 end
 
@@ -152,6 +156,16 @@ function love.keypressed( key, scancode, isrepeat )
 end
 
 function love.mousemoved( x, y, dx, dy, istouch )
+	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
+
+	if love.mouse.isDown(1) then
+		if MOUSE_DOWN_X == nil then
+			-- start the drag operation
+			MOUSE_DOWN_X = wx
+			MOUSE_DOWN_Y = wy
+		end
+	end
+
 	if love.mouse.isDown(3) then
 		TRANSLATEX = TRANSLATEX - dx
 		TRANSLATEY = TRANSLATEY - dy
@@ -185,6 +199,24 @@ end
 function love.mousereleased( x, y, button, istouch, presses )
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 	lovelyToasts.mousereleased(wx, wy, button)
+
+	if MOUSE_DOWN_X ~= nil and button == 1 then
+
+		-- cycle through persons and select all inside bounding box
+		for _, person in pairs(PERSONS) do
+			local x2, y2 = fun.getDrawXY(person)
+			if x2 > MOUSE_DOWN_X and x2 < wx then
+				if y2 > MOUSE_DOWN_Y and y2 < wy then
+					person.isSelected = true
+				end
+			end
+		end
+	end
+
+	-- used for mouse box dragging thingy
+	MOUSE_DOWN_X = nil
+	MOUSE_DOWN_Y = nil
+
 end
 
 function love.wheelmoved(x, y)
@@ -201,7 +233,7 @@ end
 
 function love.load()
 
-	love.window.setMode(800, 600, {resizable = true, display = 1, fullscreen = true})
+	love.window.setMode(800, 600, {resizable = true, display = 1})
 	res.setGame(1920, 1080)
 
 	SCREEN_WIDTH = 1920
@@ -213,6 +245,7 @@ function love.load()
 	love.keyboard.setKeyRepeat(true)
 	love.keyboard.setKeyRepeat(true)
 
+	cf.AddScreen("ExitGame", SCREEN_STACK)
     cf.AddScreen("World", SCREEN_STACK)
 
     fun.initialiseMap()     -- initialises 2d map with nils
@@ -246,6 +279,20 @@ function love.draw()
 		tax_rate_up_button:hide()
 		tax_rate_down_button:hide()
 		close_options_button:hide()
+		exit_game_button:hide()
+
+		if currentscreen == "World" then
+			-- do the mouse dragging thingy
+			if MOUSE_DOWN_X ~= nil then
+				-- draw box
+				local x, y = love.mouse.getPosition()
+				local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
+				local boxwidth = wx - MOUSE_DOWN_X
+				local boxheight = wy - MOUSE_DOWN_Y
+				love.graphics.setColor(1,1,1,1)
+				love.graphics.rectangle("line", MOUSE_DOWN_X, MOUSE_DOWN_Y, boxwidth, boxheight)
+			end
+		end
 
 		if currentscreen == "Graphs" then
 			draw.graphs()
@@ -253,14 +300,14 @@ function love.draw()
 		else
 			close_graph_button:hide()
 		end
+
 		cam:detach()
 	elseif currentscreen == "Options" then
-		tax_rate_up_button:show()
-		tax_rate_down_button:show()
-		close_options_button:show()
-
-		love.graphics.setColor(1,1,1,1)
-		love.graphics.print(SALES_TAX, 300, 415)
+		draw.optionScreen()
+	elseif currentscreen == "ExitGame" then
+		draw.exitScreen()
+	else
+		error("Current screen is " .. currentscreen)
 	end
 
 	lovelyToasts.draw()

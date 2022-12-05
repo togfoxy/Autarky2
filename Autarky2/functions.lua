@@ -101,6 +101,8 @@ function functions.getTileXY(row, col)
 end
 
 function functions.getDrawXY(person)
+    -- returns the screen x/y
+    -- used to detect mouse interactions
     local row = person.row
     local col = person.col
     local x = person.x

@@ -346,6 +346,42 @@ local function makeBid(person, stocknumber, maxqty)
     fun.getRandomMarketXY(person)
 end
 
+local function bidForFood(person)
+	local wealth = person.stock[enum.stockWealth]
+
+	-- determine bid price
+	local bidprice = marketplace.determineCommodityPrice(person.beliefRange[enum.stockFood])
+	bidprice = cf.round(bidprice, 2)
+
+	-- determine bid qty
+	local maxqtycanafford = wealth / bidprice
+	local maxqtycanhold = 14 - person.stock[enum.stockFood]
+	local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
+	local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[enum.stockFood])       -- accepts nil history
+	bidqty = cf.round(bidqty)
+
+	-- register the bid
+	marketplace.createBid(enum.stockFood, bidqty, bidprice, person.guid)
+
+	-- set destination = market
+	fun.getRandomMarketXY(person)
+end
+
+local function genericSellOutputStock(person, stockoutput)
+	local maxqtytosell = person.stock[stockoutput]
+	local askqty = marketplace.determineQty(maxqtytosell, person.stockPriceHistory[stockoutput]) -- commodity, maxQty, commodityKnowledge
+	askqty = cf.round(askqty)
+
+	-- determine ask price
+	local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
+	askprice = cf.round(askprice)
+	-- register the ask
+	marketplace.createAsk(stockoutput, askqty, askprice, person.guid)
+
+	-- set destination = market
+	fun.getRandomMarketXY(person)
+end
+
 function people.doMarketplace()
     -- determine if they need to buy/sell
 
@@ -354,24 +390,7 @@ function people.doMarketplace()
         -- food
         if person.stock[enum.stockFood] < 7 and person.occupation ~= enum.jobFarmer then
             -- try to buy food
-            local wealth = person.stock[enum.stockWealth]
-
-            -- determine bid price
-            local bidprice = marketplace.determineCommodityPrice(person.beliefRange[enum.stockFood])
-            bidprice = cf.round(bidprice, 2)
-
-            -- determine bid qty
-            local maxqtycanafford = wealth / bidprice
-            local maxqtycanhold = 14 - person.stock[enum.stockFood]
-            local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
-            local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[enum.stockFood])       -- accepts nil history
-            bidqty = cf.round(bidqty)
-
-            -- register the bid
-            marketplace.createBid(enum.stockFood, bidqty, bidprice, person.guid)
-
-            -- set destination = market
-            fun.getRandomMarketXY(person)
+			bidForFood(person)
         end
 
         -- buy herbs
@@ -392,42 +411,17 @@ function people.doMarketplace()
         local stockinput = person.occupationstockinput      -- stock type
         local wealth = person.stock[enum.stockWealth]
         if stockinput ~= nil and stockinput < 7 then
-            local bidprice = marketplace.determineCommodityPrice(person.beliefRange[stockinput])
-            bidprice = cf.round(bidprice)
-            local maxqtycanafford = wealth / bidprice
-            local maxqtycanhold = 14 - person.stock[stockinput]
-            local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
-            local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[stockinput])       -- accepts nil history
-            bidqty = cf.round(bidqty)
-            marketplace.createBid(stockinput, bidqty, bidprice, person.guid)
-
-            -- set destination = market
-            fun.getRandomMarketXY(person)
+			makeBid(person, stockinput)		--! need to test this
         end
 
         -- generic stock sell
         -- make an ask (sell)
         local stockoutput = person.occupationstockoutput        -- stock type
         if stockoutput ~= nil and person.stock[stockoutput] >= STOCK_QTY_SELLPOINT[stockoutput] then
-           local maxqtytosell = person.stock[stockoutput]
-           local askqty = marketplace.determineQty(maxqtytosell, person.stockPriceHistory[stockoutput]) -- commodity, maxQty, commodityKnowledge
-           askqty = cf.round(askqty)
-
-           -- determine ask price
-           local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
-           askprice = cf.round(askprice)
-           -- register the ask
-           marketplace.createAsk(stockoutput, askqty, askprice, person.guid)
-
-           -- set destination = market
-           fun.getRandomMarketXY(person)
-
-           -- if stockoutput == enum.stockHerbs then
-           --     print("Tried to sell herbs for $" .. askprice)
-           -- end
+			genericSellOutputStock(person, stockoutput)	--! need to test this
         end
 
-        --! need something about buying luxuries (wants)
+        --! need something about buying luxuries (wants/comfort)
     end
 
     -- resolve bids/asks after all persons have had a chance to update orders
@@ -574,6 +568,13 @@ function people.getOccupationCount()
         end
     end
     return result
+end
+
+function people.unselectAll()
+	-- ensure all persons are unselected
+	for _, person in pairs(PERSONS) do
+		person.isSelected = false
+	end
 end
 
 
