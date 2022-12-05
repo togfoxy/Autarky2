@@ -254,9 +254,7 @@ function draw.exitScreen()
 	tax_rate_down_button:hide()
 	close_options_button:hide()
 
-	-- exit_game_button:show()
-
-    love.graphics.print("Press ENTER to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+  love.graphics.print("Press ENTER to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
 end
 
