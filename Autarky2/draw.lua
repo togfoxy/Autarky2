@@ -13,7 +13,7 @@ function draw.topBar()
     str = str .. "Healers: " .. occupationtable[enum.jobHealer] .. ". "
     str = str .. "Woodsmen: " .. occupationtable[enum.jobWoodsman] .. ". "
     str = str .. "Builders: " .. occupationtable[enum.jobBuilder] .. ". "
-    love.graphics.print(str, (SCREEN_WIDTH / 2) - 250, 10)
+    love.graphics.print(str, (SCREEN_WIDTH / 2) - 175, 10)
 
     -- draw more counts on the far right margin
     local str = "Villagers available: " .. #PERSONS .. " Villagers quit: " .. PERSONS_LEFT
@@ -246,7 +246,7 @@ function draw.optionScreen()
 	-- love.graphics.print(SALES_TAX, 300, 415)
 
     love.graphics.print("Press ESCAPE to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-    
+
 end
 
 function draw.exitScreen()

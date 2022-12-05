@@ -30,6 +30,7 @@ require 'constants'
 require 'people'
 require 'structures'
 require 'gui'
+require 'file'
 
 function love.keyreleased( key, scancode )
 	if key == "escape" then
@@ -48,7 +49,12 @@ function love.keyreleased( key, scancode )
 		-- pause
 		PAUSED = not PAUSED
 	end
-
+	if key == "s" then
+		file.saveGame()
+	end
+	if key == "l" then
+		file.loadGame()
+	end
 
 	if key == "g" then
 		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
@@ -228,8 +234,6 @@ function love.mousereleased( x, y, button, istouch, presses )
 	-- used for mouse box dragging thingy
 	MOUSE_DOWN_X = nil
 	MOUSE_DOWN_Y = nil
-
-
 end
 
 function love.wheelmoved(x, y)
