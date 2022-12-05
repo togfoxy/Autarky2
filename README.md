@@ -9,6 +9,8 @@ Press keypad + to add a new villager (right-side of keyboard)
 
 Click a blue villager with mouse. The villager will turn red and have a circle around it.
 
+Press 'keypad 5' to unselect all the villagers
+
 Press 'f' to turn the villager into a FARMER
 
 Press 'w' to turn the villager into a WOODSMAN
