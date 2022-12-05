@@ -96,7 +96,7 @@ function constants.load()
     --# provide a sell point down below or it will default to 5
     NUMBER_OF_STOCK_TYPES = 14      -- maximum value of enum.stock
 
-    enum.structureHouse = 201   -- if no job/stock then start at 200
+    enum.structureHouse = 201   -- if structure is not job/stock then start at 200
 
     -- agents will sell when their output stock reaches this value
     STOCK_QTY_SELLPOINT = {}
@@ -105,11 +105,9 @@ function constants.load()
     STOCK_QTY_SELLPOINT[enum.stockHerbs] = 2
     STOCK_QTY_SELLPOINT[enum.stockHouse] = 1
 
-
     -- sprites and quads
     enum.spriteBlueWoman = 1
     enum.spriteRedWoman = 2
-
 
     -- emoticons
     enum.emoticonCash = 1
