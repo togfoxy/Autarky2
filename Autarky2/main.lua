@@ -39,6 +39,11 @@ function love.keyreleased( key, scancode )
 			cf.RemoveScreen(SCREEN_STACK)
 		end
 	end
+	if key == "return" then
+		if cf.CurrentScreenName(SCREEN_STACK) == "ExitGame" then
+			cf.RemoveScreen(SCREEN_STACK)
+		end
+	end
 	if key == "space" then
 		-- pause
 		PAUSED = not PAUSED
@@ -176,16 +181,7 @@ end
 
 function love.mousepressed( x, y, button, istouch, presses )
 
-	print(x,y)
-	print(res.toGame(x,y))
-	print(res.toScreen(x,y))
-
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
-	local zx, zy = cam:toWorld(res.toScreenX(x), res.toScreenY(y))
-
-	print(wx, wy)
-	print(zx, zy)
-	print("++++")
 
 	gspot:mousepress(wx, wy, button)
 
@@ -246,7 +242,9 @@ end
 
 function love.load()
 
-	love.window.setMode(800, 600, {resizable = true, display = 1})
+	local width, height = love.window.getDesktopDimensions(1)
+	love.window.setMode(width, height, {resizable = true, display = 1})
+	-- love.window.setMode(800, 600, {resizable = true, display = 2})
 	res.setGame(1920, 1080)
 
 	SCREEN_WIDTH = 1920
@@ -269,6 +267,8 @@ function love.load()
 	fun.RecordHistoryStock()
 
 	cam = Camera.new(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 1)
+	cam:setZoom(ZOOMFACTOR)
+	cam:setPos(TRANSLATEX,	TRANSLATEY)
 
 	gui.load()
 
@@ -309,12 +309,18 @@ function love.draw()
 
 		if currentscreen == "Graphs" then
 			draw.graphs()
-			close_graph_button:show()
+			-- close_graph_button:show()
 		else
 			close_graph_button:hide()
 		end
 
 		cam:detach()
+
+		-- this happens after the camera is detached
+		if currentscreen == "World" then
+			draw.topBar()
+		end
+
 	elseif currentscreen == "Options" then
 		draw.optionScreen()
 	elseif currentscreen == "ExitGame" then

@@ -1,5 +1,26 @@
 draw = {}
 
+function draw.topBar()
+    -- draw world hours
+    love.graphics.setColor(1,1,1,1)
+    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. " Treasury: $" .. TREASURY .. " "
+    if PAUSED then str = str .. "PAUSED" end
+    love.graphics.print(str, 10, 10)
+
+    -- draw villager counts
+    local occupationtable = people.getOccupationCount()
+    local str = "Farmers: " .. occupationtable[enum.jobFarmer] .. ". "
+    str = str .. "Healers: " .. occupationtable[enum.jobHealer] .. ". "
+    str = str .. "Woodsmen: " .. occupationtable[enum.jobWoodsman] .. ". "
+    str = str .. "Builders: " .. occupationtable[enum.jobBuilder] .. ". "
+    love.graphics.print(str, (SCREEN_WIDTH / 2) - 250, 10)
+
+    -- draw more counts on the far right margin
+    local str = "Villagers available: " .. #PERSONS .. " Villagers quit: " .. PERSONS_LEFT
+    love.graphics.print(str, SCREEN_WIDTH - 300, 10)
+
+end
+
 function draw.world()
     -- draw the map including structures
 
@@ -12,8 +33,6 @@ function draw.world()
 
     for col = 1, NUMBER_OF_COLS do
 		for row = 1, NUMBER_OF_ROWS do
-            -- drawx = LEFT_MARGIN + (col -1) * TILE_SIZE
-            -- drawy = TOP_MARGIN + (row - 1) * TILE_SIZE
             local drawx, drawy = fun.getTileXY(row, col)
 
             -- the grid border/outline
@@ -43,25 +62,6 @@ function draw.world()
             end
         end
     end
-
-    -- draw world hours
-    love.graphics.setColor(1,1,1,1)
-    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. " Treasury: $" .. TREASURY .. " "
-    if PAUSED then str = str .. "PAUSED" end
-    love.graphics.print(str, 10, 10)
-
-    -- draw villager counts
-    local occupationtable = people.getOccupationCount()
-    local str = "Farmers: " .. occupationtable[enum.jobFarmer] .. ". "
-    str = str .. "Healers: " .. occupationtable[enum.jobHealer] .. ". "
-    str = str .. "Woodsmen: " .. occupationtable[enum.jobWoodsman] .. ". "
-    str = str .. "Builders: " .. occupationtable[enum.jobBuilder] .. ". "
-    love.graphics.print(str, (SCREEN_WIDTH / 2) - 250, 10)
-
-    -- draw more counts on the far right margin
-    local str = "Villagers available: " .. #PERSONS .. " Villagers quit: " .. PERSONS_LEFT
-    love.graphics.print(str, SCREEN_WIDTH - 300, 10)
-
 
 end
 
@@ -214,6 +214,8 @@ function draw.graphs()
         local yvalue = drawy - HISTORY_PRICE[enum.stockHerbs][i]
         love.graphics.points(drawx, yvalue)
     end
+
+    love.graphics.print("Press ESCAPE to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 end
 
 function draw.imageQueue()
@@ -235,22 +237,27 @@ function draw.imageQueue()
 end
 
 function draw.optionScreen()
-	tax_rate_up_button:show()
-	tax_rate_down_button:show()
-	close_options_button:show()
-	exit_game_button:hide()
+	-- tax_rate_up_button:show()
+	-- tax_rate_down_button:show()
+	-- close_options_button:show()
+	-- exit_game_button:hide()
+    --
+	-- love.graphics.setColor(1,1,1,1)
+	-- love.graphics.print(SALES_TAX, 300, 415)
 
-	love.graphics.setColor(1,1,1,1)
-	love.graphics.print(SALES_TAX, 300, 415)
+    love.graphics.print("Press ESCAPE to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    
 end
 
-function draw.exitScreen()	
+function draw.exitScreen()
 	tax_rate_up_button:hide()
 	tax_rate_down_button:hide()
 	close_options_button:hide()
 
-	exit_game_button:show()
-		
+	-- exit_game_button:show()
+
+    love.graphics.print("Press ENTER to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+
 end
 
 return draw
