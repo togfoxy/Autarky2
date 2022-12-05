@@ -147,6 +147,7 @@ function love.keyreleased( key, scancode )
 		TRANSLATEY = SCREEN_HEIGHT / 2
 
 		people.unselectAll()
+
 	end
 end
 
@@ -214,6 +215,7 @@ function love.mousereleased( x, y, button, istouch, presses )
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 	lovelyToasts.mousereleased(wx, wy, button)
 
+
 	if MOUSE_DOWN_X ~= nil and button == 1 then
 
 		-- cycle through persons and select all inside bounding box
@@ -222,10 +224,12 @@ function love.mousereleased( x, y, button, istouch, presses )
 			if x2 > MOUSE_DOWN_X and x2 < wx then
 				if y2 > MOUSE_DOWN_Y and y2 < wy then
 					person.isSelected = true
+
 				end
 			end
 		end
 	end
+
 
 	-- used for mouse box dragging thingy
 	MOUSE_DOWN_X = nil
@@ -247,9 +251,11 @@ end
 
 function love.load()
 
+
 	local width, height = love.window.getDesktopDimensions(1)
 	love.window.setMode(width, height, {resizable = true, display = 1})
 	-- love.window.setMode(800, 600, {resizable = true, display = 2})
+
 	res.setGame(1920, 1080)
 
 	SCREEN_WIDTH = 1920
@@ -303,11 +309,13 @@ function love.draw()
 			-- do the mouse dragging thingy
 			if MOUSE_DOWN_X ~= nil then
 				-- draw box
+
 				local x, y = love.mouse.getPosition()
 				local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 				local boxwidth = wx - MOUSE_DOWN_X
 				local boxheight = wy - MOUSE_DOWN_Y
 				love.graphics.setColor(1,1,1,1)
+
 				love.graphics.rectangle("line", MOUSE_DOWN_X, MOUSE_DOWN_Y, boxwidth, boxheight)
 			end
 		end
@@ -330,6 +338,7 @@ function love.draw()
 		draw.optionScreen()
 	elseif currentscreen == "ExitGame" then
 		draw.exitScreen()
+
 	else
 		error("Current screen is " .. currentscreen)
 	end
