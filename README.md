@@ -7,7 +7,7 @@ The game will start with 5 villagers
 
 Press keypad + to add a new villager (right-side of keyboard)
 
-Click a blue villager with mouse
+Click a blue villager with mouse. The villager will turn red and have a circle around it.
 
 Press 'f' to turn the villager into a FARMER
 
