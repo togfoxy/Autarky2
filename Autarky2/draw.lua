@@ -99,10 +99,6 @@ function draw.daynight()
         -- love.graphics.setColor(1,1,1,1)
         -- love.graphics.points(100,100,200,200,300,300,400,400)
     end
-
-
-
-
 end
 
 function draw.graphs()
@@ -236,6 +232,25 @@ function draw.imageQueue()
             error()
         end
     end
+end
+
+function draw.optionScreen()
+	tax_rate_up_button:show()
+	tax_rate_down_button:show()
+	close_options_button:show()
+	exit_game_button:hide()
+
+	love.graphics.setColor(1,1,1,1)
+	love.graphics.print(SALES_TAX, 300, 415)
+end
+
+function draw.exitScreen()	
+	tax_rate_up_button:hide()
+	tax_rate_down_button:hide()
+	close_options_button:hide()
+
+	exit_game_button:show()
+		
 end
 
 return draw

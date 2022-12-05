@@ -23,9 +23,11 @@ function gui.load()
 		if SALES_TAX < 0 then SALES_TAX = 0 end
 		end
 
-
-
-
+	exit_game_button = gspot:button('Exit game', {x = 225, y = 400, w = 50, h = gspot.style.unit})
+	exit_game_button.click = function(this, x, y, button)
+		cf.RemoveScreen(SCREEN_STACK)
+		--! can invoke the 'quit' option here for safety
+		end
 
 end
 
