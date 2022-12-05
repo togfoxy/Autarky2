@@ -9,31 +9,31 @@ local rs = {
   _NAME = "Resolution Solution",
   _LICENSE = "The Unlicense",
   _LICENSE_TEXT = [[
-This is free and unencumbered software released into the public domain.
+    This is free and unencumbered software released into the public domain.
 
-Anyone is free to copy, modify, publish, use, compile, sell, or
-distribute this software, either in source code form or as a compiled
-binary, for any purpose, commercial or non-commercial, and by any
-means.
+    Anyone is free to copy, modify, publish, use, compile, sell, or
+    distribute this software, either in source code form or as a compiled
+    binary, for any purpose, commercial or non-commercial, and by any
+    means.
 
-In jurisdictions that recognize copyright laws, the author or authors
-of this software dedicate any and all copyright interest in the
-software to the public domain. We make this dedication for the benefit
-of the public at large and to the detriment of our heirs and
-successors. We intend this dedication to be an overt act of
-relinquishment in perpetuity of all present and future rights to this
-software under copyright law.
+    In jurisdictions that recognize copyright laws, the author or authors
+    of this software dedicate any and all copyright interest in the
+    software to the public domain. We make this dedication for the benefit
+    of the public at large and to the detriment of our heirs and
+    successors. We intend this dedication to be an overt act of
+    relinquishment in perpetuity of all present and future rights to this
+    software under copyright law.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+    OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+    ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
 
-For more information, please refer to <https://unlicense.org>
-]]
+    For more information, please refer to <https://unlicense.org>
+    ]]
 }
 
 -- Callback functions, that will be triggered when window size is changed
@@ -114,7 +114,7 @@ rs.update = function()
 
   -- scale for game virtual size
   local scaleWidth, scaleHeight
-  
+
   -- offset for black bars
   local xOff, yOff
 
@@ -126,110 +126,110 @@ rs.update = function()
   -- get aspect of window and virtual game size
   local gameAspect = gameWidth / gameHeight
   local windowAspect = windowWidth / windowHeight
-  
+
   -- check rs.gameChanged() callback
   local oldGameAspect   = rs.gameAspect
-  
+
   -- check rs.windowChanged() callback
   local oldWindowAspect = rs.windowAspect
-  
+
   -- scale mode
   local scaleMode = rs.scaleMode
-  
+
   -- Game zone
   local gameZone = rs.gameZone
-  
+
   if scaleMode == 1 then
      -- if window height > game height; create black bars on top and bottom
     if gameAspect > windowAspect then
       local scale = windowWidth / gameWidth
-      
+
       local barHeight = math.abs((gameHeight * scale - windowHeight) / 2)
-      
+
       scaleWidth, scaleHeight = scale, scale
-      
+
       x1, y1, w1, h1 = 0, 0, windowWidth, barHeight
       x2, y2, w2, h2 = 0, windowHeight, windowWidth, barHeight * -1
-      
+
       xOff, yOff = 0, windowHeight / 2 - (scale * gameHeight) / 2
 
   -- if window width > game width; create bars on left and right sides
   elseif gameAspect < windowAspect then
 
       local scale = windowHeight / gameHeight
-      
+
       local barWidth = math.abs((gameWidth * scale - windowWidth) / 2)
-      
+
       scaleWidth, scaleHeight = scale, scale
-      
+
       x1, y1, w1, h1 = 0, 0, barWidth, windowHeight
       x2, y2, w2, h2 = windowWidth, 0, barWidth * -1, windowHeight
-      
+
       xOff = windowWidth / 2 - (scale * gameWidth) / 2
       yOff = 0
 
     else -- if window and game size equal
       scaleWidth, scaleHeight = 1, 1
-      
+
       x1, y1, w1, h1 = 0, 0, 0, 0
       x2, y2, w2, h2 = 0, 0, 0, 0
-      
+
       xOff, yOff = 0, 0
     end -- end aspect scaling method
 
   end -- end scaleMode == 1
-  
+
   -- stretch scaling method; 2 which fills entire window
   if scaleMode == 2 then
-    
+
     scaleWidth = windowWidth / gameWidth
     scaleHeight = windowHeight / gameHeight
-    
+
     x1, y1, w1, h1 = 0, 0, 0, 0
     x2, y2, w2, h2 = 0, 0, 0, 0
-    
+
     xOff, yOff = 0, 0
-    
+
     --[[
     centerX, centerY = gam
     topLeft, topRight = 0
     bottomLeft, bottomRight = 0
-    leftCenterX, rightCenterX = 
-    topCenterY, bottomCenterY = 
+    leftCenterX, rightCenterX =
+    topCenterY, bottomCenterY =
     --]]
-    
+
   end -- end stretch scaling method
 
   -- write all changes to library
-  
+
   -- black bars
   rs.x1, rs.y1, rs.w1, rs.h1 = x1, y1, w1, h1
   rs.x2, rs.y2, rs.w2, rs.h2 = x2, y2, w2, h2
-  
+
   -- offset generated for black bars
   rs.xOff, rs.yOff = xOff, yOff
-  
+
   -- scale
   rs.scaleWidth, rs.scaleHeight = scaleWidth, scaleHeight
-  
+
   -- window size
   rs.windowWidth, rs.windowHeight = windowWidth, windowHeight
-  
+
   -- aspects
   rs.gameAspect, rs.windowAspect = gameAspect, windowAspect
-  
+
   -- game zone
-  
+
   gameZone.x = xOff
   gameZone.y = yOff
   gameZone.w = windowWidth - (xOff * 2)
   gameZone.h = windowHeight - (yOff * 2)
-  
+
   -- Call rs.gameChanged() if virtual game size is changed
   if oldGameAspect ~= gameAspect then
     rs.gameChanged()
   end
-  
+
   -- Call rs.windowChanged() if window size is changed
   if oldWindowAspect ~= windowAspect then
     rs.windowChanged()
@@ -240,16 +240,16 @@ end
 rs.start = function()
   -- Start scaling graphics until rs.stop().
   -- Everything inside this function will be scaled to fit virtual game size
-  
+
   -- prepare to scale
   love.graphics.push()
-  
+
   -- reset transformation
   love.graphics.origin()
 
   -- set offset, based on size of black bars
   love.graphics.translate(rs.xOff, rs.yOff)
-  
+
   -- scale game
   love.graphics.scale(rs.scaleWidth, rs.scaleHeight)
 end
@@ -257,7 +257,7 @@ end
 rs.stop = function()
   -- Stop scaling caused by rs.start()
   -- and draw black bars, if needed.
-  
+
   -- stop scaling
   love.graphics.pop()
 
@@ -267,10 +267,10 @@ end -- end rs.stop
 rs.unscaleStart = function()
   -- Reset scaling with love.origin() until rs.unscaleStop().
   -- With that you can, for example, draw ui with custom scaling.
-  
+
   -- start unscaling
   love.graphics.push()
-  
+
   -- reset coordinates and scaling
   love.graphics.origin()
 end
@@ -278,7 +278,7 @@ end
 rs.unscaleStop = function()
   -- Stop scaling caused by rs.unscaleStart().
   -- With that you can, for example, draw ui with custom scaling.
-  
+
   -- stop unscaling
   love.graphics.pop()
 end
@@ -323,18 +323,18 @@ rs.drawBlackBars = function()
   -- Function that will draw back bars.
   -- Can be called outside of rs.start rs.stop.
   -- Might be useful when you need just to draw black bars, without scaling via rs.start.
-  
+
   -- do nothing if we don't need draw bars or we in aspect scaling mode (1; with black bars)
   if not rs.drawBars or rs.scaleMode ~= 1 then
     return
   end
-  
+
   -- get colors, that was before rs.stop() function
   local r, g, b, a = love.graphics.getColor()
-  
+
   -- prepare to draw black bars
   love.graphics.push()
-  
+
   -- reset transformation
   love.graphics.origin()
 
@@ -345,10 +345,10 @@ rs.drawBlackBars = function()
   love.graphics.rectangle("fill", rs.x1, rs.y1, rs.w1, rs.h1)
   -- draw right or bottom most
   love.graphics.rectangle("fill", rs.x2, rs.y2, rs.w2, rs.h2)
-  
+
   -- return original colors that was before rs.stop()
   love.graphics.setColor(r, g, b, a)
-  
+
   -- end black bars rendering
   love.graphics.pop()
 end
@@ -361,7 +361,7 @@ end
 rs.switchScaleMode = function()
   -- Function to switch in-between scale modes.
 
-    if rs.scaleMode ~= 1 then 
+    if rs.scaleMode ~= 1 then
       rs.scaleMode = 1 -- aspect mode
     else
       rs.scaleMode = 2 -- stretch mode
@@ -389,7 +389,7 @@ end
 
 rs.switchDrawBars = function()
   -- Turn of/off rendering for black bars.
-  
+
   rs.drawBars = not rs.drawBars
 end
 
@@ -403,17 +403,17 @@ rs.isMouseInside = function()
   if rs.scaleMode == 2 then
     return true
   end
-  
+
   -- get mouse coordinates
   local mouseX, mouseY = love.mouse.getPosition()
-  
+
   -- get offset
   -- also, as will be mentioned in rs.toGame, there will some rounding/missmath with float coordinates;
   -- rs.toGame don't do anything with that, you should take care about this, but here
   -- for convenience, this function simply round to nearest integer, which should take care about edge cases;
   -- if you have any suggestion, etc, feel free add issue ticket/pull request at library's github page, provided in rs.__URL
   local xOff, yOff     = math.floor(rs.xOff + 0.5), math.floor(rs.yOff + 0.5)
-  
+
   -- get window size
   local windowWidth    = rs.windowWidth
   local windowHeight   = rs.windowHeight
@@ -434,7 +434,7 @@ rs.toGame = function(x, y)
   -- Translate coordinates from non-scaled values to scaled;
   -- e.g translate real mouse coordinates into scaled so you can check
   -- for example, area to check collisions with object and cursor;
-  
+
   -- ALSO, NOTE: don't forget about math precition and rounding, because with some scaling value
   -- using something like "rs.toGame(love.mouse.getPosition())" coordinates may produce: x -0.31 y -0.10
   -- when you may expect just 0, 0
@@ -451,7 +451,7 @@ rs.toGameX = function(x)
   return (x - rs.xOff) / rs.scaleWidth
 end
 
-rs.toGameY = function(y) 
+rs.toGameY = function(y)
   -- Translate y coordinate from non-scaled to scaled
   -- e.g translate real mouse coordinates into scaled so you can check
   -- for example, area to check collisions with object and cursor;
@@ -460,10 +460,10 @@ rs.toGameY = function(y)
 end
 
 rs.toScreen = function(x, y)
-  -- Thanslate coordinates from scaled to non scaled.
+  -- Translate coordinates from scaled to non scaled.
   -- e.g translate x and y of object inside scaled area
   -- to, for example, set cursor position to that object
-  
+
   return (x * rs.scaleWidth) + rs.xOff, (y * rs.scaleHeight) + rs.yOff
 end
 
@@ -471,7 +471,7 @@ rs.toScreenX = function(x)
   -- Thanslate x coordinate from scaled to non scaled.
   -- e.g translate x of object inside scaled area
   -- to, for example, set cursor position to that object
-  
+
   return (x * rs.scaleWidth) + rs.xOff
 end
 
@@ -479,7 +479,7 @@ rs.toScreenY = function(y)
   -- Thanslate y coordinate from scaled to non scaled.
   -- e.g translate y of object inside scaled area
   -- to, for example, set cursor position to that object
-  
+
   return (y * rs.scaleHeight) + rs.yOff
 end
 
@@ -554,20 +554,20 @@ end
 love.keypressed = function(key)
   -- set randow virtual size
   if key == "q" then rs.setGame(love.math.random(800, 1920), love.math.random(600, 1080)) end
-  
+
   -- switch scale mode
   if key == "w" then rs.switchScaleMode() end
-  
+
   -- reset virtual size
   if key == "r" then rs.setGame(1280, 720) end
 end
 
 local isMouseUnder = function(x, y, w, h)
   -- function to check if mouse under something
-  
+
   -- get scaled to game mouse position
   local mx, my = rs.toGame(love.mouse.getPosition())
-  
+
   -- check if cursor under
   if mx >= x     and -- left
      my >= y     and -- top
@@ -575,25 +575,25 @@ local isMouseUnder = function(x, y, w, h)
      my <= y + h then -- bottom
     return true
   end
-  
+
   return false
-  
+
 end
 
 love.update = function(dt)
   -- update library
   rs.update()
-  
+
   -- count timer
   timer = timer + dt
-  
+
   -- set timer to zero if it reach limit
   if timer > timerLimit then timer = 0 end
 
   -- move rectangle in circle
   -- x coordinate
   dx = x * math.sin(timer) + 150 + (rs.gameWidth / 10)
-  
+
   -- y coordinate
   dy = y * math.cos(timer) + 150 + (rs.gameHeight / 10)
 
@@ -603,7 +603,7 @@ love.update = function(dt)
 
   -- this will be used to determine is mouse under rectangle in love.draw
   underRectangle = isMouseUnder(dx, dy, dw, dh)
-  
+
   -- message/instructions
   message = "Does mouse touch moving rectangle?: " .. tostring(underRectangle) .. "\n" ..
             "Press Q to change virtual size: w" .. tostring(rs.gameWidth) .. " h" .. tostring(rs.gameHeight) .. "\n" ..
@@ -618,66 +618,66 @@ love.update = function(dt)
 
   -- set cursor to moving rectangle; that how you can use toScreen() function
   if love.keyboard.isDown("space") then love.mouse.setPosition(rs.toScreen(dx, dy)) end
-  
+
   -- set non-moving rectangle to cursor; that how you can use toGame() function
-  if love.keyboard.isDown("s") then 
+  if love.keyboard.isDown("s") then
     rectangle[1] = rs.toGameX(love.mouse.getX())
     rectangle[2] = rs.toGameY(love.mouse.getY())
     end
 
 end
-  
+
 love.draw = function()
   rs.start()
-  
+
   -- set color for example image
   love.graphics.setColor(1, 1, 1, 1)
   love.graphics.draw(image)
-  
+
   -- change color of moving rectangle, if you touch it with cursor or not
   if underRectangle then love.graphics.setColor(0, 1, 0) else love.graphics.setColor(1, 0, 0) end
-  
+
   -- draw moving rectangle
   love.graphics.rectangle("line", dx, dy, dw, dh)
-    
+
     -- set color for "cursor" which will follow cursor
     love.graphics.setColor(1, 0.4, 0.9, 1)
-  
+
     -- draw "cursor" translated to in-game coordinates
     love.graphics.rectangle("fill", rs.toGameX(love.mouse.getX()), rs.toGameY(love.mouse.getY()), 10, 10)
-    
+
     -- set color for non-moving rectangle
     love.graphics.setColor(0, 0, 0, 1)
-    
+
     -- draw non-moving rectangle
     love.graphics.rectangle("line", unpack(rectangle))
-    
+
     rs.unscaleStart()
     -- example how you can use "unscale" function
     -- with that you can draw custom ui, that you don't want to scale with library itself
     -- or maybe with that create nice rendering for string, in pair with rs.window/gameChanged
-  
+
       -- draw semi-transparent background for "I'm unscaled!" string
       -- set i't color to black and make transparent
       love.graphics.setColor(0, 0, 0, 0.5)
 
       -- get width and height for that background
   love.graphics.rectangle("fill", rs.windowWidth - (rs.xOff + 100), rs.windowHeight - (rs.yOff + 100), love.graphics.newFont():getWidth("I'm unscaled!"), love.graphics.newFont():getHeight("I'm unscaled!"))
-    
+
       -- draw "I'm unscaled!" string
       -- add offset for it, so it will be not drawed under black bars
       love.graphics.setColor(1, 1, 1, 1)
       love.graphics.print("I'm unscaled!", rs.windowWidth - (rs.xOff + 100), rs.windowHeight - (rs.yOff + 100))
-      
+
     rs.unscaleStop()
   rs.stop()
-  
+
     -- draw explaination/instruction
     love.graphics.setColor(0, 0, 0, 0.4)
     -- count how much string have new lines and use them to determine height oh string
   love.graphics.rectangle("fill", 0, 0, love.graphics.newFont():getWidth(message), love.graphics.newFont():getHeight(message) * select(2, string.gsub(message, "\n", "\n")))
 
-  love.graphics.setColor(1, 1, 1, 1) 
+  love.graphics.setColor(1, 1, 1, 1)
   love.graphics.print(message)
 end
 --]]
@@ -772,5 +772,5 @@ ALso, this function uses same rules as rs.stop, meaning
 rs.drawBars = false will result in rs.drawBlackBars will be not rendered.
 * Now rs.stop will draw black bars via rs.drawBlackBars.
 --]=]
-  
+
 --]]

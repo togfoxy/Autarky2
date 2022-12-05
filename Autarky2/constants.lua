@@ -15,13 +15,16 @@ function constants.load()
 
     TRANSLATEX = cf.round(SCREEN_WIDTH / 2)		-- starts the camera in the middle of the ocean
     TRANSLATEY = cf.round(SCREEN_HEIGHT / 2)	-- need to round because this is working with pixels
-    ZOOMFACTOR = 1
+    ZOOMFACTOR = 0.95
 
     GAME_LOG_DRAWX = SCREEN_WIDTH - 275
     MAP = {}
     SHOW_OPTIONS = false
     MARKET_RESOLVED = false
 		
+	MOUSE_DOWN_X = nil
+	MOUSE_DOWN_Y = nil
+
 	MOUSE_DOWN_X = nil
 	MOUSE_DOWN_Y = nil
 

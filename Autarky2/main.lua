@@ -33,7 +33,16 @@ require 'gui'
 
 function love.keyreleased( key, scancode )
 	if key == "escape" then
-		cf.RemoveScreen(SCREEN_STACK)
+		if cf.CurrentScreenName(SCREEN_STACK) == "ExitGame" then
+			cf.AddScreen("World", SCREEN_STACK)
+		else
+			cf.RemoveScreen(SCREEN_STACK)
+		end
+	end
+	if key == "return" then
+		if cf.CurrentScreenName(SCREEN_STACK) == "ExitGame" then
+			cf.RemoveScreen(SCREEN_STACK)
+		end
 	end
 	if key == "space" then
 		-- pause
@@ -127,13 +136,12 @@ function love.keyreleased( key, scancode )
 	end
 
 	if key == "kp5" then
-		ZOOMFACTOR = 1
+		ZOOMFACTOR = 0.95
 		TRANSLATEX = SCREEN_WIDTH / 2
 		TRANSLATEY = SCREEN_HEIGHT / 2
-		
+
 		people.unselectAll()
-		
-		
+
 	end
 end
 
@@ -173,6 +181,7 @@ function love.mousemoved( x, y, dx, dy, istouch )
 end
 
 function love.mousepressed( x, y, button, istouch, presses )
+
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 
 	gspot:mousepress(wx, wy, button)
@@ -199,23 +208,28 @@ end
 function love.mousereleased( x, y, button, istouch, presses )
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 	lovelyToasts.mousereleased(wx, wy, button)
-	
-	if MOUSE_DOWN_X ~= nil then
+
+
+	if MOUSE_DOWN_X ~= nil and button == 1 then
+
 		-- cycle through persons and select all inside bounding box
 		for _, person in pairs(PERSONS) do
-			if person.x > MOUSE_DOWN_X and person.x < wx then
-				if person.y > MOUSE_DOWN_Y and person.y < wy then
+			local x2, y2 = fun.getDrawXY(person)
+			if x2 > MOUSE_DOWN_X and x2 < wx then
+				if y2 > MOUSE_DOWN_Y and y2 < wy then
 					person.isSelected = true
-					--! needs thorough testing
+
 				end
 			end
 		end
 	end
-	
+
+
 	-- used for mouse box dragging thingy
 	MOUSE_DOWN_X = nil
 	MOUSE_DOWN_Y = nil
-	
+
+
 end
 
 function love.wheelmoved(x, y)
@@ -228,11 +242,16 @@ function love.wheelmoved(x, y)
 	end
 	if ZOOMFACTOR < 0.8 then ZOOMFACTOR = 0.8 end
 	if ZOOMFACTOR > 3 then ZOOMFACTOR = 3 end
+	print("Zoom factor = " .. ZOOMFACTOR)
 end
 
 function love.load()
 
-	love.window.setMode(800, 600, {resizable = true, display = 1})
+
+	local width, height = love.window.getDesktopDimensions(1)
+	love.window.setMode(width, height, {resizable = true, display = 1})
+	-- love.window.setMode(800, 600, {resizable = true, display = 2})
+
 	res.setGame(1920, 1080)
 
 	SCREEN_WIDTH = 1920
@@ -255,6 +274,8 @@ function love.load()
 	fun.RecordHistoryStock()
 
 	cam = Camera.new(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 1)
+	cam:setZoom(ZOOMFACTOR)
+	cam:setPos(TRANSLATEX,	TRANSLATEY)
 
 	gui.load()
 
@@ -279,30 +300,41 @@ function love.draw()
 		tax_rate_down_button:hide()
 		close_options_button:hide()
 		exit_game_button:hide()
-		
+
 		if currentscreen == "World" then
 			-- do the mouse dragging thingy
 			if MOUSE_DOWN_X ~= nil then
 				-- draw box
+
+				local x, y = love.mouse.getPosition()
 				local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 				local boxwidth = wx - MOUSE_DOWN_X
 				local boxheight = wy - MOUSE_DOWN_Y
+				love.graphics.setColor(1,1,1,1)
+
 				love.graphics.rectangle("line", MOUSE_DOWN_X, MOUSE_DOWN_Y, boxwidth, boxheight)
 			end
 		end
 
 		if currentscreen == "Graphs" then
 			draw.graphs()
-			close_graph_button:show()
+			-- close_graph_button:show()
 		else
 			close_graph_button:hide()
 		end
-		
+
 		cam:detach()
+
+		-- this happens after the camera is detached
+		if currentscreen == "World" then
+			draw.topBar()
+		end
+
 	elseif currentscreen == "Options" then
 		draw.optionScreen()
 	elseif currentscreen == "ExitGame" then
-		draw.exitScreen()		
+		draw.exitScreen()
+
 	else
 		error("Current screen is " .. currentscreen)
 	end
@@ -385,8 +417,11 @@ function love.update(dt)
 			end
 		end
 
-		cam:setPos(TRANSLATEX,	TRANSLATEY)
+	end
+
+	if currentscreen == "World" or currentscreen == "Graphs" then
 		cam:setZoom(ZOOMFACTOR)
+		cam:setPos(TRANSLATEX,	TRANSLATEY)
 	end
 
 	lovelyToasts.update(dt)
