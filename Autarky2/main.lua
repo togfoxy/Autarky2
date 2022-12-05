@@ -33,7 +33,9 @@ require 'gui'
 
 function love.keyreleased( key, scancode )
 	if key == "escape" then
-		if cf.CurrentScreenName(SCREEN_STACK) ~= "ExitGame" then
+		if cf.CurrentScreenName(SCREEN_STACK) == "ExitGame" then
+			cf.AddScreen("World", SCREEN_STACK)
+		else
 			cf.RemoveScreen(SCREEN_STACK)
 		end
 	end
@@ -129,7 +131,7 @@ function love.keyreleased( key, scancode )
 	end
 
 	if key == "kp5" then
-		ZOOMFACTOR = 1
+		ZOOMFACTOR = 0.95
 		TRANSLATEX = SCREEN_WIDTH / 2
 		TRANSLATEY = SCREEN_HEIGHT / 2
 
@@ -173,7 +175,17 @@ function love.mousemoved( x, y, dx, dy, istouch )
 end
 
 function love.mousepressed( x, y, button, istouch, presses )
+
+	print(x,y)
+	print(res.toGame(x,y))
+	print(res.toScreen(x,y))
+
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
+	local zx, zy = cam:toWorld(res.toScreenX(x), res.toScreenY(y))
+
+	print(wx, wy)
+	print(zx, zy)
+	print("++++")
 
 	gspot:mousepress(wx, wy, button)
 
@@ -229,6 +241,7 @@ function love.wheelmoved(x, y)
 	end
 	if ZOOMFACTOR < 0.8 then ZOOMFACTOR = 0.8 end
 	if ZOOMFACTOR > 3 then ZOOMFACTOR = 3 end
+	print("Zoom factor = " .. ZOOMFACTOR)
 end
 
 function love.load()
@@ -388,8 +401,11 @@ function love.update(dt)
 			end
 		end
 
-		cam:setPos(TRANSLATEX,	TRANSLATEY)
+	end
+
+	if currentscreen == "World" or currentscreen == "Graphs" then
 		cam:setZoom(ZOOMFACTOR)
+		cam:setPos(TRANSLATEX,	TRANSLATEY)
 	end
 
 	lovelyToasts.update(dt)
