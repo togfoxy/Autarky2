@@ -25,6 +25,8 @@ Hold 'CTRL' key to see debug information for each villager
 
 Press 'spacebar' to pause
 
+Press 'o' for options (disabled)
+
 Press 's' to save the game
 
 Press 'l' to load the game
