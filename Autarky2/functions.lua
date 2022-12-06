@@ -28,6 +28,33 @@ function functions.loadImages()
     IMAGES[enum.iconBuilder] = love.graphics.newImage("assets/images/hammericon64x64.png")
 end
 
+function functions.loadAudio()
+
+    AUDIO[enum.musicCityofMagic] = love.audio.newSource("assets/audio/City of magic.wav", "stream")
+	AUDIO[enum.musicOvertheHills] = love.audio.newSource("assets/audio/Over the hills.wav", "stream")
+	AUDIO[enum.musicSpring] = love.audio.newSource("assets/audio/Spring.wav", "stream")
+    AUDIO[enum.musicMedievalFiesta] = love.audio.newSource("assets/audio/Medieval fiesta.wav", "stream")
+    AUDIO[enum.musicFuji] = love.audio.newSource("assets/audio/Fuji.mp3", "stream")
+    AUDIO[enum.musicHiddenPond] = love.audio.newSource("assets/audio/Hidden-Pond.mp3", "stream")
+    AUDIO[enum.musicDistantMountains] = love.audio.newSource("assets/audio/Distant-Mountains.mp3", "stream")
+    AUDIO[enum.musicBirdsinForest] = love.audio.newSource("assets/audio/430917__ihitokage__birds-in-forest-5.mp3", "stream")
+    AUDIO[enum.musicBirds] = love.audio.newSource("assets/audio/532148__patchytherat__birds-1.wav", "stream")
+
+    -- AUDIO[enum.audioWork]:setVolume(0.2)
+    AUDIO[enum.musicMedievalFiesta]:setVolume(0.2)
+    AUDIO[enum.musicOvertheHills]:setVolume(0.2)
+    -- AUDIO[enum.audioNewVillager]:setVolume(0.2)
+    AUDIO[enum.musicCityofMagic]:setVolume(0.2)
+    AUDIO[enum.musicSpring]:setVolume(0.1)
+    -- AUDIO[enum.audioEat]:setVolume(0.2)
+    AUDIO[enum.musicBirdsinForest]:setVolume(1)
+    -- AUDIO[enum.audioSawWood]:setVolume(0.2)
+    -- AUDIO[enum.audioBandage]:setVolume(0.2)
+    -- AUDIO[enum.audioWarning]:setVolume(0.2)
+
+end
+
+
 function functions.initialiseMap()
 
     -- set up some perlin noise for later
@@ -196,6 +223,33 @@ function functions.getRandomMarketXY(person)
     local max = TILE_SIZE - (PERSONS_RADIUS * 2)
     person.destx = love.math.random(min, max)
     person.desty = love.math.random(min, max)
+end
+
+function functions.playAudio(audionumber, isMusic, isSound)
+    if isMusic and MUSIC_TOGGLE then
+        AUDIO[audionumber]:play()
+    end
+    if isSound and SOUND_TOGGLE then
+        AUDIO[audionumber]:play()
+    end
+    -- print("playing music/sound #" .. audionumber)
+end
+
+function functions.PlayAmbientMusic()
+	local intCount = love.audio.getActiveSourceCount()
+	if intCount == 0 then
+		if love.math.random(1,2000) == 1 then		-- allow for some silence between ambient music
+			if love.math.random(1,2) == 1 then
+                -- music
+                local random = love.math.random(11, 17)
+                fun.playAudio(random, true, false)
+			else
+
+                local random = love.math.random(21, 22)
+                fun.playAudio(random, true, false)
+			end
+		end
+	end
 end
 
 

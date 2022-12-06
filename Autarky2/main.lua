@@ -137,6 +137,7 @@ function love.keyreleased( key, scancode )
 				person.occupationstockinput = enum.stockLogs
 				person.occupationstockoutput = enum.stockHouse
 				person.occupationconversionrate = 5					-- this many inputs needed to make one output
+				person.stock[enum.stockWealth] = 100
 			end
 		end
 	end
@@ -282,6 +283,7 @@ function love.load()
 	cam:setPos(TRANSLATEX,	TRANSLATEY)
 
 	gui.load()
+	fun.loadAudio()
 
 	lovelyToasts.options.tapToDismiss = true
 end
@@ -427,6 +429,8 @@ function love.update(dt)
 		cam:setZoom(ZOOMFACTOR)
 		cam:setPos(TRANSLATEX,	TRANSLATEY)
 	end
+
+	fun.PlayAmbientMusic()
 
 	lovelyToasts.update(dt)
 	gspot:update(dt)

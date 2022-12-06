@@ -2,7 +2,7 @@ people = {}
 
 function people.initialise()
 
-    local numofppl = 5
+    local numofppl = 3
 
     for i = 1, numofppl do
         people.createPerson()
@@ -368,6 +368,7 @@ local function bidForFood(person)
 end
 
 local function genericSellOutputStock(person, stockoutput)
+    -- stockoutput = the stock the person needs to sell
 	local maxqtytosell = person.stock[stockoutput]
 	local askqty = marketplace.determineQty(maxqtytosell, person.stockPriceHistory[stockoutput]) -- commodity, maxQty, commodityKnowledge
 	askqty = cf.round(askqty)
@@ -395,7 +396,7 @@ function people.doMarketplace()
 
         -- buy herbs
         if person.stock[enum.stockHealth] < 90 and person.occupation ~= enum.jobHealer then
-            makeBid(person, enum.stockHerbs)    -- also sets destination = market
+            makeBid(person, enum.stockHerbs)    -- optional 3rd param. Also sets destination = market
         end
 
         -- buy house
@@ -410,7 +411,7 @@ function people.doMarketplace()
         -- make a bid (buy)     -- if there are lots of bids and they are all succesful then agent could be in debt
         local stockinput = person.occupationstockinput      -- stock type
         local wealth = person.stock[enum.stockWealth]
-        if stockinput ~= nil and stockinput < 7 then
+        if stockinput ~= nil and person.stock[stockinput] < 7 then
 			makeBid(person, stockinput)		--! need to test this
         end
 
@@ -418,7 +419,7 @@ function people.doMarketplace()
         -- make an ask (sell)
         local stockoutput = person.occupationstockoutput        -- stock type
         if stockoutput ~= nil and person.stock[stockoutput] >= STOCK_QTY_SELLPOINT[stockoutput] then
-			genericSellOutputStock(person, stockoutput)	--! need to test this
+			genericSellOutputStock(person, stockoutput)
         end
 
         --! need something about buying luxuries (wants/comfort)
