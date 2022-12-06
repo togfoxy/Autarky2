@@ -282,6 +282,7 @@ function love.load()
 	cam:setPos(TRANSLATEX,	TRANSLATEY)
 
 	gui.load()
+	fun.loadAudio()
 
 	lovelyToasts.options.tapToDismiss = true
 end
@@ -427,6 +428,8 @@ function love.update(dt)
 		cam:setZoom(ZOOMFACTOR)
 		cam:setPos(TRANSLATEX,	TRANSLATEY)
 	end
+
+	fun.PlayAmbientMusic()
 
 	lovelyToasts.update(dt)
 	gspot:update(dt)

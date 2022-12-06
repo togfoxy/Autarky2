@@ -19,9 +19,11 @@ function constants.load()
 
     GAME_LOG_DRAWX = SCREEN_WIDTH - 275
     MAP = {}
+
     SHOW_OPTIONS = false
     MARKET_RESOLVED = false
-		
+    MUSIC_TOGGLE = true             -- turn music on or off
+
 	MOUSE_DOWN_X = nil
 	MOUSE_DOWN_Y = nil
 
@@ -34,6 +36,8 @@ function constants.load()
     QUADS = {}
     EMOTICONS = {}      -- holds emoticon images
     IMAGE_QUEUE = {}
+    AUDIO = {}
+
 
     HISTORY_STOCK = {}
     HISTORY_PRICE = {}
@@ -115,6 +119,28 @@ function constants.load()
     -- emoticons
     enum.emoticonCash = 1
     enum.emoticonSad = 2
+
+    -- audio
+    enum.audioYawn = 1
+    enum.audioWork = 2
+    enum.audioEat = 3
+    enum.audioNewVillager = 4
+    enum.audioRustle = 5
+    enum.audioSawWood = 6
+    enum.audioBandage = 7
+    enum.audioWarning = 8
+    enum.audioDanger = 9
+
+    enum.musicCityofMagic = 11
+    enum.musicOvertheHills = 12
+    enum.musicSpring = 13
+    enum.musicMedievalFiesta = 14
+    enum.musicFuji = 15
+    enum.musicHiddenPond = 16
+    enum.musicDistantMountains = 17
+
+    enum.musicBirds = 21
+    enum.musicBirdsinForest = 22
 
 end
 
