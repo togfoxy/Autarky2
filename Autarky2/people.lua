@@ -46,7 +46,7 @@ function people.createPerson()
         thisperson.beliefRangeHistory[j] = {}
         thisperson.beliefRangeHistory[j] = {1, 10}
 
-        thisperson.stockPriceHistory[j] = {}
+        thisperson.stockPriceHistory[j] = {}        -- the price this agent paid for each stock and every transaction
         thisperson.stockPriceHistory[j] = {5}
     end
 
@@ -376,6 +376,26 @@ local function genericSellOutputStock(person, stockoutput)
 	-- determine ask price
 	local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
 	askprice = cf.round(askprice)
+
+    -- get an approximate cost price and ensure the ask price is at least that much
+    local costprice
+    local stockinput = person.occupationstockinput
+
+    if stockinput == nil then   -- will happen with primary producers
+        -- work out producers productivity and divide buy average income for that productiviy
+        costprice = fun.getAvgPrice(person.stockPriceHistory[stockoutput])
+        costprice = costprice / person.occupationstockgain
+    else
+        costprice = fun.getAvgPrice(person.stockPriceHistory[stockinput])
+    end
+
+    costprice = cf.round(costprice, 2)
+    if costprice == nil then costprice = 0 end  -- happens at start of game
+
+    -- print("Stock input type: " .. stockinput)
+    print("Trying to sell stock type " .. stockoutput .. ". Cost price is $" .. costprice .. " and ask price is $" .. askprice)
+    askprice = math.max(askprice, costprice)
+
 	-- register the ask
 	marketplace.createAsk(stockoutput, askqty, askprice, person.guid)
 
@@ -388,7 +408,7 @@ function people.doMarketplace()
 
     local avgHousePrice = fun.getHistoricAvgPrice(enum.stockHouse)
     for k, person in pairs(PERSONS) do
-        -- food
+        -- buy food
         if person.stock[enum.stockFood] < 7 and person.occupation ~= enum.jobFarmer then
             -- try to buy food
 			bidForFood(person)

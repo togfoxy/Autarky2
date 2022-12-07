@@ -59,6 +59,8 @@ function love.keyreleased( key, scancode )
 	if key == "g" then
 		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
 			cf.AddScreen("Graphs", SCREEN_STACK)
+		elseif cf.CurrentScreenName(SCREEN_STACK) == "Graphs" then
+			cf.RemoveScreen(SCREEN_STACK)
 		end
 	end
 
