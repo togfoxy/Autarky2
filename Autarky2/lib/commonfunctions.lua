@@ -133,6 +133,11 @@ function fltAbsoluteTileDistance(x1,y1,x2,y2)
 	return math.max (math.abs(x2-x1), math.abs(y2-y1))
 end
 
+function strFormatCurrency(v)
+	-- does NOT include the '$'
+	return string.format("%.2f", v)
+end
+
 function strFormatThousand(v)
     local s = string.format("%d", math.floor(math.abs(v)))
 	local sign = ""

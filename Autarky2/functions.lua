@@ -203,7 +203,7 @@ end
 
 function functions.getHistoricAvgPrice(commodity)
     -- get the actual historic average transaction price for provided commodity
-    -- retuns a number with two decimal places
+    -- returns a number with two decimal places
 
     local sum = 0
     for i = 1, #HISTORY_PRICE[commodity] do

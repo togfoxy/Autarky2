@@ -119,7 +119,7 @@ function love.keyreleased( key, scancode )
 				local row, col = structures.create(enum.structureHealer, person.guid)
 				person.workrow = row
 				person.workcol = col
-                person.occupationstockgain = love.math.random(20,40) / 10	-- (1.0 -> 2.0)
+                person.occupationstockgain = love.math.random(20,40) / 10	-- (2.0 -> 4.0)
 				person.occupationstockinput = nil
 				person.occupationstockoutput = enum.stockHerbs
 			end

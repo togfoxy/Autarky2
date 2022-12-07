@@ -3,7 +3,7 @@ draw = {}
 function draw.topBar()
     -- draw world hours
     love.graphics.setColor(1,1,1,1)
-    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. " Treasury: $" .. TREASURY .. " "
+    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. " Treasury: $" .. cf.strFormatCurrency(TREASURY) .. " "
     if PAUSED then str = str .. "PAUSED" end
     love.graphics.print(str, 10, 10)
 
@@ -215,7 +215,7 @@ function draw.graphs()
         love.graphics.points(drawx, yvalue)
     end
 
-    love.graphics.print("Press ESCAPE to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    love.graphics.print("Press 'g' or ESCAPE to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 end
 
 function draw.imageQueue()
