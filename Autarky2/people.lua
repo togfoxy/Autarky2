@@ -593,6 +593,7 @@ function people.payTaxes()
         person.stock[enum.stockTaxOwed] = 0
     end
     if taxcollected > 0 then
+        taxcollected = cf.strFormatCurrency(taxcollected)
         local x = SCREEN_WIDTH - 200
         local y = love.math.random(100 ,SCREEN_HEIGHT - 100)
         local str = "$" .. taxcollected .. " tax collected"
