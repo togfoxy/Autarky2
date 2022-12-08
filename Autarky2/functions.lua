@@ -54,7 +54,6 @@ function functions.loadAudio()
 
 end
 
-
 function functions.initialiseMap()
 
     -- set up some perlin noise for later

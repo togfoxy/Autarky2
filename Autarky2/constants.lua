@@ -43,7 +43,7 @@ function constants.load()
     HISTORY_PRICE = {}
     HISTORY_TREASURY = {}
 
-    WORLD_HOURS = 0
+    WORLD_HOURS = 9
     WORLD_DAYS = 0
     TICKER = 0          -- dt or seconds (in fractions)
     PAUSED = false

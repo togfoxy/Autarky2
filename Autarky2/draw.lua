@@ -70,25 +70,27 @@ function draw.daynight()
     local alpha
 
     if WORLD_HOURS >= 0 and WORLD_HOURS <= 4 then
-        alpha = 0.6
-    elseif WORLD_HOURS == 5 then
         alpha = 0.5
-    elseif WORLD_HOURS == 6 then
+    elseif WORLD_HOURS == 5 then
         alpha = 0.4
-    elseif WORLD_HOURS == 7 then
+    elseif WORLD_HOURS == 6 then
         alpha = 0.3
-    elseif WORLD_HOURS == 8 then
+    elseif WORLD_HOURS == 7 then
         alpha = 0.2
+    elseif WORLD_HOURS == 8 then
+        alpha = 0.1
     elseif WORLD_HOURS >= 9 and WORLD_HOURS <= 17 then
         alpha = 0.0
     elseif WORLD_HOURS == 18 then
-        alpha = 0.3
+        alpha = 0.1
     elseif WORLD_HOURS == 19 then
-        alpha = 0.4
+        alpha = 0.2
     elseif WORLD_HOURS == 20 then
+        alpha = 0.3
+    elseif WORLD_HOURS == 21 then
+        alpha = 0.4
+    elseif WORLD_HOURS >= 22 then   -- make this the same as the >= 0 at the top
         alpha = 0.5
-    elseif WORLD_HOURS >= 21 then
-        alpha = 0.6
     end
 
     love.graphics.setColor(0,0,0,alpha)

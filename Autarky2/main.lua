@@ -218,21 +218,24 @@ function love.mousereleased( x, y, button, istouch, presses )
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 	lovelyToasts.mousereleased(wx, wy, button)
 
-
 	if MOUSE_DOWN_X ~= nil and button == 1 then
+		-- a mouse box has been drawn and released
+		-- A box can be drawn in any of the four quadrants - determine the top left corner:
+		local xlow = math.min(wx, MOUSE_DOWN_X)
+		local xhigh = math.max(wx, MOUSE_DOWN_X)
+		local ylow = math.min(wy, MOUSE_DOWN_Y)
+		local yhigh = math.max(wy, MOUSE_DOWN_Y)
 
 		-- cycle through persons and select all inside bounding box
 		for _, person in pairs(PERSONS) do
-			local x2, y2 = fun.getDrawXY(person)
-			if x2 > MOUSE_DOWN_X and x2 < wx then
-				if y2 > MOUSE_DOWN_Y and y2 < wy then
-					person.isSelected = true
+			local personx, persony = fun.getDrawXY(person)
+			if personx >= xlow and personx <= xhigh and
+				persony >= ylow and persony <= yhigh then
 
-				end
+				person.isSelected = true
 			end
 		end
 	end
-
 
 	-- used for mouse box dragging thingy
 	MOUSE_DOWN_X = nil
@@ -313,14 +316,19 @@ function love.draw()
 			-- do the mouse dragging thingy
 			if MOUSE_DOWN_X ~= nil then
 				-- draw box
-
 				local x, y = love.mouse.getPosition()
 				local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
-				local boxwidth = wx - MOUSE_DOWN_X
-				local boxheight = wy - MOUSE_DOWN_Y
-				love.graphics.setColor(1,1,1,1)
 
-				love.graphics.rectangle("line", MOUSE_DOWN_X, MOUSE_DOWN_Y, boxwidth, boxheight)
+				local xlow = math.min(wx, MOUSE_DOWN_X)
+				local xhigh = math.max(wx, MOUSE_DOWN_X)
+				local ylow = math.min(wy, MOUSE_DOWN_Y)
+				local yhigh = math.max(wy, MOUSE_DOWN_Y)
+
+				local boxwidth = math.abs(xhigh - xlow)
+				local boxheight = math.abs(yhigh - ylow)
+
+				love.graphics.setColor(1,1,1,1)
+				love.graphics.rectangle("line", xlow, ylow, boxwidth, boxheight)
 			end
 		end
 
