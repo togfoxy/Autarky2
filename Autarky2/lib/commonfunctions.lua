@@ -55,6 +55,7 @@ function GetDistance(x1, y1, x2, y2)
 	-- this is real distance in pixels
 	-- receives two coordinate pairs (not vectors)
 	-- returns a single number
+	-- Euclidean distance
 
 	if (x1 == nil) or (y1 == nil) or (x2 == nil) or (y2 == nil) then return 0 end
 

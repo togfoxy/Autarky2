@@ -196,21 +196,29 @@ function love.mousepressed( x, y, button, istouch, presses )
 	gspot:mousepress(wx, wy, button)
 
 	if button == 1 then
-		-- select the villager if clicked, else select the tile (further down)
+		-- select the villager if clicked
+		local personclicked = false			-- to capture if a villager was clicked
 		for k, person in pairs(PERSONS) do
 			local x2, y2 = fun.getDrawXY(person)
 			local dist = math.abs(cf.GetDistance(wx, wy, x2, y2))
 
 			if dist <= PERSONS_RADIUS then
+				personclicked = true
 				if person.isSelected then
 					person.isSelected = false
 					VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1
 				else
 					person.isSelected = true
 					VILLAGERS_SELECTED = VILLAGERS_SELECTED + 1
+
 				end
 			end
 		end
+
+		if not personclicked then
+			people.unselectAll()
+		end
+
 	end
 end
 
@@ -272,6 +280,8 @@ function love.load()
     love.window.setTitle("Autarky2 " .. GAME_VERSION)
 	love.keyboard.setKeyRepeat(true)
 	love.keyboard.setKeyRepeat(true)
+
+	fun.loadFonts()
 
 	cf.AddScreen("ExitGame", SCREEN_STACK)
     cf.AddScreen("World", SCREEN_STACK)

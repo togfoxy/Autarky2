@@ -37,6 +37,7 @@ function constants.load()
     EMOTICONS = {}      -- holds emoticon images
     IMAGE_QUEUE = {}
     AUDIO = {}
+    FONT = {}
 
 
     HISTORY_STOCK = {}
@@ -141,6 +142,9 @@ function constants.load()
 
     enum.musicBirds = 21
     enum.musicBirdsinForest = 22
+
+    enum.fontDefault = 1
+    enum.fontLarge = 2
 
 end
 

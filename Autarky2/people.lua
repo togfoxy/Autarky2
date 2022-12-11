@@ -416,34 +416,38 @@ local function genericSellOutputStock(person, stockoutput)
 	local askqty = marketplace.determineQty(maxqtytosell, person.stockPriceHistory[stockoutput]) -- commodity, maxQty, commodityKnowledge
 	askqty = cf.round(askqty)
 
-	-- determine ask price
-	local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
-	askprice = cf.round(askprice)
+    if askqty > 0 then
 
-    -- get an approximate cost price and ensure the ask price is at least that much
-    local costprice
-    local stockinput = person.occupationstockinput
+    	-- determine ask price
+    	local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
+    	askprice = cf.round(askprice)
 
-    if stockinput == nil then   -- will happen with primary producers
-        -- work out producers productivity and divide buy average income for that productiviy
-        costprice = fun.getAvgPrice(person.stockPriceHistory[stockoutput])
-        costprice = costprice / person.occupationstockgain
-    else
-        costprice = fun.getAvgPrice(person.stockPriceHistory[stockinput])
+        -- get an approximate cost price and ensure the ask price is at least that much
+        local costprice
+        local stockinput = person.occupationstockinput
+
+        if stockinput == nil then   -- will happen with primary producers
+            -- work out producers productivity and divide buy average income for that productiviy
+
+            -- cost price for primary producers = how much food consumed per item
+            costprice = 1 / person.occupationstockgain * fun.getAvgPrice(person.stockPriceHistory[enum.stockFood])
+        else    -- not a primary producer
+            costprice = fun.getAvgPrice(person.stockPriceHistory[stockinput])
+        end
+
+        costprice = cf.round(costprice, 2)
+        if costprice == nil then costprice = 0 end  -- happens at start of game
+
+        -- print("Stock input type: " .. stockinput)
+        print("Trying to sell stock type " .. stockoutput .. ". Cost price is $" .. costprice .. " and ask price is $" .. askprice)
+        askprice = math.max(askprice, costprice)
+
+    	-- register the ask
+    	marketplace.createAsk(stockoutput, askqty, askprice, person.guid)
+
+    	-- set destination = market
+    	fun.getRandomMarketXY(person)
     end
-
-    costprice = cf.round(costprice, 2)
-    if costprice == nil then costprice = 0 end  -- happens at start of game
-
-    -- print("Stock input type: " .. stockinput)
-    print("Trying to sell stock type " .. stockoutput .. ". Cost price is $" .. costprice .. " and ask price is $" .. askprice)
-    askprice = math.max(askprice, costprice)
-
-	-- register the ask
-	marketplace.createAsk(stockoutput, askqty, askprice, person.guid)
-
-	-- set destination = market
-	fun.getRandomMarketXY(person)
 end
 
 function people.doMarketplace()
