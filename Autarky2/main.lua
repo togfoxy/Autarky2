@@ -59,6 +59,8 @@ function love.keyreleased( key, scancode )
 	if key == "g" then
 		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
 			cf.AddScreen("Graphs", SCREEN_STACK)
+		elseif cf.CurrentScreenName(SCREEN_STACK) == "Graphs" then
+			cf.RemoveScreen(SCREEN_STACK)
 		end
 	end
 
@@ -117,7 +119,7 @@ function love.keyreleased( key, scancode )
 				local row, col = structures.create(enum.structureHealer, person.guid)
 				person.workrow = row
 				person.workcol = col
-                person.occupationstockgain = love.math.random(20,40) / 10	-- (1.0 -> 2.0)
+                person.occupationstockgain = love.math.random(20,40) / 10	-- (2.0 -> 4.0)
 				person.occupationstockinput = nil
 				person.occupationstockoutput = enum.stockHerbs
 			end
@@ -194,21 +196,29 @@ function love.mousepressed( x, y, button, istouch, presses )
 	gspot:mousepress(wx, wy, button)
 
 	if button == 1 then
-		-- select the villager if clicked, else select the tile (further down)
+		-- select the villager if clicked
+		local personclicked = false			-- to capture if a villager was clicked
 		for k, person in pairs(PERSONS) do
 			local x2, y2 = fun.getDrawXY(person)
 			local dist = math.abs(cf.GetDistance(wx, wy, x2, y2))
 
 			if dist <= PERSONS_RADIUS then
+				personclicked = true
 				if person.isSelected then
 					person.isSelected = false
 					VILLAGERS_SELECTED = VILLAGERS_SELECTED - 1
 				else
 					person.isSelected = true
 					VILLAGERS_SELECTED = VILLAGERS_SELECTED + 1
+
 				end
 			end
 		end
+
+		if not personclicked then
+			people.unselectAll()
+		end
+
 	end
 end
 
@@ -216,21 +226,24 @@ function love.mousereleased( x, y, button, istouch, presses )
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 	lovelyToasts.mousereleased(wx, wy, button)
 
-
 	if MOUSE_DOWN_X ~= nil and button == 1 then
+		-- a mouse box has been drawn and released
+		-- A box can be drawn in any of the four quadrants - determine the top left corner:
+		local xlow = math.min(wx, MOUSE_DOWN_X)
+		local xhigh = math.max(wx, MOUSE_DOWN_X)
+		local ylow = math.min(wy, MOUSE_DOWN_Y)
+		local yhigh = math.max(wy, MOUSE_DOWN_Y)
 
 		-- cycle through persons and select all inside bounding box
 		for _, person in pairs(PERSONS) do
-			local x2, y2 = fun.getDrawXY(person)
-			if x2 > MOUSE_DOWN_X and x2 < wx then
-				if y2 > MOUSE_DOWN_Y and y2 < wy then
-					person.isSelected = true
+			local personx, persony = fun.getDrawXY(person)
+			if personx >= xlow and personx <= xhigh and
+				persony >= ylow and persony <= yhigh then
 
-				end
+				person.isSelected = true
 			end
 		end
 	end
-
 
 	-- used for mouse box dragging thingy
 	MOUSE_DOWN_X = nil
@@ -267,6 +280,8 @@ function love.load()
     love.window.setTitle("Autarky2 " .. GAME_VERSION)
 	love.keyboard.setKeyRepeat(true)
 	love.keyboard.setKeyRepeat(true)
+
+	fun.loadFonts()
 
 	cf.AddScreen("ExitGame", SCREEN_STACK)
     cf.AddScreen("World", SCREEN_STACK)
@@ -311,14 +326,19 @@ function love.draw()
 			-- do the mouse dragging thingy
 			if MOUSE_DOWN_X ~= nil then
 				-- draw box
-
 				local x, y = love.mouse.getPosition()
 				local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
-				local boxwidth = wx - MOUSE_DOWN_X
-				local boxheight = wy - MOUSE_DOWN_Y
-				love.graphics.setColor(1,1,1,1)
 
-				love.graphics.rectangle("line", MOUSE_DOWN_X, MOUSE_DOWN_Y, boxwidth, boxheight)
+				local xlow = math.min(wx, MOUSE_DOWN_X)
+				local xhigh = math.max(wx, MOUSE_DOWN_X)
+				local ylow = math.min(wy, MOUSE_DOWN_Y)
+				local yhigh = math.max(wy, MOUSE_DOWN_Y)
+
+				local boxwidth = math.abs(xhigh - xlow)
+				local boxheight = math.abs(yhigh - ylow)
+
+				love.graphics.setColor(1,1,1,1)
+				love.graphics.rectangle("line", xlow, ylow, boxwidth, boxheight)
 			end
 		end
 

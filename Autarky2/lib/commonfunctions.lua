@@ -55,6 +55,7 @@ function GetDistance(x1, y1, x2, y2)
 	-- this is real distance in pixels
 	-- receives two coordinate pairs (not vectors)
 	-- returns a single number
+	-- Euclidean distance
 
 	if (x1 == nil) or (y1 == nil) or (x2 == nil) or (y2 == nil) then return 0 end
 
@@ -131,6 +132,11 @@ function fltAbsoluteTileDistance(x1,y1,x2,y2)
 	-- this returns the number of steps or tiles in whole numbers and not in diagonals
 
 	return math.max (math.abs(x2-x1), math.abs(y2-y1))
+end
+
+function strFormatCurrency(v)
+	-- does NOT include the '$'
+	return string.format("%.2f", v)
 end
 
 function strFormatThousand(v)

@@ -2,8 +2,9 @@ draw = {}
 
 function draw.topBar()
     -- draw world hours
+    love.graphics.setFont(FONT[enum.fontLarge])
     love.graphics.setColor(1,1,1,1)
-    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. " Treasury: $" .. TREASURY .. " "
+    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. " Treasury: $" .. cf.strFormatCurrency(TREASURY) .. " "
     if PAUSED then str = str .. "PAUSED" end
     love.graphics.print(str, 10, 10)
 
@@ -17,7 +18,7 @@ function draw.topBar()
 
     -- draw more counts on the far right margin
     local str = "Villagers available: " .. #PERSONS .. " Villagers quit: " .. PERSONS_LEFT
-    love.graphics.print(str, SCREEN_WIDTH - 300, 10)
+    love.graphics.print(str, SCREEN_WIDTH - 350, 10)
 
 end
 
@@ -70,25 +71,27 @@ function draw.daynight()
     local alpha
 
     if WORLD_HOURS >= 0 and WORLD_HOURS <= 4 then
-        alpha = 0.6
-    elseif WORLD_HOURS == 5 then
         alpha = 0.5
-    elseif WORLD_HOURS == 6 then
+    elseif WORLD_HOURS == 5 then
         alpha = 0.4
-    elseif WORLD_HOURS == 7 then
+    elseif WORLD_HOURS == 6 then
         alpha = 0.3
-    elseif WORLD_HOURS == 8 then
+    elseif WORLD_HOURS == 7 then
         alpha = 0.2
+    elseif WORLD_HOURS == 8 then
+        alpha = 0.1
     elseif WORLD_HOURS >= 9 and WORLD_HOURS <= 17 then
         alpha = 0.0
     elseif WORLD_HOURS == 18 then
-        alpha = 0.3
+        alpha = 0.1
     elseif WORLD_HOURS == 19 then
-        alpha = 0.4
+        alpha = 0.2
     elseif WORLD_HOURS == 20 then
+        alpha = 0.3
+    elseif WORLD_HOURS == 21 then
+        alpha = 0.4
+    elseif WORLD_HOURS >= 22 then   -- make this the same as the >= 0 at the top
         alpha = 0.5
-    elseif WORLD_HOURS >= 21 then
-        alpha = 0.6
     end
 
     love.graphics.setColor(0,0,0,alpha)
@@ -104,6 +107,7 @@ end
 function draw.graphs()
 
     love.graphics.setColor(1,1,1,1)
+    love.graphics.setFont(FONT[enum.fontDefault])
 
     -- *************** first row ****************
     -- food
@@ -116,7 +120,9 @@ function draw.graphs()
     love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
     drawy = drawy + 100
 
-    for i = 1, #HISTORY_STOCK[enum.stockFood] do
+    local startindex = (#HISTORY_STOCK[enum.stockFood] - 100)
+    if startindex < 1 then startindex = 1 end
+    for i = startindex, #HISTORY_STOCK[enum.stockFood] do
         drawx = drawx + 1
         local yvalue = drawy - HISTORY_STOCK[enum.stockFood][i]
         love.graphics.points(drawx, yvalue)
@@ -132,6 +138,8 @@ function draw.graphs()
     love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
     drawy = drawy + 100
 
+    local startindex = (#HISTORY_STOCK[enum.stockHealth] - 100)
+    if startindex < 1 then startindex = 1 end
     for i = 1, #HISTORY_STOCK[enum.stockHealth] do
         drawx = drawx + 1
         local yvalue = drawy - HISTORY_STOCK[enum.stockHealth][i]
@@ -146,6 +154,9 @@ function draw.graphs()
     love.graphics.line(drawx, drawy, drawx, drawy + 100)
     love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
     drawy = drawy + 100
+
+    local startindex = (#HISTORY_STOCK[enum.stockWealth] - 100)
+    if startindex < 1 then startindex = 1 end
     for i = 1, #HISTORY_STOCK[enum.stockWealth] do
         drawx = drawx + 1
         local yvalue = drawy - HISTORY_STOCK[enum.stockWealth][i]
@@ -160,6 +171,9 @@ function draw.graphs()
     love.graphics.line(drawx, drawy, drawx, drawy + 100)
     love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
     drawy = drawy + 100
+
+    local startindex = (#HISTORY_TREASURY - 100)
+    if startindex < 1 then startindex = 1 end
     for i = 1, #HISTORY_TREASURY do
         drawx = drawx + 1
         local yvalue = drawy - HISTORY_TREASURY[i]
@@ -177,6 +191,8 @@ function draw.graphs()
     love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
     drawy = drawy + 100
 
+    local startindex = (#HISTORY_PRICE[enum.stockFood] - 100)
+    if startindex < 1 then startindex = 1 end
     for i = 1, #HISTORY_PRICE[enum.stockFood] do
         drawx = drawx + 1
         local yvalue = drawy - (HISTORY_PRICE[enum.stockFood][i] * 10)
@@ -193,6 +209,8 @@ function draw.graphs()
     love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
     drawy = drawy + 100
 
+    local startindex = (#HISTORY_PRICE[enum.stockLogs] - 100)
+    if startindex < 1 then startindex = 1 end
     for i = 1, #HISTORY_PRICE[enum.stockLogs] do
         drawx = drawx + 1
         local yvalue = drawy - HISTORY_PRICE[enum.stockLogs][i]
@@ -209,13 +227,16 @@ function draw.graphs()
     love.graphics.line(drawx, drawy + 100, drawx + 100, drawy + 100)
     drawy = drawy + 100
 
+    local startindex = (#HISTORY_PRICE[enum.stockHerbs] - 100)
+    if startindex < 1 then startindex = 1 end
     for i = 1, #HISTORY_PRICE[enum.stockHerbs] do
         drawx = drawx + 1
         local yvalue = drawy - HISTORY_PRICE[enum.stockHerbs][i]
         love.graphics.points(drawx, yvalue)
     end
 
-    love.graphics.print("Press ESCAPE to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    love.graphics.setFont(FONT[enum.fontLarge])
+    love.graphics.print("Press 'g' or ESCAPE to close this screen", (SCREEN_WIDTH / 2) - 100, SCREEN_HEIGHT / 2)
 end
 
 function draw.imageQueue()
@@ -254,7 +275,7 @@ function draw.exitScreen()
 	tax_rate_down_button:hide()
 	close_options_button:hide()
 
-  love.graphics.print("Press ENTER to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+  love.graphics.print("Press ENTER to exit the game", (SCREEN_WIDTH / 2) - 100, SCREEN_HEIGHT / 2)
 
 end
 

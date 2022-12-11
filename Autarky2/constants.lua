@@ -3,7 +3,7 @@ constants = {}
 function constants.load()
     -- includes globals
 
-    GAME_VERSION = "0.05"
+    GAME_VERSION = "0.06"
 
     TILE_SIZE = 50
     UPPER_TERRAIN_HEIGHT = 6
@@ -37,13 +37,14 @@ function constants.load()
     EMOTICONS = {}      -- holds emoticon images
     IMAGE_QUEUE = {}
     AUDIO = {}
+    FONT = {}
 
 
     HISTORY_STOCK = {}
     HISTORY_PRICE = {}
     HISTORY_TREASURY = {}
 
-    WORLD_HOURS = 0
+    WORLD_HOURS = 9
     WORLD_DAYS = 0
     TICKER = 0          -- dt or seconds (in fractions)
     PAUSED = false
@@ -141,6 +142,9 @@ function constants.load()
 
     enum.musicBirds = 21
     enum.musicBirdsinForest = 22
+
+    enum.fontDefault = 1
+    enum.fontLarge = 2
 
 end
 

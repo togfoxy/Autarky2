@@ -54,6 +54,14 @@ function functions.loadAudio()
 
 end
 
+function functions.loadFonts()
+    FONT[enum.fontDefault] = love.graphics.newFont("assets/fonts/Vera.ttf", 12)
+    FONT[enum.fontLarge] = love.graphics.newFont("assets/fonts/Vera.ttf", 18)
+    -- FONT[enum.fontHeavyMetalLarge] = love.graphics.newFont("assets/fonts/Heavy Metal Box.ttf")
+    -- FONT[enum.fontTech18] = love.graphics.newFont("assets/fonts/CorporateGothicNbpRegular-YJJ2.ttf", 24)
+
+    love.graphics.setFont(FONT[enum.fontDefault])
+end
 
 function functions.initialiseMap()
 
@@ -203,7 +211,7 @@ end
 
 function functions.getHistoricAvgPrice(commodity)
     -- get the actual historic average transaction price for provided commodity
-    -- retuns a number with two decimal places
+    -- returns a number with two decimal places
 
     local sum = 0
     for i = 1, #HISTORY_PRICE[commodity] do

@@ -46,18 +46,61 @@ function people.createPerson()
         thisperson.beliefRangeHistory[j] = {}
         thisperson.beliefRangeHistory[j] = {1, 10}
 
-        thisperson.stockPriceHistory[j] = {}
+        thisperson.stockPriceHistory[j] = {}        -- the price this agent paid for each stock and every transaction
         thisperson.stockPriceHistory[j] = {5}
     end
-
     -- this happens AFTER the above loop to override and set correct initial values
     thisperson.stock[enum.stockFood] = love.math.random(7,7)                 -- days
     thisperson.stock[enum.stockHealth] = 100
     thisperson.stock[enum.stockWealth] = 20
 
+    -- set meaningful beliefs and stock history
+    local avgprice = fun.getHistoricAvgPrice(enum.stockFood)
+    if avgprice >= 0 then
+        thisperson.beliefRange[enum.stockFood] = {avgprice * 0.8, avgprice * 1.2}
+        thisperson.beliefRangeHistory[enum.stockFood] = {avgprice * 0.8, avgprice * 1.2}
+        thisperson.stockPriceHistory[enum.stockFood] = {avgprice}
+    else
+        thisperson.beliefRange[enum.stockFood] = {1,5}
+        thisperson.beliefRangeHistory[enum.stockFood] = {1, 5}
+        thisperson.stockPriceHistory[enum.stockFood] = {3}
+    end
+
+    avgprice = fun.getHistoricAvgPrice(enum.stockLogs)
+    if avgprice >= 0 then
+        thisperson.beliefRange[enum.stockLogs] = {avgprice * 0.8, avgprice * 1.2}
+        thisperson.beliefRangeHistory[enum.stockLogs] = {avgprice * 0.8, avgprice * 1.2}
+        thisperson.stockPriceHistory[enum.stockLogs] = {avgprice}
+    else
+        thisperson.beliefRange[enum.stockLogs] = {9,11}
+        thisperson.beliefRangeHistory[enum.stockLogs] = {7.2, 10.8}
+        thisperson.stockPriceHistory[enum.stockLogs] = {9}
+    end
+
+    avgprice = fun.getHistoricAvgPrice(enum.stockHouse)
+    if avgprice >= 0 then
+        thisperson.beliefRange[enum.stockHouse] = {avgprice * 0.8, avgprice * 1.2}
+        thisperson.beliefRangeHistory[enum.stockHouse] = {avgprice * 0.8, avgprice * 1.2}
+        thisperson.stockPriceHistory[enum.stockHouse] = {avgprice}
+    else
+        thisperson.beliefRange[enum.stockHouse] = {28,42}
+        thisperson.beliefRangeHistory[enum.stockHouse] = {28, 42}
+        thisperson.stockPriceHistory[enum.stockHouse] = {35}
+    end
+
+    avgprice = fun.getHistoricAvgPrice(enum.stockHerbs)
+    if avgprice >= 0 then
+        thisperson.beliefRange[enum.stockHerbs] = {avgprice * 0.8, avgprice * 1.2}
+        thisperson.beliefRangeHistory[enum.stockHerbs] = {avgprice * 0.8, avgprice * 1.2}
+        thisperson.stockPriceHistory[enum.stockHerbs] = {avgprice}
+    else
+        thisperson.beliefRange[enum.stockHerbs] = {0.8, 1.2}
+        thisperson.beliefRangeHistory[enum.stockHerbs] = {0.8, 1.2}
+        thisperson.stockPriceHistory[enum.stockHerbs] = {1}
+    end
+
     table.insert(PERSONS, thisperson)
 end
-
 
 local function drawDebug(person)
     local drawx, drawy = fun.getTileXY(person.row, person.col)
@@ -373,14 +416,38 @@ local function genericSellOutputStock(person, stockoutput)
 	local askqty = marketplace.determineQty(maxqtytosell, person.stockPriceHistory[stockoutput]) -- commodity, maxQty, commodityKnowledge
 	askqty = cf.round(askqty)
 
-	-- determine ask price
-	local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
-	askprice = cf.round(askprice)
-	-- register the ask
-	marketplace.createAsk(stockoutput, askqty, askprice, person.guid)
+    if askqty > 0 then
 
-	-- set destination = market
-	fun.getRandomMarketXY(person)
+    	-- determine ask price
+    	local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
+    	askprice = cf.round(askprice)
+
+        -- get an approximate cost price and ensure the ask price is at least that much
+        local costprice
+        local stockinput = person.occupationstockinput
+
+        if stockinput == nil then   -- will happen with primary producers
+            -- work out producers productivity and divide buy average income for that productiviy
+
+            -- cost price for primary producers = how much food consumed per item
+            costprice = 1 / person.occupationstockgain * fun.getAvgPrice(person.stockPriceHistory[enum.stockFood])
+        else    -- not a primary producer
+            costprice = fun.getAvgPrice(person.stockPriceHistory[stockinput])
+        end
+
+        costprice = cf.round(costprice, 2)
+        if costprice == nil then costprice = 0 end  -- happens at start of game
+
+        -- print("Stock input type: " .. stockinput)
+        print("Trying to sell stock type " .. stockoutput .. ". Cost price is $" .. costprice .. " and ask price is $" .. askprice)
+        askprice = math.max(askprice, costprice)
+
+    	-- register the ask
+    	marketplace.createAsk(stockoutput, askqty, askprice, person.guid)
+
+    	-- set destination = market
+    	fun.getRandomMarketXY(person)
+    end
 end
 
 function people.doMarketplace()
@@ -388,7 +455,7 @@ function people.doMarketplace()
 
     local avgHousePrice = fun.getHistoricAvgPrice(enum.stockHouse)
     for k, person in pairs(PERSONS) do
-        -- food
+        -- buy food
         if person.stock[enum.stockFood] < 7 and person.occupation ~= enum.jobFarmer then
             -- try to buy food
 			bidForFood(person)
@@ -530,6 +597,7 @@ function people.payTaxes()
         person.stock[enum.stockTaxOwed] = 0
     end
     if taxcollected > 0 then
+        taxcollected = cf.strFormatCurrency(taxcollected)
         local x = SCREEN_WIDTH - 200
         local y = love.math.random(100 ,SCREEN_HEIGHT - 100)
         local str = "$" .. taxcollected .. " tax collected"
