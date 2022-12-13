@@ -400,7 +400,7 @@ function love.update(dt)
 						people.getLoan()
 						people.buildHouse()
 						people.payTaxes()
-						people.claimSocialSecurity()
+						--! people.claimSocialSecurity()
 						fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
 						fun.RecordHistoryTreasury()
 
@@ -408,14 +408,13 @@ function love.update(dt)
 						WORLD_DAYS = WORLD_DAYS + 1
 
 						MARKET_RESOLVED = false 			-- reset this every midnight
-
-
 					end
 				end
 
 				-- pay time
 				if WORLD_HOURS == 17 then
 					people.pay()
+					people.repayLoan()	-- need to ensure a loan is not paid back in the same cycle
 				end
 
 				-- dinner time

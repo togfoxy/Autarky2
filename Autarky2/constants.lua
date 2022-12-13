@@ -49,7 +49,7 @@ function constants.load()
     TICKER = 0          -- dt or seconds (in fractions)
     PAUSED = false
     SALES_TAX = 0.05
-    TREASURY = 0        -- govt coffers
+    TREASURY = 100        -- govt coffers
     TREASURY_OWED = 0       -- how much is owed to the treasury
 
     PERSONS = {}

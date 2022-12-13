@@ -73,6 +73,15 @@ local function saveHistoryTreasury()
     return success
 end
 
+local function saveMap()
+    local savefile = savedir .. "map.dat"
+
+    local serialisedString = bitser.dumps(MAP)
+    local success, message = nativefs.write(savefile, serialisedString)
+
+    return success
+end
+
 function file.saveGame()
     local success1 = saveGlobals()
     local success2 = savePersons()
@@ -80,13 +89,15 @@ function file.saveGame()
     local success4 = saveHistoryStock()
     local success5 = saveHistoryPrice()
     local success6 = saveHistoryTreasury()
+    local success7 = saveMap()
 
     --! will need to save the perlin noise at some stage
 
-    if success1 and success2 and success3 and success4 and success5 and success6 then
+    if success1 and success2 and success3 and success4 and success5 and success6 and success7 then
         lovelyToasts.show("Game saved",10)
     else
         lovelyToasts.show("Error saving",10)
+        print(success1, success2, success3, success4, success5, success6, success7)
     end
 end
 
@@ -96,7 +107,7 @@ local function loadGlobals()
 	if nativefs.getInfo(savefile) then
 
         -- erase these values here and then reload new values below
-        MAP[WELLROW][WELLCOL].structure = nils
+        MAP[WELLROW][WELLCOL].structure = nil       --! these two lines are probably redundant
         MAP[MARKETROW][MARKETCOL].structure = nil
 
 		contents, size = nativefs.read(savefile)
@@ -113,7 +124,7 @@ local function loadGlobals()
         MARKETCOL = t.MARKETCOL
         PERSONS_LEFT = t.PERSONS_LEFT
 
-        MAP[WELLROW][WELLCOL].structure = enum.well
+        MAP[WELLROW][WELLCOL].structure = enum.well             --! these two lines are probably redundant
         MAP[MARKETROW][MARKETCOL].structure = enum.market
 
         return true
@@ -182,6 +193,19 @@ local function loadHistoryTreasury()
     end
 end
 
+local function loadMap()
+    local savefile = savedir .. "map.dat"
+
+	if nativefs.getInfo(savefile) then
+		contents, size = nativefs.read(savefile)
+	    MAP = bitser.loads(contents)
+        return true
+    else
+        error()
+    end
+end
+
+
 function file.loadGame()
     local success1 = loadGlobals()
     local success2 = loadPersons()
@@ -189,12 +213,13 @@ function file.loadGame()
     local success4 = loadHistoryStock()
     local success5 = loadHistoryPrice()
     local success6 = loadHistoryTreasury()
+    local success7 = loadMap()
 
-    if success1 and success2 and success3 and success4 and success5 and success6 then
+    if success1 and success2 and success3 and success4 and success5 and success6 and success7 then
         lovelyToasts.show("Game loaded",10)
     else
         lovelyToasts.show("Error loading",10)
-        print(success1, success2, success3, success4, success5, success6)
+        print(success1, success2, success3, success4, success5, success6, success7)
     end
 
 end
