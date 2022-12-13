@@ -8,9 +8,6 @@ res = require 'lib.resolution_solution'
 Camera = require 'lib.cam11.cam11'
 -- https://notabug.org/pgimeno/cam11
 
-gspot = require 'lib.gspot.Gspot'
--- https://notabug.org/pgimeno/Gspot
-
 bitser = require 'lib.bitser'
 -- https://github.com/gvx/bitser
 
@@ -19,7 +16,6 @@ nativefs = require 'lib.nativefs'
 
 lovelyToasts = require 'lib.lovelyToasts'
 -- https://github.com/Loucee/Lovely-Toasts
-
 
 marketplace = require 'lib.marketplace'
 
@@ -195,8 +191,6 @@ function love.mousepressed( x, y, button, istouch, presses )
 
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 
-	gspot:mousepress(wx, wy, button)
-
 	if button == 1 then
 		-- select the villager if clicked
 		local personclicked = false			-- to capture if a villager was clicked
@@ -228,28 +222,35 @@ function love.mousereleased( x, y, button, istouch, presses )
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 	lovelyToasts.mousereleased(wx, wy, button)
 
-	if MOUSE_DOWN_X ~= nil and button == 1 then
-		-- a mouse box has been drawn and released
-		-- A box can be drawn in any of the four quadrants - determine the top left corner:
-		local xlow = math.min(wx, MOUSE_DOWN_X)
-		local xhigh = math.max(wx, MOUSE_DOWN_X)
-		local ylow = math.min(wy, MOUSE_DOWN_Y)
-		local yhigh = math.max(wy, MOUSE_DOWN_Y)
+	local currentscreen = cf.CurrentScreenName(SCREEN_STACK)
+	if currentscreen == "World" then
 
-		-- cycle through persons and select all inside bounding box
-		for _, person in pairs(PERSONS) do
-			local personx, persony = fun.getDrawXY(person)
-			if personx >= xlow and personx <= xhigh and
-				persony >= ylow and persony <= yhigh then
+		if MOUSE_DOWN_X ~= nil and button == 1 then
+			-- a mouse box has been drawn and released
+			-- A box can be drawn in any of the four quadrants - determine the top left corner:
+			local xlow = math.min(wx, MOUSE_DOWN_X)
+			local xhigh = math.max(wx, MOUSE_DOWN_X)
+			local ylow = math.min(wy, MOUSE_DOWN_Y)
+			local yhigh = math.max(wy, MOUSE_DOWN_Y)
 
-				person.isSelected = true
+			-- cycle through persons and select all inside bounding box
+			for _, person in pairs(PERSONS) do
+				local personx, persony = fun.getDrawXY(person)
+				if personx >= xlow and personx <= xhigh and
+					persony >= ylow and persony <= yhigh then
+
+					person.isSelected = true
+				end
 			end
 		end
-	end
 
-	-- used for mouse box dragging thingy
-	MOUSE_DOWN_X = nil
-	MOUSE_DOWN_Y = nil
+		-- used for mouse box dragging thingy		--! not sure if this needs to be inside the IF statement
+		MOUSE_DOWN_X = nil
+		MOUSE_DOWN_Y = nil
+	elseif currentscreen == "Options" then
+		-- do bounding box stuff
+
+	end
 end
 
 function love.wheelmoved(x, y)
@@ -319,11 +320,6 @@ function love.draw()
 
 		draw.daynight()	-- draw day/night last
 
-		tax_rate_up_button:hide()
-		tax_rate_down_button:hide()
-		close_options_button:hide()
-		exit_game_button:hide()
-
 		if currentscreen == "World" then
 			-- do the mouse dragging thingy
 			if MOUSE_DOWN_X ~= nil then
@@ -346,9 +342,8 @@ function love.draw()
 
 		if currentscreen == "Graphs" then
 			draw.graphs()
-			-- close_graph_button:show()
 		else
-			close_graph_button:hide()
+
 		end
 
 		cam:detach()
@@ -367,7 +362,6 @@ function love.draw()
 	end
 
 	lovelyToasts.draw()
-	gspot:draw()
     res.stop()
 end
 
@@ -451,6 +445,5 @@ function love.update(dt)
 	fun.PlayAmbientMusic()
 
 	lovelyToasts.update(dt)
-	gspot:update(dt)
 	res.update()
 end

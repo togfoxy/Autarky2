@@ -263,16 +263,13 @@ end
 function draw.optionScreen()
 
 	love.graphics.setColor(1,1,1,1)
-	love.graphics.print(SALES_TAX, 300, 415)
+	love.graphics.print(SALES_TAX, 300, 425)
 
     love.graphics.print("Press 'O' or ESCAPE to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
 end
 
 function draw.exitScreen()
-	tax_rate_up_button:hide()
-	tax_rate_down_button:hide()
-	close_options_button:hide()
 
   love.graphics.print("Press ENTER to exit the game", (SCREEN_WIDTH / 2) - 100, SCREEN_HEIGHT / 2)
 
