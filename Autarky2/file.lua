@@ -81,6 +81,8 @@ function file.saveGame()
     local success5 = saveHistoryPrice()
     local success6 = saveHistoryTreasury()
 
+    --! will need to save the perlin noise at some stage
+
     if success1 and success2 and success3 and success4 and success5 and success6 then
         lovelyToasts.show("Game saved",10)
     else

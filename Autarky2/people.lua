@@ -115,6 +115,7 @@ local function drawDebug(person)
     txt = txt .. "Herbs: " .. person.stock[enum.stockHerbs] .. "\n"
     txt = txt .. "Houses: " .. person.stock[enum.stockHouse] .. "\n"
     txt = txt .. "Tax owed: " .. person.stock[enum.stockTaxOwed] .. "\n"
+    txt = txt .. "Loans owed: " .. person.stock[enum.stockWealthOwed] .. "\n"
 
     love.graphics.setColor(1,1,1,1)
     love.graphics.print(txt, drawx, drawy, 0, 1, 1, 0, 0)
@@ -656,15 +657,23 @@ function people.getLoan()
         if stockoutput ~= nil and stockinput ~= nil then
             if person.stock[stockoutput] == 0 then
                 local avgprice = fun.getAvgPrice(HISTORY_PRICE[stockinput])
-                if person.stock[enum.stockWealth] < avgprice then
+                local numberofinputsneeded = person.occupationconversionrate
+                local totalwealthneeded = avgprice * numberofinputsneeded
+                if person.stock[enum.stockWealth] < totalwealthneeded then
                     -- person qualifies for loan
-                    print("Person needs a loan")
+                    -- see if treasury can fund a loan
+                    local loanneeded = totalwealthneeded - person.stock[enum.stockWealth]
+                    if TREASURY >= loanneeded then
+                        -- loan approved
+                        TREASURY = TREASURY - loanneeded
+                        TREASURY_OWED = TREASURY_OWED + loanneeded
+                        person.stock[enum.stockWealthOwed] = person.stock[enum.stockWealthOwed] + loanneeded
+                        person.stock[enum.stockWealth] = person.stock[enum.stockWealth] + loanneeded
+                    end
                 end
             end
         end
     end
-
-
 end
 
 
