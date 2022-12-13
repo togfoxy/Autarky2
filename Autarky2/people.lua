@@ -2,7 +2,7 @@ people = {}
 
 function people.initialise()
 
-    local numofppl = 4
+    local numofppl = 6
 
     for i = 1, numofppl do
         people.createPerson()

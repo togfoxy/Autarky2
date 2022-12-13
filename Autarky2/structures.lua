@@ -40,7 +40,16 @@ function structures.kill(row, col)
     MAP[row][col].owner = nil
 end
 
-
-
+function structures.countStructureType(structtype)
+    local total = 0         --! forperformance, can move inside structures.age
+    for col = 1, NUMBER_OF_COLS do
+        for row = 1,NUMBER_OF_ROWS do
+            if MAP[row][col].structure == structtype then
+                total = total + 1
+            end
+        end
+    end
+    return total
+end
 
 return structures

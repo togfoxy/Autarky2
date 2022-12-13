@@ -15,6 +15,8 @@ function draw.topBar()
     str = str .. "Healers: " .. occupationtable[enum.jobHealer] .. ". "
     str = str .. "Woodsmen: " .. occupationtable[enum.jobWoodsman] .. ". "
     str = str .. "Builders: " .. occupationtable[enum.jobBuilder] .. ". "
+    str = str .. "# of houses: " .. structures.countStructureType(enum.structureHouse)
+
     love.graphics.print(str, (SCREEN_WIDTH / 2) - 175, 10)
 
     -- draw more counts on the far right margin
@@ -259,15 +261,11 @@ function draw.imageQueue()
 end
 
 function draw.optionScreen()
-	-- tax_rate_up_button:show()
-	-- tax_rate_down_button:show()
-	-- close_options_button:show()
-	-- exit_game_button:hide()
-    --
-	-- love.graphics.setColor(1,1,1,1)
-	-- love.graphics.print(SALES_TAX, 300, 415)
 
-    love.graphics.print("Press ESCAPE to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+	love.graphics.setColor(1,1,1,1)
+	love.graphics.print(SALES_TAX, 300, 415)
+
+    love.graphics.print("Press 'O' or ESCAPE to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
 end
 

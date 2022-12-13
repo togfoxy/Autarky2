@@ -67,6 +67,8 @@ function love.keyreleased( key, scancode )
 	if key == "o" then
 		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
 			cf.AddScreen("Options", SCREEN_STACK)
+		elseif cf.CurrentScreenName(SCREEN_STACK) == "Options" then
+			cf.RemoveScreen(SCREEN_STACK)
 		end
 	end
 
@@ -360,7 +362,6 @@ function love.draw()
 		draw.optionScreen()
 	elseif currentscreen == "ExitGame" then
 		draw.exitScreen()
-
 	else
 		error("Current screen is " .. currentscreen)
 	end

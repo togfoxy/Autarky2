@@ -38,6 +38,7 @@ function constants.load()
     IMAGE_QUEUE = {}
     AUDIO = {}
     FONT = {}
+    GUI = {}            -- buttons and spinners etc
 
 
     HISTORY_STOCK = {}
@@ -49,7 +50,7 @@ function constants.load()
     TICKER = 0          -- dt or seconds (in fractions)
     PAUSED = false
     SALES_TAX = 0.05
-    TREASURY = 100        -- govt coffers
+    TREASURY = 0        -- govt coffers
     TREASURY_OWED = 0       -- how much is owed to the treasury
 
     PERSONS = {}
@@ -148,6 +149,9 @@ function constants.load()
 
     enum.fontDefault = 1
     enum.fontLarge = 2
+
+    enum.guiSpinnerUp = 1
+    enum.guiSpinnerDown = 2
 
 end
 
