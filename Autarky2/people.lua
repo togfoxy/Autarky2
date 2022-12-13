@@ -124,7 +124,7 @@ end
 function people.draw()
 
     local alpha
-    if cf.CurrentScreenName(SCREEN_STACK) == "Graphs" then
+    if cf.CurrentScreenName(SCREEN_STACK) == enum.sceneGraphs then
          alpha = 0.25       -- a modifier (not the actual alpha)
     else
         alpha = 1

@@ -25,19 +25,19 @@ require 'draw'
 require 'constants'
 require 'people'
 require 'structures'
-require 'gui'
 require 'file'
+buttons = require 'buttons'
 
 function love.keyreleased( key, scancode )
 	if key == "escape" then
-		if cf.CurrentScreenName(SCREEN_STACK) == "ExitGame" then
-			cf.AddScreen("World", SCREEN_STACK)
+		if cf.CurrentScreenName(SCREEN_STACK) == enum.sceneExitGame then
+			cf.AddScreen(enum.sceneWorld, SCREEN_STACK)
 		else
 			cf.RemoveScreen(SCREEN_STACK)
 		end
 	end
 	if key == "return" then
-		if cf.CurrentScreenName(SCREEN_STACK) == "ExitGame" then
+		if cf.CurrentScreenName(SCREEN_STACK) == enum.sceneExitGame then
 			cf.RemoveScreen(SCREEN_STACK)
 		end
 	end
@@ -53,17 +53,17 @@ function love.keyreleased( key, scancode )
 	end
 
 	if key == "g" then
-		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
-			cf.AddScreen("Graphs", SCREEN_STACK)
-		elseif cf.CurrentScreenName(SCREEN_STACK) == "Graphs" then
+		if cf.CurrentScreenName(SCREEN_STACK) == enum.sceneWorld then
+			cf.AddScreen(enum.sceneGraphs, SCREEN_STACK)
+		elseif cf.CurrentScreenName(SCREEN_STACK) == enum.sceneGraphs then
 			cf.RemoveScreen(SCREEN_STACK)
 		end
 	end
 
 	if key == "o" then
-		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
-			cf.AddScreen("Options", SCREEN_STACK)
-		elseif cf.CurrentScreenName(SCREEN_STACK) == "Options" then
+		if cf.CurrentScreenName(SCREEN_STACK) == enum.sceneWorld then
+			cf.AddScreen(enum.sceneOptions, SCREEN_STACK)
+		elseif cf.CurrentScreenName(SCREEN_STACK) == enum.sceneOptions then
 			cf.RemoveScreen(SCREEN_STACK)
 		end
 	end
@@ -174,10 +174,12 @@ function love.mousemoved( x, y, dx, dy, istouch )
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 
 	if love.mouse.isDown(1) then
-		if MOUSE_DOWN_X == nil then
-			-- start the drag operation
-			MOUSE_DOWN_X = wx
-			MOUSE_DOWN_Y = wy
+		if cf.CurrentScreenName(SCREEN_STACK) == enum.sceneWorld then
+			if MOUSE_DOWN_X == nil then
+				-- start the drag operation
+				MOUSE_DOWN_X = wx
+				MOUSE_DOWN_Y = wy
+			end
 		end
 	end
 
@@ -223,7 +225,7 @@ function love.mousereleased( x, y, button, istouch, presses )
 	lovelyToasts.mousereleased(wx, wy, button)
 
 	local currentscreen = cf.CurrentScreenName(SCREEN_STACK)
-	if currentscreen == "World" then
+	if currentscreen == enum.sceneWorld then
 
 		if MOUSE_DOWN_X ~= nil and button == 1 then
 			-- a mouse box has been drawn and released
@@ -247,7 +249,7 @@ function love.mousereleased( x, y, button, istouch, presses )
 		-- used for mouse box dragging thingy		--! not sure if this needs to be inside the IF statement
 		MOUSE_DOWN_X = nil
 		MOUSE_DOWN_Y = nil
-	elseif currentscreen == "Options" then
+	elseif currentscreen == enum.sceneOptions then
 		-- do bounding box stuff
 
 	end
@@ -286,8 +288,8 @@ function love.load()
 
 	fun.loadFonts()
 
-	cf.AddScreen("ExitGame", SCREEN_STACK)
-    cf.AddScreen("World", SCREEN_STACK)
+	cf.AddScreen(enum.sceneExitGame, SCREEN_STACK)
+    cf.AddScreen(enum.sceneWorld, SCREEN_STACK)
 
     fun.initialiseMap()     -- initialises 2d map with nils
 	people.initialise()		-- adds ppl to the world
@@ -300,8 +302,8 @@ function love.load()
 	cam:setZoom(ZOOMFACTOR)
 	cam:setPos(TRANSLATEX,	TRANSLATEY)
 
-	gui.load()
 	fun.loadAudio()
+	buttons.loadButtons()			-- the buttons that are displayed on different gui's
 
 	lovelyToasts.options.tapToDismiss = true
 end
@@ -311,7 +313,7 @@ function love.draw()
 
 	local currentscreen = cf.CurrentScreenName(SCREEN_STACK)
 
-	if currentscreen == "World" or currentscreen == "Graphs" then
+	if currentscreen == enum.sceneWorld or currentscreen == enum.sceneGraphs then
 		cam:attach()
 
 		draw.world()	-- draw the world before the people
@@ -320,7 +322,7 @@ function love.draw()
 
 		draw.daynight()	-- draw day/night last
 
-		if currentscreen == "World" then
+		if currentscreen == enum.sceneWorld then
 			-- do the mouse dragging thingy
 			if MOUSE_DOWN_X ~= nil then
 				-- draw box
@@ -340,7 +342,7 @@ function love.draw()
 			end
 		end
 
-		if currentscreen == "Graphs" then
+		if currentscreen == enum.sceneGraphs then
 			draw.graphs()
 		else
 
@@ -349,16 +351,16 @@ function love.draw()
 		cam:detach()
 
 		-- this happens after the camera is detached
-		if currentscreen == "World" then
+		if currentscreen == enum.sceneWorld then
 			draw.topBar()
 		end
 
-	elseif currentscreen == "Options" then
+	elseif currentscreen == enum.sceneOptions then
 		draw.optionScreen()
-	elseif currentscreen == "ExitGame" then
+	elseif currentscreen == enum.sceneExitGame then
 		draw.exitScreen()
 	else
-		error("Current screen is " .. currentscreen)
+		error("Current screen is unrecognised: " .. currentscreen)
 	end
 
 	lovelyToasts.draw()
@@ -369,7 +371,7 @@ function love.update(dt)
 
 	local currentscreen = cf.CurrentScreenName(SCREEN_STACK)
 
-	if currentscreen == "World" then
+	if currentscreen == enum.sceneWorld then
 
 		if not PAUSED then
 
@@ -437,7 +439,7 @@ function love.update(dt)
 
 	end
 
-	if currentscreen == "World" or currentscreen == "Graphs" then
+	if currentscreen == enum.sceneWorld or currentscreen == enum.sceneGraphs then
 		cam:setZoom(ZOOMFACTOR)
 		cam:setPos(TRANSLATEX,	TRANSLATEY)
 	end

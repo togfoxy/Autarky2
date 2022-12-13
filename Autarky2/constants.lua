@@ -39,6 +39,7 @@ function constants.load()
     AUDIO = {}
     FONT = {}
     GUI = {}            -- buttons and spinners etc
+    GUI_BUTTONS = {}
 
 
     HISTORY_STOCK = {}
@@ -152,6 +153,13 @@ function constants.load()
 
     enum.guiSpinnerUp = 1
     enum.guiSpinnerDown = 2
+
+    enum.sceneOptions = 1       --! this is inconsistently applied
+    enum.sceneWorld = 2
+    enum.sceneGraphs = 3
+    enum.sceneExitGame = 4
+
+    enum.buttonOptionsOkay = 1
 
 end
 
