@@ -115,6 +115,7 @@ function functions.initialiseMap()
         marketrow = love.math.random(minrow, maxrow)
         marketcol = love.math.random(minrow, maxrow)
     until math.abs(wellrow - marketrow) > 1 or math.abs(wellcol - marketcol) > 1
+
     MAP[marketrow][marketcol].structure = enum.market
     MARKETROW = marketrow
     MARKETCOL = marketcol

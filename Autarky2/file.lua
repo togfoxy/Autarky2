@@ -92,6 +92,11 @@ local function loadGlobals()
     local savefile = savedir .. "globals.dat"
 
 	if nativefs.getInfo(savefile) then
+
+        -- erase these values here and then reload new values below
+        MAP[WELLROW][WELLCOL].structure = nils
+        MAP[MARKETROW][MARKETCOL].structure = nil
+
 		contents, size = nativefs.read(savefile)
 	    t = bitser.loads(contents)
 
@@ -105,6 +110,9 @@ local function loadGlobals()
         MARKETROW = t.MARKETROW
         MARKETCOL = t.MARKETCOL
         PERSONS_LEFT = t.PERSONS_LEFT
+
+        MAP[WELLROW][WELLCOL].structure = enum.well
+        MAP[MARKETROW][MARKETCOL].structure = enum.market
 
         return true
     else

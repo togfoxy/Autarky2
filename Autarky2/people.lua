@@ -655,7 +655,7 @@ function people.getLoan()
         local stockinput = person.occupationstockinput
         if stockoutput ~= nil and stockinput ~= nil then
             if person.stock[stockoutput] == 0 then
-                local avgprice = fun.getAvgPrice(HISTORY_PRICE[stockoutput])
+                local avgprice = fun.getAvgPrice(HISTORY_PRICE[stockinput])
                 if person.stock[enum.stockWealth] < avgprice then
                     -- person qualifies for loan
                     print("Person needs a loan")
