@@ -1,9 +1,13 @@
 module(...,package.seeall)
 
-function round(num, idp)
-	--Input: number to round; decimal places required
-	assert(num ~= nil, "Can't ROUND a nil value")
-	return tonumber(string.format("%." .. (idp or 0) .. "f", num))
+function round(val, decimal)
+	-- rounding function provided by zorg and Jasoco
+	if not val then return 0 end
+	if (decimal) then
+		return math.floor( (val * 10^decimal) + 0.5) / (10^decimal)
+	else
+		return math.floor(val+0.5)
+	end
 end
 
 function deepcopy(orig, copies)

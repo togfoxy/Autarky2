@@ -439,11 +439,15 @@ local function genericSellOutputStock(person, stockoutput)
             costprice = fun.getAvgPrice(person.stockPriceHistory[stockinput])
         end
 
-        costprice = cf.round(costprice, 2)
+        costprice = cf.round(costprice * 1.30, 2)       -- add a 30% profit margin
         if costprice == nil then costprice = 0 end  -- happens at start of game
 
-        -- print("Stock input type: " .. stockinput)
-        print("Trying to sell stock type " .. stockoutput .. ". Agent thinks cost price for stock type " .. stockinput .. " is $" .. costprice .. " and ask price is $" .. askprice)
+        if stockinput ~= nil then
+            print("Trying to sell stock type " .. stockoutput .. ". Agent thinks cost price for stock type " .. stockinput .. " is $" .. costprice .. " and ask price is $" .. askprice)
+        else
+            print("Primary producer trying to sell stock type " .. stockoutput .. ". Agent thinks cost price is $" .. costprice .. " and ask price is $" .. askprice)
+        end
+
         askprice = math.max(askprice, costprice)
 
     	-- register the ask
@@ -690,10 +694,11 @@ function people.repayLoan()
                     -- pay off whole loan
                     repayment = person.stock[enum.stockWealthOwed]
                 else
-                    local repayment = person.stock[enum.stockWealthOwed] * 0.10     -- 10%
-                    local repayment = math.min(repayment, person.stock[enum.stockWealth])
+                    repayment = person.stock[enum.stockWealthOwed] * 0.10     -- 10%
+                    repayment = math.min(repayment, person.stock[enum.stockWealth])
                 end
 
+                repayment = cf.round(repayment, 2)
                 person.stock[enum.stockWealth] = person.stock[enum.stockWealth] - repayment
                 person.stock[enum.stockWealthOwed] = person.stock[enum.stockWealthOwed] - repayment
                 TREASURY = TREASURY + repayment
