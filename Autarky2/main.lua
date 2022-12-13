@@ -397,21 +397,19 @@ function love.update(dt)
 						-- do once per day
 						people.heal()
 						structures.age()
+						people.getLoan()
 						people.buildHouse()
 						people.payTaxes()
 						people.claimSocialSecurity()
 						fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
 						fun.RecordHistoryTreasury()
 
-
 						WORLD_HOURS = WORLD_HOURS - 24
 						WORLD_DAYS = WORLD_DAYS + 1
 
 						MARKET_RESOLVED = false 			-- reset this every midnight
 
-						-- print("Person 1 belief history (food and herbs)")
-						-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockFood]))
-						-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockHerbs]))
+
 					end
 				end
 

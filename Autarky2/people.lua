@@ -2,7 +2,7 @@ people = {}
 
 function people.initialise()
 
-    local numofppl = 3
+    local numofppl = 4
 
     for i = 1, numofppl do
         people.createPerson()
@@ -644,6 +644,27 @@ function people.unselectAll()
 	for _, person in pairs(PERSONS) do
 		person.isSelected = false
 	end
+end
+
+function people.getLoan()
+
+    for _, person in pairs(PERSONS) do
+
+        -- if person is a producer and has no output to sell and has no money to buy inputs then get loan
+        local stockoutput = person.occupationstockoutput
+        local stockinput = person.occupationstockinput
+        if stockoutput ~= nil and stockinput ~= nil then
+            if person.stock[stockoutput] == 0 then
+                local avgprice = fun.getAvgPrice(HISTORY_PRICE[stockoutput])
+                if person.stock[enum.stockWealth] < avgprice then
+                    -- person qualifies for loan
+                    print("Person needs a loan")
+                end
+            end
+        end
+    end
+
+
 end
 
 

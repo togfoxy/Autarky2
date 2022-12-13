@@ -33,10 +33,12 @@ local function saveGlobals()
     t.WORLD_HOURS = WORLD_HOURS
     t.SALES_TAX = SALES_TAX
     t.TREASURY = TREASURY
+    t.TREASURY_OWED = TREASURY_OWED
     t.WELLROW = WELLROW
     t.WELLCOL = WELLCOL
     t.MARKETROW = MARKETROW
     t.MARKETCOL = MARKETCOL
+    t.PERSONS_LEFT = PERSONS_LEFT
 
     local serialisedString = bitser.dumps(t)
     local success, message = nativefs.write(savefile, serialisedString)
@@ -97,10 +99,13 @@ local function loadGlobals()
         WORLD_HOURS = t.WORLD_HOURS
         SALES_TAX = t.SALES_TAX
         TREASURY = t.TREASURY
+        TREASURY_OWED = t.TREASURY_OWED
         WELLROW = t.WELLROW
         WELLCOL = t.WELLCOL
         MARKETROW = t.MARKETROW
         MARKETCOL = t.MARKETCOL
+        PERSONS_LEFT = t.PERSONS_LEFT
+
         return true
     else
         error()

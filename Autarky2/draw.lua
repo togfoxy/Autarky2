@@ -4,7 +4,8 @@ function draw.topBar()
     -- draw world hours
     love.graphics.setFont(FONT[enum.fontLarge])
     love.graphics.setColor(1,1,1,1)
-    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. " Treasury: $" .. cf.strFormatCurrency(TREASURY) .. " "
+    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. "  Treasury: $" .. cf.strFormatCurrency(TREASURY) .. "  "
+    str = str .. "Loaned out: $" .. cf.strFormatCurrency(TREASURY_OWED)
     if PAUSED then str = str .. "PAUSED" end
     love.graphics.print(str, 10, 10)
 
