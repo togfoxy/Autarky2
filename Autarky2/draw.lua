@@ -264,40 +264,32 @@ function draw.optionScreen()
 
 	love.graphics.setColor(1,1,1,1)
 	love.graphics.print(SALES_TAX, 300, 425)
-    love.graphics.print("Press 'O' or ESCAPE to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-
+    love.graphics.print("Press 'O' or ESCAPE to exit", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2)
 
 	-- draw buttons
 	for k, button in pairs(GUI_BUTTONS) do
 		if button.scene == enum.sceneOptions and button.visible then
 			-- draw the button
-			love.graphics.setColor(button.bgcolour)
+            -- draw the bg
+            love.graphics.setColor(button.bgcolour)
+            love.graphics.rectangle("fill", button.x, button.y, button.width, button.height)			-- drawx/y is the top left corner of the square
 
-			if button.drawOutline == nil or button.drawOutline == true then
-				if button.state == "on" then
-					love.graphics.rectangle("fill", button.x, button.y, button.width, button.height)			-- drawx/y is the top left corner of the square
-				else
-					love.graphics.rectangle("line", button.x, button.y, button.width, button.height)			-- drawx/y is the top left corner of the square
-				end
-			end
+            -- draw the outline
+            love.graphics.setColor(button.outlineColour)
+            love.graphics.rectangle("line", button.x, button.y, button.width, button.height)			-- drawx/y is the top left corner of the square
 
 			if button.image ~= nil then
+                love.graphics.setColor(1,1,1,1)
 				love.graphics.draw(button.image, button.x, button.y)
 			end
 
 			-- draw the label
-			if button.state == "off" then
-				love.graphics.setColor(button.labeloffcolour)
-			else
-				love.graphics.setColor(button.labeloncolour)
-			end
 			local labelxoffset = button.labelxoffset or 0
+            love.graphics.setColor(button.labelcolour)
 			love.graphics.setFont(FONT[enum.fontDefault])        --! the font should be a setting and not hardcoded here
 			love.graphics.print(button.label, button.x + labelxoffset, button.y + 5)
 		end
 	end
-
-
 end
 
 function draw.exitScreen()

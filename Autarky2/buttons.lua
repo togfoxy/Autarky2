@@ -42,18 +42,22 @@ local mybutton = {}
 
     -- alarms off
     local mybutton = {}
-    mybutton.x = 200
-    mybutton.y = 200
+    mybutton.width = 65
+    mybutton.x = (SCREEN_WIDTH / 2) - (mybutton.width / 2)
+    mybutton.y = (SCREEN_HEIGHT  / 2) + 25
     mybutton.width = 65
     mybutton.height = 20
+    mybutton.bgcolour = {0,0,0,1}
     mybutton.drawOutline = true
-    mybutton.label = ""		-- alarm off
+    mybutton.outlineColour = {1,1,1,1}
+    mybutton.label = "Close"		-- alarm off
     mybutton.image = nil
     -- -- mybutton.labelcolour = {1,1,1,1}
     mybutton.labeloffcolour = {1,1,1,1}
     mybutton.labeloncolour = {1,1,1,1}
+    mybutton.labelcolour = {1,1,1,1}
     mybutton.labelxoffset = 0
-    mybutton.bgcolour = {1,0,0,1}
+
     mybutton.state = "on"
     mybutton.visible = true
     mybutton.scene = enum.sceneOptions
