@@ -39,6 +39,7 @@ local function saveGlobals()
     t.MARKETROW = MARKETROW
     t.MARKETCOL = MARKETCOL
     t.PERSONS_LEFT = PERSONS_LEFT
+    t.SOCIAL_SECURITY_ACTIVE = SOCIAL_SECURITY_ACTIVE
 
     local serialisedString = bitser.dumps(t)
     local success, message = nativefs.write(savefile, serialisedString)
@@ -123,9 +124,12 @@ local function loadGlobals()
         MARKETROW = t.MARKETROW
         MARKETCOL = t.MARKETCOL
         PERSONS_LEFT = t.PERSONS_LEFT
+        SOCIAL_SECURITY_ACTIVE = t.SOCIAL_SECURITY_ACTIVE
 
         MAP[WELLROW][WELLCOL].structure = enum.well             --! these two lines are probably redundant
         MAP[MARKETROW][MARKETCOL].structure = enum.market
+
+        buttons.changeButtonLabel(enum.buttonOptionsSocialSecurity, SOCIAL_SECURITY_ACTIVE)
 
         return true
     else

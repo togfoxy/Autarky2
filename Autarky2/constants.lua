@@ -23,7 +23,7 @@ function constants.load()
     SHOW_OPTIONS = false
     MARKET_RESOLVED = false
     MUSIC_TOGGLE = true             -- turn music on or off
-    SOCIAL_SECURITY_ACTIVE = true        -- wounded villagers can get free treatment
+    SOCIAL_SECURITY_ACTIVE = false        -- wounded villagers can get free treatment
 
 	MOUSE_DOWN_X = nil
 	MOUSE_DOWN_Y = nil
