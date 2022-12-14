@@ -279,12 +279,14 @@ function draw.optionScreen()
             love.graphics.rectangle("fill", button.x, button.y, button.width, button.height)			-- drawx/y is the top left corner of the square
 
             -- draw the outline
-            love.graphics.setColor(button.outlineColour)
-            love.graphics.rectangle("line", button.x, button.y, button.width, button.height)			-- drawx/y is the top left corner of the square
+            if button.drawOutline then
+                love.graphics.setColor(button.outlineColour)
+                love.graphics.rectangle("line", button.x, button.y, button.width, button.height)			-- drawx/y is the top left corner of the square
+            end
 
 			if button.image ~= nil then
                 love.graphics.setColor(1,1,1,1)
-				love.graphics.draw(button.image, button.x, button.y)
+				love.graphics.draw(button.image, button.x, button.y, 0, 1, 1, button.imageOffsetX, button.imageOffsetY)
 			end
 
 			-- draw the label
@@ -295,6 +297,7 @@ function draw.optionScreen()
 		end
 	end
 
+    love.graphics.setFont(FONT[enum.fontLarge])
     love.graphics.print("Press 'O' or ESCAPE to exit", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2)
 end
 
