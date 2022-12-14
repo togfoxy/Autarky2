@@ -11,8 +11,8 @@ The game has a 24 hour day/night cycle and a number of things happen each day:
 - after bartering they will travel to their house (or random location on the map)
 - they will eat if they have food
 - they will heal if they are wounded
-- they will pay taxes they owe
-- they will draw from your treasury if they are hungry and broke
+- they will pay taxes they owe (sales tax can be adjusted)
+- they will draw from your treasury if they are hungry and broke (social security)
 
 Fluid economy
 =============
@@ -23,9 +23,9 @@ Monitor the welfare of the villagers and the economy and the town will flourish.
 Instructions
 ============
 
-The game will start with 5 villagers
+The game will start with a small number of villagers
 
-Press keypad + to add a new villager (right-side of keyboard)
+Press keypad+ to add a new villager (right-side of keyboard)
 
 Click a blue villager with mouse. The villager will turn red and have a circle around it.
 
@@ -59,7 +59,7 @@ Hold middle mouse button to pan
 
 Scroll middle mouse wheel to zoom
 
-Press 'keypad 5' to recentre camera
+Press 'keypad 5' to recentre camera and deselect all villagers
 
 
 
