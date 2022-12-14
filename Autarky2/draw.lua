@@ -263,8 +263,12 @@ end
 function draw.optionScreen()
 
 	love.graphics.setColor(1,1,1,1)
-	love.graphics.print(SALES_TAX, 150, 125)
-    love.graphics.print("Press 'O' or ESCAPE to exit", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2)
+    love.graphics.setFont(FONT[enum.fontLarge])
+    love.graphics.print("Sales tax on purchases", 25, 65)
+    love.graphics.print(SALES_TAX * 100 .. "%", 145, 115)
+
+    love.graphics.print("Social security", 25, 200)
+
 
 	-- draw buttons
 	for k, button in pairs(GUI_BUTTONS) do
@@ -287,15 +291,15 @@ function draw.optionScreen()
 			local labelxoffset = button.labelxoffset or 0
             love.graphics.setColor(button.labelcolour)
 			love.graphics.setFont(FONT[enum.fontDefault])        --! the font should be a setting and not hardcoded here
-			love.graphics.print(button.label, button.x + labelxoffset, button.y + 5)
+			love.graphics.print(tostring(button.label), button.x + labelxoffset, button.y + 5)
 		end
 	end
+
+    love.graphics.print("Press 'O' or ESCAPE to exit", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2)
 end
 
 function draw.exitScreen()
-
-  love.graphics.print("Press ENTER to exit the game", (SCREEN_WIDTH / 2) - 100, SCREEN_HEIGHT / 2)
-
+    love.graphics.print("Press ENTER to exit the game", (SCREEN_WIDTH / 2) - 100, SCREEN_HEIGHT / 2)
 end
 
 return draw

@@ -265,10 +265,10 @@ function love.mousereleased( x, y, button, istouch, presses )
 					SALES_TAX = SALES_TAX - 0.01
 					if SALES_TAX < 0.01 then SALES_TAX = 0 end
 				end
-
-
-
-
+				if mybuttonID == enum.buttonOptionsSocialSecurity then
+					SOCIAL_SECURITY_ACTIVE = not SOCIAL_SECURITY_ACTIVE
+					buttons.changeButtonLabel(enum.buttonOptionsSocialSecurity, SOCIAL_SECURITY_ACTIVE)
+				end
 			end
 		end
 	end
@@ -416,7 +416,9 @@ function love.update(dt)
 						people.getLoan()
 						people.buildHouse()
 						people.payTaxes()
-						--! people.claimSocialSecurity()
+						if SOCIAL_SECURITY_ACTIVE then		-- this is a toggle on the options screen
+							people.claimSocialSecurity()
+						end
 						fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
 						fun.RecordHistoryTreasury()
 

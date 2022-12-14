@@ -34,6 +34,15 @@ function buttons.buttonClicked(mx, my, button)
 	end
 end
 
+function buttons.changeButtonLabel(enumvalue, newlabel)
+	for k, button in pairs(GUI_BUTTONS) do
+		if button.identifier == enumvalue then
+			button.label = tostring(newlabel)
+			break
+		end
+	end
+end
+
 function buttons.loadButtons()
     -- load the global GUI_BUTTONS table with buttons
 local mybutton = {}
@@ -108,6 +117,29 @@ local mybutton = {}
 	mybutton.visible = true
 	mybutton.scene = enum.sceneOptions
 	mybutton.identifier = enum.buttonOptionsDownSpinner
+	table.insert(GUI_BUTTONS, mybutton)
+
+	-- checkbox for social security
+	local mybutton = {}
+	mybutton.width = 80
+	mybutton.x = (90)
+	mybutton.y = (225)
+	mybutton.width = 40
+	mybutton.height = 25
+	mybutton.bgcolour = {0,0,0,1}
+	mybutton.drawOutline = true
+	mybutton.outlineColour = {1,1,1,1}
+	mybutton.label = tostring(SOCIAL_SECURITY_ACTIVE)
+	-- -- mybutton.labelcolour = {1,1,1,1}
+	mybutton.labeloffcolour = {1,1,1,1}
+	mybutton.labeloncolour = {1,1,1,1}
+	mybutton.labelcolour = {1,1,1,1}
+	mybutton.labelxoffset = 7
+
+	mybutton.state = "on"
+	mybutton.visible = true
+	mybutton.scene = enum.sceneOptions
+	mybutton.identifier = enum.buttonOptionsSocialSecurity
 	table.insert(GUI_BUTTONS, mybutton)
 
 end
