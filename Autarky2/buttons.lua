@@ -57,7 +57,7 @@ local mybutton = {}
     mybutton.state = "on"
     mybutton.visible = true
     mybutton.scene = enum.sceneOptions
-    mybutton.identifier = enum.buttonOptionsOkay
+    mybutton.identifier = enum.buttonOptionsExit
     table.insert(GUI_BUTTONS, mybutton)
 
 end

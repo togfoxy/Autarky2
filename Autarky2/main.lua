@@ -246,12 +246,20 @@ function love.mousereleased( x, y, button, istouch, presses )
 			end
 		end
 
-		-- used for mouse box dragging thingy		--! not sure if this needs to be inside the IF statement
+		-- used for mouse box dragging thingy
 		MOUSE_DOWN_X = nil
 		MOUSE_DOWN_Y = nil
 	elseif currentscreen == enum.sceneOptions then
-		-- do bounding box stuff
-
+		-- do button stuff
+		local rx, ry = res.toGame(x,y)		-- does this need to be applied consistently across all mouse clicks?
+		for k, button in pairs(GUI_BUTTONS) do
+			if button.scene == enum.sceneOptions and button.visible then
+				local mybuttonID = buttons.buttonClicked(rx, ry, button)		-- bounding box stuff
+				if mybuttonID == enum.buttonOptionsExit then
+					cf.RemoveScreen(SCREEN_STACK)
+				end
+			end
+		end
 	end
 end
 

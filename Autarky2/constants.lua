@@ -39,7 +39,7 @@ function constants.load()
     AUDIO = {}
     FONT = {}
     GUI = {}            -- buttons and spinners etc
-    GUI_BUTTONS = {}
+    GUI_BUTTONS = {}    -- this is the complete set of buttons
 
 
     HISTORY_STOCK = {}
@@ -159,7 +159,7 @@ function constants.load()
     enum.sceneGraphs = 3
     enum.sceneExitGame = 4
 
-    enum.buttonOptionsOkay = 1
+    enum.buttonOptionsExit = 1
 
 end
 
