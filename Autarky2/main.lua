@@ -258,6 +258,17 @@ function love.mousereleased( x, y, button, istouch, presses )
 				if mybuttonID == enum.buttonOptionsExit then
 					cf.RemoveScreen(SCREEN_STACK)
 				end
+				if mybuttonID == enum.buttonOptionsUpSpinner then
+					SALES_TAX = SALES_TAX + 0.01
+				end
+				if mybuttonID == enum.buttonOptionsDownSpinner then
+					SALES_TAX = SALES_TAX - 0.01
+					if SALES_TAX < 0.01 then SALES_TAX = 0 end
+				end
+
+
+
+
 			end
 		end
 	end

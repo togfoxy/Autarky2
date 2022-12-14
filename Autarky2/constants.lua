@@ -160,6 +160,8 @@ function constants.load()
     enum.sceneExitGame = 4
 
     enum.buttonOptionsExit = 1
+    enum.buttonOptionsUpSpinner = 2
+    enum.buttonOptionsDownSpinner = 3
 
 end
 

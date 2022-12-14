@@ -1,7 +1,5 @@
 buttons = {}
 
-
-
 function buttons.setButtonVisible(enumvalue)
 	-- receives an enum (number) and sets the visibility of that button to true
 	for k, button in pairs(GUI_BUTTONS) do
@@ -40,7 +38,7 @@ function buttons.loadButtons()
     -- load the global GUI_BUTTONS table with buttons
 local mybutton = {}
 
-    -- alarms off
+    -- exit button on options screen
     local mybutton = {}
     mybutton.width = 65
     mybutton.x = (SCREEN_WIDTH / 2) - (mybutton.width / 2)
@@ -63,6 +61,54 @@ local mybutton = {}
     mybutton.scene = enum.sceneOptions
     mybutton.identifier = enum.buttonOptionsExit
     table.insert(GUI_BUTTONS, mybutton)
+
+	-- up spinner on options screen
+	local mybutton = {}
+	mybutton.width = 65
+	mybutton.x = (100)
+	mybutton.y = (100)
+	mybutton.width = 20
+	mybutton.height = 20
+	mybutton.bgcolour = {0,0,0,1}
+	mybutton.drawOutline = true
+	mybutton.outlineColour = {1,1,1,1}
+	mybutton.label = " ^"		-- alarm off
+	mybutton.image = nil
+	-- -- mybutton.labelcolour = {1,1,1,1}
+	mybutton.labeloffcolour = {1,1,1,1}
+	mybutton.labeloncolour = {1,1,1,1}
+	mybutton.labelcolour = {1,1,1,1}
+	mybutton.labelxoffset = 0
+
+	mybutton.state = "on"
+	mybutton.visible = true
+	mybutton.scene = enum.sceneOptions
+	mybutton.identifier = enum.buttonOptionsUpSpinner
+	table.insert(GUI_BUTTONS, mybutton)
+
+	-- down spinner on options screen
+	local mybutton = {}
+	mybutton.width = 65
+	mybutton.x = (100)
+	mybutton.y = (130)
+	mybutton.width = 20
+	mybutton.height = 20
+	mybutton.bgcolour = {0,0,0,1}
+	mybutton.drawOutline = true
+	mybutton.outlineColour = {1,1,1,1}
+	mybutton.label = " v"		-- alarm off
+	mybutton.image = nil
+	-- -- mybutton.labelcolour = {1,1,1,1}
+	mybutton.labeloffcolour = {1,1,1,1}
+	mybutton.labeloncolour = {1,1,1,1}
+	mybutton.labelcolour = {1,1,1,1}
+	mybutton.labelxoffset = 0
+
+	mybutton.state = "on"
+	mybutton.visible = true
+	mybutton.scene = enum.sceneOptions
+	mybutton.identifier = enum.buttonOptionsDownSpinner
+	table.insert(GUI_BUTTONS, mybutton)
 
 end
 
