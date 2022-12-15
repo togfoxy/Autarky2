@@ -2,7 +2,7 @@ people = {}
 
 function people.initialise()
 
-    local numofppl = 6
+    local numofppl = 2
 
     for i = 1, numofppl do
         people.createPerson()
@@ -339,7 +339,7 @@ function people.pay()
 
                 if love.math.random(1,7) == 1 then
                     -- person is hurt while working
-                    person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - love.math.random(15,25)
+                    person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - love.math.random(5,15)
                     if person.stock[enum.stockHealth] <= 0 then
                         people.dies(person, "no health")
                     end
@@ -377,7 +377,7 @@ local function makeBid(person, stocknumber, maxqty)
     local bidprice = marketplace.determineCommodityPrice(person.beliefRange[stocknumber])
 
     -- determine bid qty
-    local maxqtycanafford = cf.round(wealth / bidprice)
+    local maxqtycanafford = math.floor(wealth / bidprice)
     local maxqtycanhold = 14 - person.stock[stocknumber]
     local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold, maxqty)
     local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[stocknumber])       -- accepts nil history
@@ -389,6 +389,8 @@ local function makeBid(person, stocknumber, maxqty)
 
         -- set destination = market
         fun.getRandomMarketXY(person)
+    else
+        print("Bid qty nil: ", stocknumber, bidprice, maxqtycanafford, maxqtycanhold, maxqtytobuy)
     end
 end
 
@@ -477,17 +479,21 @@ function people.doMarketplace()
         -- buy house
         if person.houserow == nil and person.housecol == nil then
             if person.stock[enum.stockHouse] < 1 then
-                -- try to buy house
-                makeBid(person, enum.stockHouse, 1)
+                if person.occupation == enum.jobBuilder and person.stock[enum.stockWealthOwed] <= 0 or
+                    person.occupation ~= enum.jobBuilder then
+                    -- above if won't let build buy house for themselve if they owe money
+
+                    -- try to buy house
+                    makeBid(person, enum.stockHouse, 1)
+                end
             end
         end
 
         -- generic stock input (if relevant)
         -- make a bid (buy)     -- if there are lots of bids and they are all succesful then agent could be in debt
         local stockinput = person.occupationstockinput      -- stock type
-        local wealth = person.stock[enum.stockWealth]
         if stockinput ~= nil and person.stock[stockinput] < 7 then
-			makeBid(person, stockinput)		--! need to test this
+			makeBid(person, stockinput)
         end
 
         -- generic stock sell
@@ -505,7 +511,7 @@ function people.doMarketplace()
     results = marketplace.resolveOrders()
 
     print("----------------------")
-    print("Market results")
+    print("Market results before money exchange")
     print(inspect(results))
     print("----------------------")
 
@@ -516,7 +522,7 @@ function people.doMarketplace()
         -- capture the agreed price for stat purposes
         table.insert(HISTORY_PRICE[outcome.commodityID], outcome.agreedprice)
 
-        if buyer.stock[enum.stockWealth] >= outcome.transactionTotalPrice then
+        -- if buyer.stock[enum.stockWealth] >= outcome.transactionTotalPrice then
             -- funding assured - finalise the transaction
             buyer.stock[enum.stockWealth] = buyer.stock[enum.stockWealth] - outcome.transactionTotalPrice
             seller.stock[enum.stockWealth] = seller.stock[enum.stockWealth] + outcome.transactionTotalPrice
@@ -526,7 +532,9 @@ function people.doMarketplace()
 
             -- record tax owed. It won't be paid until later
             buyer.stock[enum.stockTaxOwed] = cf.round(buyer.stock[enum.stockTaxOwed] + (outcome.transactionTotalPrice * SALES_TAX),2)
-        end
+        -- else
+            -- print("Transaction aborted: buyer ran out of funds")
+        -- end
     end
 
     if #results > 0 then
@@ -662,9 +670,15 @@ function people.getLoan()
         local stockinput = person.occupationstockinput
         if stockoutput ~= nil and stockinput ~= nil then
             if person.stock[stockoutput] == 0 then
-                local avgprice = fun.getAvgPrice(HISTORY_PRICE[stockinput])
+                -- local avgprice = fun.getAvgPrice(HISTORY_PRICE[stockinput])
+                local avgprice = fun.getAvgPrice(person.stockPriceHistory[stockinput])
                 local numberofinputsneeded = person.occupationconversionrate
+                local numberofinputsneeded = numberofinputsneeded - person.stock[stockinput]    -- deduct stock in hand
+                if numberofinputsneeded < 2 then numberofinputsneeded = 2 end   -- a safeguard. Not sure if good idea
                 local totalwealthneeded = avgprice * numberofinputsneeded
+
+print(avgprice, numberofinputsneeded, totalwealthneeded)
+
                 if person.stock[enum.stockWealth] < totalwealthneeded then
                     -- person qualifies for loan
                     -- see if treasury can fund a loan

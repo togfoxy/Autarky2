@@ -443,8 +443,6 @@ function marketplace.resolveOrders()
                 adjustAskersBeliefs(summary)
                 -- print("delta: seller belief range after adjustment")
                 -- print(inspect(seller.beliefRange))
-
-
             end
         end
     end

@@ -3,7 +3,7 @@ constants = {}
 function constants.load()
     -- includes globals
 
-    GAME_VERSION = "0.07"
+    GAME_VERSION = "0.08"
 
     TILE_SIZE = 50
     UPPER_TERRAIN_HEIGHT = 6
