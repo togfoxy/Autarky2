@@ -26,6 +26,12 @@ function functions.loadImages()
     IMAGES[enum.iconWoodsman] = love.graphics.newImage("assets/images/axeicon64x64.png")
     IMAGES[enum.iconHealer] = love.graphics.newImage("assets/images/healericon64x64.png")
     IMAGES[enum.iconBuilder] = love.graphics.newImage("assets/images/hammericon64x64.png")
+
+    -- GUI
+    GUI[enum.guiSpinnerUp] = love.graphics.newImage("assets/images/buttonspinnerup.png")
+    GUI[enum.guiSpinnerDown] = love.graphics.newImage("assets/images/buttonspinnerdown.png")
+
+
 end
 
 function functions.loadAudio()
@@ -115,6 +121,7 @@ function functions.initialiseMap()
         marketrow = love.math.random(minrow, maxrow)
         marketcol = love.math.random(minrow, maxrow)
     until math.abs(wellrow - marketrow) > 1 or math.abs(wellcol - marketcol) > 1
+
     MAP[marketrow][marketcol].structure = enum.market
     MARKETROW = marketrow
     MARKETCOL = marketcol

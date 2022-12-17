@@ -2,7 +2,7 @@ people = {}
 
 function people.initialise()
 
-    local numofppl = 3
+    local numofppl = 6
 
     for i = 1, numofppl do
         people.createPerson()
@@ -115,6 +115,7 @@ local function drawDebug(person)
     txt = txt .. "Herbs: " .. person.stock[enum.stockHerbs] .. "\n"
     txt = txt .. "Houses: " .. person.stock[enum.stockHouse] .. "\n"
     txt = txt .. "Tax owed: " .. person.stock[enum.stockTaxOwed] .. "\n"
+    txt = txt .. "Loans owed: " .. person.stock[enum.stockWealthOwed] .. "\n"
 
     love.graphics.setColor(1,1,1,1)
     love.graphics.print(txt, drawx, drawy, 0, 1, 1, 0, 0)
@@ -123,7 +124,7 @@ end
 function people.draw()
 
     local alpha
-    if cf.CurrentScreenName(SCREEN_STACK) == "Graphs" then
+    if cf.CurrentScreenName(SCREEN_STACK) == enum.sceneGraphs then
          alpha = 0.25       -- a modifier (not the actual alpha)
     else
         alpha = 1
@@ -382,11 +383,13 @@ local function makeBid(person, stocknumber, maxqty)
     local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[stocknumber])       -- accepts nil history
     bidqty = cf.round(bidqty)
 
-    -- register the bid
-    marketplace.createBid(stocknumber, bidqty, bidprice, person.guid)
+    if bidqty > 0 then
+        -- register the bid
+        marketplace.createBid(stocknumber, bidqty, bidprice, person.guid)
 
-    -- set destination = market
-    fun.getRandomMarketXY(person)
+        -- set destination = market
+        fun.getRandomMarketXY(person)
+    end
 end
 
 local function bidForFood(person)
@@ -403,11 +406,13 @@ local function bidForFood(person)
 	local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[enum.stockFood])       -- accepts nil history
 	bidqty = cf.round(bidqty)
 
-	-- register the bid
-	marketplace.createBid(enum.stockFood, bidqty, bidprice, person.guid)
+    if bidqty > 0 then
+    	-- register the bid
+    	marketplace.createBid(enum.stockFood, bidqty, bidprice, person.guid)
 
-	-- set destination = market
-	fun.getRandomMarketXY(person)
+    	-- set destination = market
+    	fun.getRandomMarketXY(person)
+    end
 end
 
 local function genericSellOutputStock(person, stockoutput)
@@ -417,7 +422,6 @@ local function genericSellOutputStock(person, stockoutput)
 	askqty = cf.round(askqty)
 
     if askqty > 0 then
-
     	-- determine ask price
     	local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
     	askprice = cf.round(askprice)
@@ -435,11 +439,15 @@ local function genericSellOutputStock(person, stockoutput)
             costprice = fun.getAvgPrice(person.stockPriceHistory[stockinput])
         end
 
-        costprice = cf.round(costprice, 2)
+        costprice = cf.round(costprice * 1.30, 2)       -- add a 30% profit margin
         if costprice == nil then costprice = 0 end  -- happens at start of game
 
-        -- print("Stock input type: " .. stockinput)
-        print("Trying to sell stock type " .. stockoutput .. ". Cost price is $" .. costprice .. " and ask price is $" .. askprice)
+        if stockinput ~= nil then
+            print("Trying to sell stock type " .. stockoutput .. ". Agent thinks cost price for stock type " .. stockinput .. " is $" .. costprice .. " and ask price is $" .. askprice)
+        else
+            print("Primary producer trying to sell stock type " .. stockoutput .. ". Agent thinks cost price is $" .. costprice .. " and ask price is $" .. askprice)
+        end
+
         askprice = math.max(askprice, costprice)
 
     	-- register the ask
@@ -644,6 +652,60 @@ function people.unselectAll()
 	for _, person in pairs(PERSONS) do
 		person.isSelected = false
 	end
+end
+
+function people.getLoan()
+
+    for _, person in pairs(PERSONS) do
+        -- if person is a producer and has no output to sell and has no money to buy inputs then get loan
+        local stockoutput = person.occupationstockoutput
+        local stockinput = person.occupationstockinput
+        if stockoutput ~= nil and stockinput ~= nil then
+            if person.stock[stockoutput] == 0 then
+                local avgprice = fun.getAvgPrice(HISTORY_PRICE[stockinput])
+                local numberofinputsneeded = person.occupationconversionrate
+                local totalwealthneeded = avgprice * numberofinputsneeded
+                if person.stock[enum.stockWealth] < totalwealthneeded then
+                    -- person qualifies for loan
+                    -- see if treasury can fund a loan
+                    local loanneeded = cf.round(totalwealthneeded - person.stock[enum.stockWealth],2)
+                    print("Loan needed = $" .. loanneeded)
+                    if TREASURY >= loanneeded then
+                        -- loan approved
+                        TREASURY = TREASURY - loanneeded
+                        TREASURY_OWED = TREASURY_OWED + loanneeded
+                        person.stock[enum.stockWealthOwed] = person.stock[enum.stockWealthOwed] + loanneeded
+                        person.stock[enum.stockWealth] = person.stock[enum.stockWealth] + loanneeded
+                    end
+                end
+            end
+        end
+    end
+end
+
+function people.repayLoan()
+    for _, person in pairs(PERSONS) do
+        if person.stock[enum.stockWealthOwed] > 0 then
+            local stockoutput = person.occupationstockoutput
+            if person.stock[stockoutput] ~= nil and person.stock[stockoutput] > 0 then
+                -- repay loan
+                local repayment = 0
+                if person.stock[enum.stockWealthOwed] <= 1 and person.stock[enum.stockWealth] > person.stock[enum.stockWealthOwed] then
+                    -- pay off whole loan
+                    repayment = person.stock[enum.stockWealthOwed]
+                else
+                    repayment = person.stock[enum.stockWealthOwed] * 0.10     -- 10%
+                    repayment = math.min(repayment, person.stock[enum.stockWealth])
+                end
+
+                repayment = cf.round(repayment, 2)
+                person.stock[enum.stockWealth] = person.stock[enum.stockWealth] - repayment
+                person.stock[enum.stockWealthOwed] = person.stock[enum.stockWealthOwed] - repayment
+                TREASURY = TREASURY + repayment
+                TREASURY_OWED = TREASURY_OWED - repayment
+            end
+        end
+    end
 end
 
 

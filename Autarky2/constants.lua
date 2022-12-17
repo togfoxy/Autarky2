@@ -3,7 +3,7 @@ constants = {}
 function constants.load()
     -- includes globals
 
-    GAME_VERSION = "0.06"
+    GAME_VERSION = "0.07"
 
     TILE_SIZE = 50
     UPPER_TERRAIN_HEIGHT = 6
@@ -23,6 +23,7 @@ function constants.load()
     SHOW_OPTIONS = false
     MARKET_RESOLVED = false
     MUSIC_TOGGLE = true             -- turn music on or off
+    SOCIAL_SECURITY_ACTIVE = false        -- wounded villagers can get free treatment
 
 	MOUSE_DOWN_X = nil
 	MOUSE_DOWN_Y = nil
@@ -38,6 +39,8 @@ function constants.load()
     IMAGE_QUEUE = {}
     AUDIO = {}
     FONT = {}
+    GUI = {}            -- buttons and spinners etc
+    GUI_BUTTONS = {}    -- this is the complete set of buttons
 
 
     HISTORY_STOCK = {}
@@ -50,6 +53,7 @@ function constants.load()
     PAUSED = false
     SALES_TAX = 0.05
     TREASURY = 0        -- govt coffers
+    TREASURY_OWED = 0       -- how much is owed to the treasury
 
     PERSONS = {}
     PERSONS_RADIUS = 7      -- for drawing and mouse click purposes
@@ -98,11 +102,13 @@ function constants.load()
     enum.structureBuilder = 14
     enum.iconBuilder = 114
 
+    enum.stockWealthOwed = 15
+
     --# update NUMBER_OF_STOCK_TYPES constant when adding new stock types
     --# update functions.loadImages() x 2
     --# update main.keyreleased()
     --# provide a sell point down below or it will default to 5
-    NUMBER_OF_STOCK_TYPES = 14      -- maximum value of enum.stock
+    NUMBER_OF_STOCK_TYPES = 15      -- maximum value of enum.stock
 
     enum.structureHouse = 201   -- if structure is not job/stock then start at 200
 
@@ -145,6 +151,19 @@ function constants.load()
 
     enum.fontDefault = 1
     enum.fontLarge = 2
+
+    enum.guiSpinnerUp = 1
+    enum.guiSpinnerDown = 2
+
+    enum.sceneOptions = 1       --! this is inconsistently applied
+    enum.sceneWorld = 2
+    enum.sceneGraphs = 3
+    enum.sceneExitGame = 4
+
+    enum.buttonOptionsExit = 1
+    enum.buttonOptionsUpSpinner = 2
+    enum.buttonOptionsDownSpinner = 3
+    enum.buttonOptionsSocialSecurity = 4
 
 end
 

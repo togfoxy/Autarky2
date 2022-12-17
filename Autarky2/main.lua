@@ -8,9 +8,6 @@ res = require 'lib.resolution_solution'
 Camera = require 'lib.cam11.cam11'
 -- https://notabug.org/pgimeno/cam11
 
-gspot = require 'lib.gspot.Gspot'
--- https://notabug.org/pgimeno/Gspot
-
 bitser = require 'lib.bitser'
 -- https://github.com/gvx/bitser
 
@@ -20,7 +17,6 @@ nativefs = require 'lib.nativefs'
 lovelyToasts = require 'lib.lovelyToasts'
 -- https://github.com/Loucee/Lovely-Toasts
 
-
 marketplace = require 'lib.marketplace'
 
 cf = require 'lib.commonfunctions'
@@ -29,19 +25,19 @@ require 'draw'
 require 'constants'
 require 'people'
 require 'structures'
-require 'gui'
 require 'file'
+buttons = require 'buttons'
 
 function love.keyreleased( key, scancode )
 	if key == "escape" then
-		if cf.CurrentScreenName(SCREEN_STACK) == "ExitGame" then
-			cf.AddScreen("World", SCREEN_STACK)
+		if cf.CurrentScreenName(SCREEN_STACK) == enum.sceneExitGame then
+			cf.AddScreen(enum.sceneWorld, SCREEN_STACK)
 		else
 			cf.RemoveScreen(SCREEN_STACK)
 		end
 	end
 	if key == "return" then
-		if cf.CurrentScreenName(SCREEN_STACK) == "ExitGame" then
+		if cf.CurrentScreenName(SCREEN_STACK) == enum.sceneExitGame then
 			cf.RemoveScreen(SCREEN_STACK)
 		end
 	end
@@ -57,16 +53,18 @@ function love.keyreleased( key, scancode )
 	end
 
 	if key == "g" then
-		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
-			cf.AddScreen("Graphs", SCREEN_STACK)
-		elseif cf.CurrentScreenName(SCREEN_STACK) == "Graphs" then
+		if cf.CurrentScreenName(SCREEN_STACK) == enum.sceneWorld then
+			cf.AddScreen(enum.sceneGraphs, SCREEN_STACK)
+		elseif cf.CurrentScreenName(SCREEN_STACK) == enum.sceneGraphs then
 			cf.RemoveScreen(SCREEN_STACK)
 		end
 	end
 
 	if key == "o" then
-		if cf.CurrentScreenName(SCREEN_STACK) == "World" then
-			cf.AddScreen("Options", SCREEN_STACK)
+		if cf.CurrentScreenName(SCREEN_STACK) == enum.sceneWorld then
+			cf.AddScreen(enum.sceneOptions, SCREEN_STACK)
+		elseif cf.CurrentScreenName(SCREEN_STACK) == enum.sceneOptions then
+			cf.RemoveScreen(SCREEN_STACK)
 		end
 	end
 
@@ -139,7 +137,7 @@ function love.keyreleased( key, scancode )
 				person.occupationstockinput = enum.stockLogs
 				person.occupationstockoutput = enum.stockHouse
 				person.occupationconversionrate = 5					-- this many inputs needed to make one output
-				person.stock[enum.stockWealth] = 100
+				-- person.stock[enum.stockWealth] = 100
 			end
 		end
 	end
@@ -176,10 +174,12 @@ function love.mousemoved( x, y, dx, dy, istouch )
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 
 	if love.mouse.isDown(1) then
-		if MOUSE_DOWN_X == nil then
-			-- start the drag operation
-			MOUSE_DOWN_X = wx
-			MOUSE_DOWN_Y = wy
+		if cf.CurrentScreenName(SCREEN_STACK) == enum.sceneWorld then
+			if MOUSE_DOWN_X == nil then
+				-- start the drag operation
+				MOUSE_DOWN_X = wx
+				MOUSE_DOWN_Y = wy
+			end
 		end
 	end
 
@@ -192,8 +192,6 @@ end
 function love.mousepressed( x, y, button, istouch, presses )
 
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
-
-	gspot:mousepress(wx, wy, button)
 
 	if button == 1 then
 		-- select the villager if clicked
@@ -226,28 +224,54 @@ function love.mousereleased( x, y, button, istouch, presses )
 	local wx, wy = cam:toWorld(x, y)	-- converts screen x/y to world x/y
 	lovelyToasts.mousereleased(wx, wy, button)
 
-	if MOUSE_DOWN_X ~= nil and button == 1 then
-		-- a mouse box has been drawn and released
-		-- A box can be drawn in any of the four quadrants - determine the top left corner:
-		local xlow = math.min(wx, MOUSE_DOWN_X)
-		local xhigh = math.max(wx, MOUSE_DOWN_X)
-		local ylow = math.min(wy, MOUSE_DOWN_Y)
-		local yhigh = math.max(wy, MOUSE_DOWN_Y)
+	local currentscreen = cf.CurrentScreenName(SCREEN_STACK)
+	if currentscreen == enum.sceneWorld then
 
-		-- cycle through persons and select all inside bounding box
-		for _, person in pairs(PERSONS) do
-			local personx, persony = fun.getDrawXY(person)
-			if personx >= xlow and personx <= xhigh and
-				persony >= ylow and persony <= yhigh then
+		if MOUSE_DOWN_X ~= nil and button == 1 then
+			-- a mouse box has been drawn and released
+			-- A box can be drawn in any of the four quadrants - determine the top left corner:
+			local xlow = math.min(wx, MOUSE_DOWN_X)
+			local xhigh = math.max(wx, MOUSE_DOWN_X)
+			local ylow = math.min(wy, MOUSE_DOWN_Y)
+			local yhigh = math.max(wy, MOUSE_DOWN_Y)
 
-				person.isSelected = true
+			-- cycle through persons and select all inside bounding box
+			for _, person in pairs(PERSONS) do
+				local personx, persony = fun.getDrawXY(person)
+				if personx >= xlow and personx <= xhigh and
+					persony >= ylow and persony <= yhigh then
+
+					person.isSelected = true
+				end
+			end
+		end
+
+		-- used for mouse box dragging thingy
+		MOUSE_DOWN_X = nil
+		MOUSE_DOWN_Y = nil
+	elseif currentscreen == enum.sceneOptions then
+		-- do button stuff
+		local rx, ry = res.toGame(x,y)		-- does this need to be applied consistently across all mouse clicks?
+		for k, button in pairs(GUI_BUTTONS) do
+			if button.scene == enum.sceneOptions and button.visible then
+				local mybuttonID = buttons.buttonClicked(rx, ry, button)		-- bounding box stuff
+				if mybuttonID == enum.buttonOptionsExit then
+					cf.RemoveScreen(SCREEN_STACK)
+				end
+				if mybuttonID == enum.buttonOptionsUpSpinner then
+					SALES_TAX = SALES_TAX + 0.01
+				end
+				if mybuttonID == enum.buttonOptionsDownSpinner then
+					SALES_TAX = SALES_TAX - 0.01
+					if SALES_TAX < 0.01 then SALES_TAX = 0 end
+				end
+				if mybuttonID == enum.buttonOptionsSocialSecurity then
+					SOCIAL_SECURITY_ACTIVE = not SOCIAL_SECURITY_ACTIVE
+					buttons.changeButtonLabel(enum.buttonOptionsSocialSecurity, SOCIAL_SECURITY_ACTIVE)
+				end
 			end
 		end
 	end
-
-	-- used for mouse box dragging thingy
-	MOUSE_DOWN_X = nil
-	MOUSE_DOWN_Y = nil
 end
 
 function love.wheelmoved(x, y)
@@ -283,8 +307,8 @@ function love.load()
 
 	fun.loadFonts()
 
-	cf.AddScreen("ExitGame", SCREEN_STACK)
-    cf.AddScreen("World", SCREEN_STACK)
+	cf.AddScreen(enum.sceneExitGame, SCREEN_STACK)
+    cf.AddScreen(enum.sceneWorld, SCREEN_STACK)
 
     fun.initialiseMap()     -- initialises 2d map with nils
 	people.initialise()		-- adds ppl to the world
@@ -297,8 +321,8 @@ function love.load()
 	cam:setZoom(ZOOMFACTOR)
 	cam:setPos(TRANSLATEX,	TRANSLATEY)
 
-	gui.load()
 	fun.loadAudio()
+	buttons.loadButtons()			-- the buttons that are displayed on different gui's
 
 	lovelyToasts.options.tapToDismiss = true
 end
@@ -308,7 +332,7 @@ function love.draw()
 
 	local currentscreen = cf.CurrentScreenName(SCREEN_STACK)
 
-	if currentscreen == "World" or currentscreen == "Graphs" then
+	if currentscreen == enum.sceneWorld or currentscreen == enum.sceneGraphs then
 		cam:attach()
 
 		draw.world()	-- draw the world before the people
@@ -317,12 +341,7 @@ function love.draw()
 
 		draw.daynight()	-- draw day/night last
 
-		tax_rate_up_button:hide()
-		tax_rate_down_button:hide()
-		close_options_button:hide()
-		exit_game_button:hide()
-
-		if currentscreen == "World" then
+		if currentscreen == enum.sceneWorld then
 			-- do the mouse dragging thingy
 			if MOUSE_DOWN_X ~= nil then
 				-- draw box
@@ -342,31 +361,28 @@ function love.draw()
 			end
 		end
 
-		if currentscreen == "Graphs" then
+		if currentscreen == enum.sceneGraphs then
 			draw.graphs()
-			-- close_graph_button:show()
 		else
-			close_graph_button:hide()
+
 		end
 
 		cam:detach()
 
 		-- this happens after the camera is detached
-		if currentscreen == "World" then
+		if currentscreen == enum.sceneWorld then
 			draw.topBar()
 		end
 
-	elseif currentscreen == "Options" then
+	elseif currentscreen == enum.sceneOptions then
 		draw.optionScreen()
-	elseif currentscreen == "ExitGame" then
+	elseif currentscreen == enum.sceneExitGame then
 		draw.exitScreen()
-
 	else
-		error("Current screen is " .. currentscreen)
+		error("Current screen is unrecognised: " .. currentscreen)
 	end
 
 	lovelyToasts.draw()
-	gspot:draw()
     res.stop()
 end
 
@@ -374,7 +390,7 @@ function love.update(dt)
 
 	local currentscreen = cf.CurrentScreenName(SCREEN_STACK)
 
-	if currentscreen == "World" then
+	if currentscreen == enum.sceneWorld then
 
 		if not PAUSED then
 
@@ -397,27 +413,26 @@ function love.update(dt)
 						-- do once per day
 						people.heal()
 						structures.age()
+						people.getLoan()
 						people.buildHouse()
 						people.payTaxes()
-						people.claimSocialSecurity()
+						if SOCIAL_SECURITY_ACTIVE then		-- this is a toggle on the options screen
+							people.claimSocialSecurity()
+						end
 						fun.RecordHistoryStock()		-- record key stats for graphs etc. Do before the day ticker increments
 						fun.RecordHistoryTreasury()
-
 
 						WORLD_HOURS = WORLD_HOURS - 24
 						WORLD_DAYS = WORLD_DAYS + 1
 
 						MARKET_RESOLVED = false 			-- reset this every midnight
-
-						-- print("Person 1 belief history (food and herbs)")
-						-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockFood]))
-						-- print(inspect(PERSONS[1].beliefRangeHistory[enum.stockHerbs]))
 					end
 				end
 
 				-- pay time
 				if WORLD_HOURS == 17 then
 					people.pay()
+					people.repayLoan()	-- need to ensure a loan is not paid back in the same cycle
 				end
 
 				-- dinner time
@@ -445,7 +460,7 @@ function love.update(dt)
 
 	end
 
-	if currentscreen == "World" or currentscreen == "Graphs" then
+	if currentscreen == enum.sceneWorld or currentscreen == enum.sceneGraphs then
 		cam:setZoom(ZOOMFACTOR)
 		cam:setPos(TRANSLATEX,	TRANSLATEY)
 	end
@@ -453,6 +468,5 @@ function love.update(dt)
 	fun.PlayAmbientMusic()
 
 	lovelyToasts.update(dt)
-	gspot:update(dt)
 	res.update()
 end

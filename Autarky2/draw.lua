@@ -4,7 +4,8 @@ function draw.topBar()
     -- draw world hours
     love.graphics.setFont(FONT[enum.fontLarge])
     love.graphics.setColor(1,1,1,1)
-    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. " Treasury: $" .. cf.strFormatCurrency(TREASURY) .. " "
+    local str = "Time: " .. WORLD_HOURS .. ":00 Day: " .. WORLD_DAYS .. "  Treasury: $" .. cf.strFormatCurrency(TREASURY) .. "  "
+    str = str .. "Loaned out: $" .. cf.strFormatCurrency(TREASURY_OWED)
     if PAUSED then str = str .. "PAUSED" end
     love.graphics.print(str, 10, 10)
 
@@ -14,6 +15,8 @@ function draw.topBar()
     str = str .. "Healers: " .. occupationtable[enum.jobHealer] .. ". "
     str = str .. "Woodsmen: " .. occupationtable[enum.jobWoodsman] .. ". "
     str = str .. "Builders: " .. occupationtable[enum.jobBuilder] .. ". "
+    str = str .. "# of houses: " .. structures.countStructureType(enum.structureHouse)
+
     love.graphics.print(str, (SCREEN_WIDTH / 2) - 175, 10)
 
     -- draw more counts on the far right margin
@@ -26,7 +29,7 @@ function draw.world()
     -- draw the map including structures
 
     local alpha
-    if cf.CurrentScreenName(SCREEN_STACK) == "Graphs" then
+    if cf.CurrentScreenName(SCREEN_STACK) == enum.sceneGraphs then
          alpha = 0.25       -- a modifier (not the actual alpha)
     else
         alpha = 1
@@ -258,25 +261,45 @@ function draw.imageQueue()
 end
 
 function draw.optionScreen()
-	-- tax_rate_up_button:show()
-	-- tax_rate_down_button:show()
-	-- close_options_button:show()
-	-- exit_game_button:hide()
-    --
-	-- love.graphics.setColor(1,1,1,1)
-	-- love.graphics.print(SALES_TAX, 300, 415)
 
-    love.graphics.print("Press ESCAPE to exit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+	love.graphics.setColor(1,1,1,1)
+    love.graphics.setFont(FONT[enum.fontLarge])
+    love.graphics.print("Sales tax on purchases", 25, 65)
+    love.graphics.print(SALES_TAX * 100 .. "%", 145, 115)
 
+    love.graphics.print("Social security", 25, 200)
+
+
+	-- draw buttons
+	for k, button in pairs(GUI_BUTTONS) do
+		if button.scene == enum.sceneOptions and button.visible then
+			-- draw the button
+            -- draw the bg
+            love.graphics.setColor(button.bgcolour)
+            love.graphics.rectangle("fill", button.x, button.y, button.width, button.height)			-- drawx/y is the top left corner of the square
+
+            -- draw the outline
+            love.graphics.setColor(button.outlineColour)
+            love.graphics.rectangle("line", button.x, button.y, button.width, button.height)			-- drawx/y is the top left corner of the square
+
+			if button.image ~= nil then
+                love.graphics.setColor(1,1,1,1)
+				love.graphics.draw(button.image, button.x, button.y)
+			end
+
+			-- draw the label
+			local labelxoffset = button.labelxoffset or 0
+            love.graphics.setColor(button.labelcolour)
+			love.graphics.setFont(FONT[enum.fontDefault])        --! the font should be a setting and not hardcoded here
+			love.graphics.print(tostring(button.label), button.x + labelxoffset, button.y + 5)
+		end
+	end
+
+    love.graphics.print("Press 'O' or ESCAPE to exit", SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2)
 end
 
 function draw.exitScreen()
-	tax_rate_up_button:hide()
-	tax_rate_down_button:hide()
-	close_options_button:hide()
-
-  love.graphics.print("Press ENTER to exit the game", (SCREEN_WIDTH / 2) - 100, SCREEN_HEIGHT / 2)
-
+    love.graphics.print("Press ENTER to exit the game", (SCREEN_WIDTH / 2) - 100, SCREEN_HEIGHT / 2)
 end
 
 return draw
