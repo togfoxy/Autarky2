@@ -153,6 +153,7 @@ function constants.load()
 
     enum.fontDefault = 1
     enum.fontLarge = 2
+    enum.fontMedium = 3
 
     enum.guiSpinnerUp = 1
     enum.guiSpinnerDown = 2

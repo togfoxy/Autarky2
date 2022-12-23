@@ -62,6 +62,7 @@ end
 
 function functions.loadFonts()
     FONT[enum.fontDefault] = love.graphics.newFont("assets/fonts/Vera.ttf", 12)
+    FONT[enum.fontMedium] = love.graphics.newFont("assets/fonts/Vera.ttf", 14)
     FONT[enum.fontLarge] = love.graphics.newFont("assets/fonts/Vera.ttf", 18)
     -- FONT[enum.fontHeavyMetalLarge] = love.graphics.newFont("assets/fonts/Heavy Metal Box.ttf")
     -- FONT[enum.fontTech18] = love.graphics.newFont("assets/fonts/CorporateGothicNbpRegular-YJJ2.ttf", 24)
@@ -267,5 +268,19 @@ function functions.PlayAmbientMusic()
 	end
 end
 
+function functions.getCommodityLabel(commodityID)
+    -- receives an enum and returns a string
+    -- has no pre or post spacing
+
+    if commodityID == enum.stockFood then
+        return "apples"     --! singular/plural
+    elseif commodityID == enum.stockLogs then
+        return "logs"
+    elseif commodityID == enum.stockHerbs then
+        return "herbs"
+    elseif commodityID == enum.stockHouse then
+        return "house"
+    end
+end
 
 return functions
