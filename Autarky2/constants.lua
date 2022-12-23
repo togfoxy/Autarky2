@@ -7,14 +7,15 @@ function constants.load()
 
     TILE_SIZE = 50
     UPPER_TERRAIN_HEIGHT = 6
-    NUMBER_OF_ROWS = (cf.round(SCREEN_HEIGHT / TILE_SIZE)) - 3
-    NUMBER_OF_COLS = (cf.round(SCREEN_WIDTH / TILE_SIZE)) - 2
+    local width, height = love.window.getDesktopDimensions(1)
+    NUMBER_OF_ROWS = (cf.round(height / TILE_SIZE)) - 1
+    NUMBER_OF_COLS = (cf.round(width / TILE_SIZE)) - 1
 
     LEFT_MARGIN = cf.round(TILE_SIZE / 1)
     TOP_MARGIN = cf.round(TILE_SIZE / 1)
 
-    TRANSLATEX = cf.round(SCREEN_WIDTH / 2)		-- starts the camera in the middle of the ocean
-    TRANSLATEY = cf.round(SCREEN_HEIGHT / 2)	-- need to round because this is working with pixels
+    TRANSLATEX = cf.round(width / 2)		-- starts the camera in the middle of the ocean
+    TRANSLATEY = cf.round(height / 2)	-- need to round because this is working with pixels
     ZOOMFACTOR = 0.95
 
     GAME_LOG_DRAWX = SCREEN_WIDTH - 275
@@ -46,6 +47,7 @@ function constants.load()
     HISTORY_STOCK = {}
     HISTORY_PRICE = {}
     HISTORY_TREASURY = {}
+    LAST_MARKET_ASK = {}        -- hack. store the last price that was asked for each commodity and let newbies use this value
 
     WORLD_HOURS = 9
     WORLD_DAYS = 0

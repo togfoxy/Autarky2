@@ -136,7 +136,7 @@ function love.keyreleased( key, scancode )
 				person.workcol = col
 				person.occupationstockinput = enum.stockLogs
 				person.occupationstockoutput = enum.stockHouse
-				person.occupationconversionrate = 3					-- this many inputs needed to make one output
+				person.occupationconversionrate = 5					-- this many inputs needed to make one output
 				-- person.stock[enum.stockWealth] = 100
 			end
 		end
@@ -148,7 +148,13 @@ function love.keyreleased( key, scancode )
 		TRANSLATEY = SCREEN_HEIGHT / 2
 
 		people.unselectAll()
+	end
 
+	if key == "-" then
+		ZOOMFACTOR = ZOOMFACTOR - 0.05
+	end
+	if key == "=" then
+		ZOOMFACTOR = ZOOMFACTOR + 0.05
 	end
 end
 
@@ -215,6 +221,7 @@ function love.mousepressed( x, y, button, istouch, presses )
 
 		if not personclicked then
 			people.unselectAll()
+			VILLAGERS_SELECTED = 0
 		end
 
 	end
@@ -241,7 +248,12 @@ function love.mousereleased( x, y, button, istouch, presses )
 				if personx >= xlow and personx <= xhigh and
 					persony >= ylow and persony <= yhigh then
 
-					person.isSelected = true
+					if person.isSelected then
+						-- nothing to do
+					else
+						person.isSelected = true
+						VILLAGERS_SELECTED = VILLAGERS_SELECTED + 1
+					end
 				end
 			end
 		end
@@ -288,7 +300,6 @@ function love.wheelmoved(x, y)
 end
 
 function love.load()
-
 
 	local width, height = love.window.getDesktopDimensions(1)
 	love.window.setMode(width, height, {resizable = true, display = 1})
@@ -444,7 +455,8 @@ function love.update(dt)
 				if WORLD_HOURS == 19 then
 					-- market time
 					if not MARKET_RESOLVED then
-						people.doMarketplace()
+						-- people.doMarketplace()
+						people.gotoMarket()
 						MARKET_RESOLVED = true
 					end
 				end

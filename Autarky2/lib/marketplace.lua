@@ -359,6 +359,7 @@ function marketplace.resolveOrders()
                 seller = people.get(asktable[commodity][1][3])
 
                 -- the [1] indicates the first item in the table (top of sorted table)
+                -- thr [1] is removed when the bid/ask is satisfied and a new entry becomes [1]
                 -- the [2] indicates the bid/ask price (not qty)
                 -- the qty traded is determined if and only if a price is agreed
                 bidprice = bidtable[commodity][1][2]
@@ -368,7 +369,7 @@ function marketplace.resolveOrders()
 
                 if bidprice >= askprice then
                     transactionprice = (bidprice + askprice) / 2      -- this is a float
-                    transactionprice = cf.round(transactionprice, 1)
+                    transactionprice = cf.round(transactionprice, 2)
                     -- print("Price agreed at $" .. transactionprice)
                     bidqty = bidtable[commodity][1][1]
                     askqty = asktable[commodity][1][1]
@@ -398,14 +399,44 @@ function marketplace.resolveOrders()
                     -- update the memory for the buyer
                     table.insert(buyer.stockPriceHistory[commodity], transactionprice)
 
-                    -- print("+++ stock history for agent 1 +++")
-                    -- print(inspect((buyer.stockPriceHistory[commodity])))
-                    -- print("+++++++++++++++++++++++++++++++++")
-
                     -- update the memory for the seller
                     table.insert(seller.stockPriceHistory[commodity], transactionprice)
 
                     -- global history is updated in the love.main()
+
+                    -- adjust price point for buyer
+                    -- assumes buyer and seller already has a price point
+                    -- adjust down according to the over bid
+                    print("Buyers pricepoint is " .. buyer.pricePoint[commodity])
+                    local adjustamt = (bidprice - askprice) / 2
+                    buyer.pricePoint[commodity] = buyer.pricePoint[commodity] - adjustamt
+                    print("Adjusting for overbidding: " .. buyer.pricePoint[commodity])
+                    -- adjust based on over/under supply
+                    if transactionamt < bidqty then
+                        -- undersupply. adjust pricepoint up
+                        buyer.pricePoint[commodity] = buyer.pricePoint[commodity] * 1.1
+                        print("Adjusting for undersupply: " .. buyer.pricePoint[commodity])
+                    else
+                        -- over supply or just enough supply
+                        buyer.pricePoint[commodity] = buyer.pricePoint[commodity] * 0.95
+                        print("Adjusting for oversupply: " .. buyer.pricePoint[commodity])
+                    end
+
+                    -- adjust price point for seller
+                    local adjustamt = (bidprice - askprice) / 2
+                    seller.pricePoint[commodity] = seller.pricePoint[commodity] + adjustamt
+
+                    -- adjust based on over/under supply
+                    if transactionamt == askqty then
+                        -- undersupply. adjust pricepoint up
+                        seller.pricePoint[commodity] = seller.pricePoint[commodity] * 1.1
+                    else
+                        -- over supply or just enough supply
+                        seller.pricePoint[commodity] = seller.pricePoint[commodity] * 0.95
+                    end
+
+                    buyer.pricePoint[commodity] = cf.round(buyer.pricePoint[commodity],2)
+                    seller.pricePoint[commodity] = cf.round(seller.pricePoint[commodity],2)
 
                     -- remove bid if qty satisfied
                     if bidtable[commodity][1][1] <= 0 then
@@ -415,34 +446,24 @@ function marketplace.resolveOrders()
                     if asktable[commodity][1][1] <= 0 then
                         table.remove(asktable[commodity], 1)
                     end
+
                 else
-                    -- print("Price not agreed. Trade fails")
+                    print("Price not agreed. Trade fails")
                     -- remove bid as bid price is too low to be satisfied
                     table.remove(bidtable[commodity], 1)
+
+                    -- adjust price points
+                    buyer.pricePoint[commodity] = buyer.pricePoint[commodity] * 1.1
+                    seller.pricePoint[commodity] = seller.pricePoint[commodity] * 0.95
+
+                    buyer.pricePoint[commodity] = cf.round(buyer.pricePoint[commodity],2)
+                    seller.pricePoint[commodity] = cf.round(seller.pricePoint[commodity],2)
+
+                    print("Buyer price point for commodity " .. commodity .. " is now " .. buyer.pricePoint[commodity])
+                    print("Seller price point for commodity " .. commodity .. " is now " .. seller.pricePoint[commodity])
                 end
-
-                -- adjust beliefs
-                local summary = {}
-                summary.commodity = commodity
-                summary.buyer = buyer
-                summary.beliefRange = buyer.beliefRange
-                summary.bidprice = bidprice
-                summary.askprice = askprice
-                summary.bidqty = bidqty or 0
-                summary.askqty = askqty or 0
-                summary.transactionqty = transactionamt
-                summary.transactionprice = transactionprice
-                summary.currentInventory = buyer.stock[commodity]
-                summary.history = buyer.stockPriceHistory[commodity]
-                adjustBiddersBeliefs(summary)
-
-                -- print("Bravo: buyer belief range after adjustment")
-                -- print(inspect(buyer.beliefRange))
-
-                summary.seller = seller
-                adjustAskersBeliefs(summary)
-                -- print("delta: seller belief range after adjustment")
-                -- print(inspect(seller.beliefRange))
+                --! the sellers price point should probably be adjusted right at the end based
+                -- on the qty sold and if that was < than the ask qty
             end
         end
     end
@@ -453,6 +474,21 @@ function marketplace.resolveOrders()
 
     return results
 
+end
+
+function marketplace.getAvgAskPrice(commodity)
+    --! hacked
+    return LAST_MARKET_ASK[commodity]
+
+    -- -- scan the ASK table and see what sellers are asking
+    -- if asktable[commodity] == nil then
+    --     return 0
+    -- end
+    -- local total = 0
+    -- for i = 1, #asktable[commodity] do
+    --     total = total + asktable[commodity][i][2]      -- [2] = ask price
+    -- end
+    -- return total / #asktable[commodity]
 end
 
 return marketplace

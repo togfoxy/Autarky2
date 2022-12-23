@@ -2,7 +2,7 @@ people = {}
 
 function people.initialise()
 
-    local numofppl = 2
+    local numofppl = 6
 
     for i = 1, numofppl do
         people.createPerson()
@@ -37,65 +37,71 @@ function people.createPerson()
     thisperson.beliefRange = {}                 -- eg PERSONS[i].beliefRange[enum.stockFood] = {1,10}
     thisperson.beliefRangeHistory = {}          --  .beliefRangeHistory[enum.stockFood][1] = (1,10})
     thisperson.stockPriceHistory = {}           -- this is the stock price history known to this agent (not global)
+    thisperson.pricePoint = {}
+    thisperson.log = {}                     -- a log to be displayed to the user
     for j = 1, NUMBER_OF_STOCK_TYPES do
         thisperson.stock[j] = 0
 
-        thisperson.beliefRange[j] = {}
-        thisperson.beliefRange[j] = {1,10}
-
-        thisperson.beliefRangeHistory[j] = {}
-        thisperson.beliefRangeHistory[j] = {1, 10}
+        -- thisperson.beliefRange[j] = {}
+        -- thisperson.beliefRange[j] = {1,10}
+        --
+        -- thisperson.beliefRangeHistory[j] = {}
+        -- thisperson.beliefRangeHistory[j] = {1, 10}
 
         thisperson.stockPriceHistory[j] = {}        -- the price this agent paid for each stock and every transaction
         thisperson.stockPriceHistory[j] = {5}
+
+        thisperson.pricePoint[j] = nil
     end
+
     -- this happens AFTER the above loop to override and set correct initial values
     thisperson.stock[enum.stockFood] = love.math.random(7,7)                 -- days
     thisperson.stock[enum.stockHealth] = 100
     thisperson.stock[enum.stockWealth] = 20
 
     -- set meaningful beliefs and stock history
+    -- used by villagers starting midway through game
     local avgprice = fun.getHistoricAvgPrice(enum.stockFood)
     if avgprice >= 0 then
-        thisperson.beliefRange[enum.stockFood] = {avgprice * 0.8, avgprice * 1.2}
-        thisperson.beliefRangeHistory[enum.stockFood] = {avgprice * 0.8, avgprice * 1.2}
+        -- thisperson.beliefRange[enum.stockFood] = {avgprice * 0.8, avgprice * 1.2}
+        -- thisperson.beliefRangeHistory[enum.stockFood] = {avgprice * 0.8, avgprice * 1.2}
         thisperson.stockPriceHistory[enum.stockFood] = {avgprice}
     else
-        thisperson.beliefRange[enum.stockFood] = {1,5}
-        thisperson.beliefRangeHistory[enum.stockFood] = {1, 5}
+        -- thisperson.beliefRange[enum.stockFood] = {1,5}
+        -- thisperson.beliefRangeHistory[enum.stockFood] = {1, 5}
         thisperson.stockPriceHistory[enum.stockFood] = {3}
     end
 
     avgprice = fun.getHistoricAvgPrice(enum.stockLogs)
     if avgprice >= 0 then
-        thisperson.beliefRange[enum.stockLogs] = {avgprice * 0.8, avgprice * 1.2}
-        thisperson.beliefRangeHistory[enum.stockLogs] = {avgprice * 0.8, avgprice * 1.2}
+        -- thisperson.beliefRange[enum.stockLogs] = {avgprice * 0.8, avgprice * 1.2}
+        -- thisperson.beliefRangeHistory[enum.stockLogs] = {avgprice * 0.8, avgprice * 1.2}
         thisperson.stockPriceHistory[enum.stockLogs] = {avgprice}
     else
-        thisperson.beliefRange[enum.stockLogs] = {9,11}
-        thisperson.beliefRangeHistory[enum.stockLogs] = {7.2, 10.8}
+        -- thisperson.beliefRange[enum.stockLogs] = {9,11}
+        -- thisperson.beliefRangeHistory[enum.stockLogs] = {7.2, 10.8}
         thisperson.stockPriceHistory[enum.stockLogs] = {9}
     end
 
     avgprice = fun.getHistoricAvgPrice(enum.stockHouse)
     if avgprice >= 0 then
-        thisperson.beliefRange[enum.stockHouse] = {avgprice * 0.8, avgprice * 1.2}
-        thisperson.beliefRangeHistory[enum.stockHouse] = {avgprice * 0.8, avgprice * 1.2}
+        -- thisperson.beliefRange[enum.stockHouse] = {avgprice * 0.8, avgprice * 1.2}
+        -- thisperson.beliefRangeHistory[enum.stockHouse] = {avgprice * 0.8, avgprice * 1.2}
         thisperson.stockPriceHistory[enum.stockHouse] = {avgprice}
     else
-        thisperson.beliefRange[enum.stockHouse] = {28,42}
-        thisperson.beliefRangeHistory[enum.stockHouse] = {28, 42}
+        -- thisperson.beliefRange[enum.stockHouse] = {28,42}
+        -- thisperson.beliefRangeHistory[enum.stockHouse] = {28, 42}
         thisperson.stockPriceHistory[enum.stockHouse] = {35}
     end
 
     avgprice = fun.getHistoricAvgPrice(enum.stockHerbs)
     if avgprice >= 0 then
-        thisperson.beliefRange[enum.stockHerbs] = {avgprice * 0.8, avgprice * 1.2}
-        thisperson.beliefRangeHistory[enum.stockHerbs] = {avgprice * 0.8, avgprice * 1.2}
+        -- thisperson.beliefRange[enum.stockHerbs] = {avgprice * 0.8, avgprice * 1.2}
+        -- thisperson.beliefRangeHistory[enum.stockHerbs] = {avgprice * 0.8, avgprice * 1.2}
         thisperson.stockPriceHistory[enum.stockHerbs] = {avgprice}
     else
-        thisperson.beliefRange[enum.stockHerbs] = {0.8, 1.2}
-        thisperson.beliefRangeHistory[enum.stockHerbs] = {0.8, 1.2}
+        -- thisperson.beliefRange[enum.stockHerbs] = {0.8, 1.2}
+        -- thisperson.beliefRangeHistory[enum.stockHerbs] = {0.8, 1.2}
         thisperson.stockPriceHistory[enum.stockHerbs] = {1}
     end
 
@@ -119,6 +125,17 @@ local function drawDebug(person)
 
     love.graphics.setColor(1,1,1,1)
     love.graphics.print(txt, drawx, drawy, 0, 1, 1, 0, 0)
+end
+
+local function drawVillagersLog(person)
+    local drawx = 300
+    local drawy = 300
+
+    local maxindex = math.min(100, #person.log)
+    for i = 1, maxindex do
+        love.graphics.print(person.log[i], drawx, drawy)
+        drawy = drawy + 50
+    end
 end
 
 function people.draw()
@@ -164,6 +181,11 @@ function people.draw()
         -- draw debug information
         if love.keyboard.isDown("lctrl") or love.keyboard.isDown("rctrl") then
             drawDebug(person)
+        end
+
+        -- draw villagers log
+        if person.isSelected and VILLAGERS_SELECTED == 1 then
+            drawVillagersLog(person)
         end
     end
 end
@@ -339,7 +361,7 @@ function people.pay()
 
                 if love.math.random(1,7) == 1 then
                     -- person is hurt while working
-                    person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - love.math.random(5,15)
+                    person.stock[enum.stockHealth] = person.stock[enum.stockHealth] - love.math.random(15,25)
                     if person.stock[enum.stockHealth] <= 0 then
                         people.dies(person, "no health")
                     end
@@ -374,144 +396,107 @@ local function makeBid(person, stocknumber, maxqty)
     local wealth = person.stock[enum.stockWealth]
     --! should rename stocknumber to commodity for consistency
     -- determine bid price
-    local bidprice = marketplace.determineCommodityPrice(person.beliefRange[stocknumber])
+    -- local bidprice = marketplace.determineCommodityPrice(person.beliefRange[stocknumber]
 
-    -- determine bid qty
-    local maxqtycanafford = math.floor(wealth / bidprice)
-    local maxqtycanhold = 14 - person.stock[stocknumber]
-    local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold, maxqty)
-    local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[stocknumber])       -- accepts nil history
-    bidqty = cf.round(bidqty)
+    local bidprice = person.pricePoint[stocknumber]
+    if bidprice == nil then
+        -- this person has no real knowledge of a fair price
+        -- need a way to determine initial bid price
+        bidprice = marketplace.getAvgAskPrice(stocknumber)
+        if bidprice == nil then bidprice = 0 end
+        if bidprice > 0 then person.pricePoint[stocknumber] = bidprice end
 
-    if bidqty > 0 then
-        -- register the bid
-        marketplace.createBid(stocknumber, bidqty, bidprice, person.guid)
+        -- print("Don't know how much to bid. Taking last ASK price. Bidding: " .. bidprice .. " for commodity: " .. stocknumber)
+    end
+    bidprice = cf.round(bidprice, 2)
 
-        -- set destination = market
-        fun.getRandomMarketXY(person)
+    if bidprice > 0 then
+        -- determine bid qty
+        local maxqtycanafford = cf.round(wealth / bidprice)
+        local maxqtycanhold = 14 - person.stock[stocknumber]
+        local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold, maxqty)
+        local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[stocknumber])       -- accepts nil history
+        bidqty = cf.round(bidqty)
+
+        if bidqty > 0 then
+            -- register the bid
+            marketplace.createBid(stocknumber, bidqty, bidprice, person.guid)
+
+            -- set destination = market
+            fun.getRandomMarketXY(person)
+        else
+            -- print("No bid today. Bid qty = 0. Commodity: " .. stocknumber)
+        end
     else
-        print("Bid qty nil: ", stocknumber, bidprice, maxqtycanafford, maxqtycanhold, maxqtytobuy)
+        -- print("Retracting bid. Unsure of price. Commodity: " .. stocknumber)
     end
 end
 
-local function bidForFood(person)
-	local wealth = person.stock[enum.stockWealth]
+local function makeAsk(person, stocktosell)
 
-	-- determine bid price
-	local bidprice = marketplace.determineCommodityPrice(person.beliefRange[enum.stockFood])
-	bidprice = cf.round(bidprice, 2)
+    -- determine cost price
+        -- cost price is driven by:
+            -- number of days to craft * avg cost of food per day +
+            -- number of days to craft * herbs bought in that period * avg cost of Herbs
+            -- number of inputs to craft * avg cost of inputs
 
-	-- determine bid qty
-	local maxqtycanafford = wealth / bidprice
-	local maxqtycanhold = 14 - person.stock[enum.stockFood]
-	local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
-	local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[enum.stockFood])       -- accepts nil history
-	bidqty = cf.round(bidqty)
+    local daystocraft = 1 / person.occupationstockgain
+    local avgfoodprice = fun.getAvgPrice(person.stockPriceHistory[enum.stockFood])
+    local avgherbprice = fun.getAvgPrice(person.stockPriceHistory[enum.stockHerbs])
+    local herbsperday = 3     --! need to make this and people.pay() global variables
 
-    if bidqty > 0 then
-    	-- register the bid
-    	marketplace.createBid(enum.stockFood, bidqty, bidprice, person.guid)
-
-    	-- set destination = market
-    	fun.getRandomMarketXY(person)
+    local avgstockinputprice
+    local numinputs = person.occupationconversionrate
+    if numinputs == nil then numinputs = 0 end
+    local stockinput = person.occupationstockinput
+    if stockinput == nil then
+        -- person is a pribary producer. Average price of input = 0
+        avgstockinputprice = 0
+    else
+        avgstockinputprice = fun.getAvgPrice(person.stockPriceHistory[stockinput])
     end
-end
 
-local function genericSellOutputStock(person, stockoutput)
-    -- stockoutput = the stock the person needs to sell
-	local maxqtytosell = person.stock[stockoutput]
-	local askqty = marketplace.determineQty(maxqtytosell, person.stockPriceHistory[stockoutput]) -- commodity, maxQty, commodityKnowledge
+    local costprice = (daystocraft * avgfoodprice) + (daystocraft * herbsperday * avgherbprice) + (numinputs * avgstockinputprice)
+    print("Cost price for commodity " .. stocktosell .. " is: " .. costprice, daystocraft, avgfoodprice, herbsperday, avgherbprice, numinputs, avgstockinputprice)
+
+    -- determine price point
+    local preferredprice = person.pricePoint[stocktosell]
+    if preferredprice == nil then
+        -- this person has no knowledge of a good price so will use cost price
+        preferredprice = costprice * 1.3
+        person.pricePoint[stocktosell] = preferredprice
+    end
+
+    -- determine what to go to market with
+    local askprice
+    if person.stock[enum.stockFood] < 1 and person.stock[enum.stockWealth] < avgfoodprice then
+        -- desperate so sell reduced price
+        askprice = math.min(costprice, preferredprice)
+    else
+        askprice = math.max(costprice, preferredprice)
+    end
+    askprice = cf.round(askprice, 2)
+
+    -- determine qty to sell
+    local maxqtytosell = person.stock[stocktosell]
+	local askqty = marketplace.determineQty(maxqtytosell, person.stockPriceHistory[stocktosell])
 	askqty = cf.round(askqty)
 
-    if askqty > 0 then
-    	-- determine ask price
-    	local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
-    	askprice = cf.round(askprice)
+    -- place ask
+    marketplace.createAsk(stocktosell, askqty, askprice, person.guid)
+    LAST_MARKET_ASK[stocktosell] = askprice     -- a hack value that is constantly wiped to help newbies get started
 
-        -- get an approximate cost price and ensure the ask price is at least that much
-        local costprice
-        local stockinput = person.occupationstockinput
-
-        if stockinput == nil then   -- will happen with primary producers
-            -- work out producers productivity and divide buy average income for that productiviy
-
-            -- cost price for primary producers = how much food consumed per item
-            costprice = 1 / person.occupationstockgain * fun.getAvgPrice(person.stockPriceHistory[enum.stockFood])
-        else    -- not a primary producer
-            costprice = fun.getAvgPrice(person.stockPriceHistory[stockinput])
-        end
-
-        costprice = cf.round(costprice * 1.30, 2)       -- add a 30% profit margin
-        if costprice == nil then costprice = 0 end  -- happens at start of game
-
-        if stockinput ~= nil then
-            print("Trying to sell stock type " .. stockoutput .. ". Agent thinks cost price for stock type " .. stockinput .. " is $" .. costprice .. " and ask price is $" .. askprice)
-        else
-            print("Primary producer trying to sell stock type " .. stockoutput .. ". Agent thinks cost price is $" .. costprice .. " and ask price is $" .. askprice)
-        end
-
-        askprice = math.max(askprice, costprice)
-
-    	-- register the ask
-    	marketplace.createAsk(stockoutput, askqty, askprice, person.guid)
-
-    	-- set destination = market
-    	fun.getRandomMarketXY(person)
-    end
+    -- set destination = market
+    fun.getRandomMarketXY(person)
 end
 
-function people.doMarketplace()
-    -- determine if they need to buy/sell
-
-    local avgHousePrice = fun.getHistoricAvgPrice(enum.stockHouse)
-    for k, person in pairs(PERSONS) do
-        -- buy food
-        if person.stock[enum.stockFood] < 7 and person.occupation ~= enum.jobFarmer then
-            -- try to buy food
-			bidForFood(person)
-        end
-
-        -- buy herbs
-        if person.stock[enum.stockHealth] < 90 and person.occupation ~= enum.jobHealer then
-            makeBid(person, enum.stockHerbs)    -- optional 3rd param. Also sets destination = market
-        end
-
-        -- buy house
-        if person.houserow == nil and person.housecol == nil then
-            if person.stock[enum.stockHouse] < 1 then
-                if person.occupation == enum.jobBuilder and person.stock[enum.stockWealthOwed] <= 0 or
-                    person.occupation ~= enum.jobBuilder then
-                    -- above if won't let build buy house for themselve if they owe money
-
-                    -- try to buy house
-                    makeBid(person, enum.stockHouse, 1)
-                end
-            end
-        end
-
-        -- generic stock input (if relevant)
-        -- make a bid (buy)     -- if there are lots of bids and they are all succesful then agent could be in debt
-        local stockinput = person.occupationstockinput      -- stock type
-        if stockinput ~= nil and person.stock[stockinput] < 7 then
-			makeBid(person, stockinput)
-        end
-
-        -- generic stock sell
-        -- make an ask (sell)
-        local stockoutput = person.occupationstockoutput        -- stock type
-        if stockoutput ~= nil and person.stock[stockoutput] >= STOCK_QTY_SELLPOINT[stockoutput] then
-			genericSellOutputStock(person, stockoutput)
-        end
-
-        --! need something about buying luxuries (wants/comfort)
-    end
-
+local function resolveMarketplace()
     -- resolve bids/asks after all persons have had a chance to update orders
-    results = {}        --! should this be local?
-    results = marketplace.resolveOrders()
+    local results = {}        --! should this be local?
+    results = marketplace.resolveOrders() -- also adjusts beliefs
 
     print("----------------------")
-    print("Market results before money exchange")
+    print("Market results")
     print(inspect(results))
     print("----------------------")
 
@@ -522,7 +507,7 @@ function people.doMarketplace()
         -- capture the agreed price for stat purposes
         table.insert(HISTORY_PRICE[outcome.commodityID], outcome.agreedprice)
 
-        -- if buyer.stock[enum.stockWealth] >= outcome.transactionTotalPrice then
+        if buyer.stock[enum.stockWealth] >= outcome.transactionTotalPrice then
             -- funding assured - finalise the transaction
             buyer.stock[enum.stockWealth] = buyer.stock[enum.stockWealth] - outcome.transactionTotalPrice
             seller.stock[enum.stockWealth] = seller.stock[enum.stockWealth] + outcome.transactionTotalPrice
@@ -532,11 +517,12 @@ function people.doMarketplace()
 
             -- record tax owed. It won't be paid until later
             buyer.stock[enum.stockTaxOwed] = cf.round(buyer.stock[enum.stockTaxOwed] + (outcome.transactionTotalPrice * SALES_TAX),2)
-        -- else
-            -- print("Transaction aborted: buyer ran out of funds")
-        -- end
+            local str = "I bought " .. outcome.transactionTotalQty .. " " .. outcome.commodityID .. " for $" .. outcome.agreedprice
+            table.insert(buyer.log, 1, str)
+        end
     end
 
+    -- emoticons
     if #results > 0 then
         -- EMOTICONS
         local myemote = {}
@@ -558,6 +544,46 @@ function people.doMarketplace()
         -- myemote.imagetype = "emoticon"
         -- table.insert(IMAGE_QUEUE, myemote)
     end
+end
+
+
+function people.gotoMarket()
+
+    for k, person in pairs(PERSONS) do
+        -- if have stock to sell then put ask on stock
+        local stockoutput = person.occupationstockoutput        -- stock type
+        if stockoutput ~= nil and person.stock[stockoutput] >= STOCK_QTY_SELLPOINT[stockoutput] then
+            makeAsk(person, stockoutput)
+        end
+
+        -- if low on food then make bid for food
+        if person.stock[enum.stockFood] < 7 and person.occupation ~= enum.jobFarmer then
+            -- try to buy food
+            makeBid(person, enum.stockFood)    -- optional 3rd param. Also sets destination = market
+        end
+
+        -- buy herbs
+        if person.stock[enum.stockHealth] < 90 and person.occupation ~= enum.jobHealer then
+            makeBid(person, enum.stockHerbs)    -- optional 3rd param. Also sets destination = market
+        end
+
+        -- if low on house then make bid for house
+        if person.houserow == nil and person.housecol == nil then
+            if person.stock[enum.stockHouse] < 1 then
+                -- try to buy house
+                makeBid(person, enum.stockHouse, 1)
+            end
+        end
+
+        -- if low on input stock then make bid for input stock
+        local stockinput = person.occupationstockinput      -- stock type
+        if stockinput ~= nil and person.stock[stockinput] < person.occupationconversionrate then
+            makeBid(person, stockinput)		--! need to test this
+        end
+
+    end
+    -- resolve market
+    resolveMarketplace()
 end
 
 function people.heal()
@@ -670,15 +696,9 @@ function people.getLoan()
         local stockinput = person.occupationstockinput
         if stockoutput ~= nil and stockinput ~= nil then
             if person.stock[stockoutput] == 0 then
-                -- local avgprice = fun.getAvgPrice(HISTORY_PRICE[stockinput])
-                local avgprice = fun.getAvgPrice(person.stockPriceHistory[stockinput])
+                local avgprice = fun.getAvgPrice(HISTORY_PRICE[stockinput])
                 local numberofinputsneeded = person.occupationconversionrate
-                local numberofinputsneeded = numberofinputsneeded - person.stock[stockinput]    -- deduct stock in hand
-                if numberofinputsneeded < 2 then numberofinputsneeded = 2 end   -- a safeguard. Not sure if good idea
                 local totalwealthneeded = avgprice * numberofinputsneeded
-
-print(avgprice, numberofinputsneeded, totalwealthneeded)
-
                 if person.stock[enum.stockWealth] < totalwealthneeded then
                     -- person qualifies for loan
                     -- see if treasury can fund a loan
@@ -721,6 +741,166 @@ function people.repayLoan()
         end
     end
 end
+
+-- function people.doMarketplace()
+--     -- determine if they need to buy/sell
+--
+--     local avgHousePrice = fun.getHistoricAvgPrice(enum.stockHouse)
+--     for k, person in pairs(PERSONS) do
+--         -- buy food
+--         if person.stock[enum.stockFood] < 7 and person.occupation ~= enum.jobFarmer then
+--             -- try to buy food
+-- 			bidForFood(person)
+--         end
+--
+--         -- buy herbs
+--         if person.stock[enum.stockHealth] < 90 and person.occupation ~= enum.jobHealer then
+--             makeBid(person, enum.stockHerbs)    -- optional 3rd param. Also sets destination = market
+--         end
+--
+--         -- buy house
+--         if person.houserow == nil and person.housecol == nil then
+--             if person.stock[enum.stockHouse] < 1 then
+--                 -- try to buy house
+--                 makeBid(person, enum.stockHouse, 1)
+--             end
+--         end
+--
+--         -- generic stock input (if relevant)
+--         -- make a bid (buy)     -- if there are lots of bids and they are all succesful then agent could be in debt
+--         local stockinput = person.occupationstockinput      -- stock type
+--         local wealth = person.stock[enum.stockWealth]
+--         if stockinput ~= nil and person.stock[stockinput] < 7 then
+-- 			makeBid(person, stockinput)		--! need to test this
+--         end
+--
+--         -- generic stock sell
+--         -- make an ask (sell)
+--         local stockoutput = person.occupationstockoutput        -- stock type
+--         if stockoutput ~= nil and person.stock[stockoutput] >= STOCK_QTY_SELLPOINT[stockoutput] then
+-- 			genericSellOutputStock(person, stockoutput)
+--         end
+--
+--         --! need something about buying luxuries (wants/comfort)
+--     end
+--
+--     -- resolve bids/asks after all persons have had a chance to update orders
+--     results = {}        --! should this be local?
+--     results = marketplace.resolveOrders()
+--
+--     print("----------------------")
+--     print("Market results")
+--     print(inspect(results))
+--     print("----------------------")
+--
+--     for k, outcome in pairs(results) do
+--         -- charge the buyer and ensure that succeeds
+--         local buyer = people.get(outcome.buyerguid)
+--         local seller = people.get(outcome.sellerguid)
+--         -- capture the agreed price for stat purposes
+--         table.insert(HISTORY_PRICE[outcome.commodityID], outcome.agreedprice)
+--
+--         if buyer.stock[enum.stockWealth] >= outcome.transactionTotalPrice then
+--             -- funding assured - finalise the transaction
+--             buyer.stock[enum.stockWealth] = buyer.stock[enum.stockWealth] - outcome.transactionTotalPrice
+--             seller.stock[enum.stockWealth] = seller.stock[enum.stockWealth] + outcome.transactionTotalPrice
+--
+--             buyer.stock[outcome.commodityID] = buyer.stock[outcome.commodityID] + outcome.transactionTotalQty
+--             seller.stock[outcome.commodityID] = seller.stock[outcome.commodityID] - outcome.transactionTotalQty
+--
+--             -- record tax owed. It won't be paid until later
+--             buyer.stock[enum.stockTaxOwed] = cf.round(buyer.stock[enum.stockTaxOwed] + (outcome.transactionTotalPrice * SALES_TAX),2)
+--         end
+--     end
+--
+--     if #results > 0 then
+--         -- EMOTICONS
+--         local myemote = {}
+--         local x, y = fun.getTileXY(MARKETROW, MARKETCOL)
+--         myemote.x = x
+--         myemote.y = y
+--         myemote.imagenumber = enum.emoticonCash
+--         myemote.time = 5
+--         myemote.imagetype = "emoticon"
+--         table.insert(IMAGE_QUEUE, myemote)
+--     else
+--         --! need to make a sad face if and only if a bid/ask was not satisfied
+--         -- local myemote = {}
+--         -- local x, y = fun.getTileXY(MARKETROW, MARKETCOL)
+--         -- myemote.x = x
+--         -- myemote.y = y
+--         -- myemote.imagenumber = enum.emoticonSad
+--         -- myemote.time = 5
+--         -- myemote.imagetype = "emoticon"
+--         -- table.insert(IMAGE_QUEUE, myemote)
+--     end
+-- end
+
+-- local function bidForFood(person)
+-- 	local wealth = person.stock[enum.stockWealth]
+--
+-- 	-- determine bid price
+-- 	local bidprice = marketplace.determineCommodityPrice(person.beliefRange[enum.stockFood])
+-- 	bidprice = cf.round(bidprice, 2)
+--
+-- 	-- determine bid qty
+-- 	local maxqtycanafford = wealth / bidprice
+-- 	local maxqtycanhold = 14 - person.stock[enum.stockFood]
+-- 	local maxqtytobuy = math.min(maxqtycanafford, maxqtycanhold)
+-- 	local bidqty = marketplace.determineQty(maxqtytobuy, person.stockPriceHistory[enum.stockFood])       -- accepts nil history
+-- 	bidqty = cf.round(bidqty)
+--
+--     if bidqty > 0 then
+--     	-- register the bid
+--     	marketplace.createBid(enum.stockFood, bidqty, bidprice, person.guid)
+--
+--     	-- set destination = market
+--     	fun.getRandomMarketXY(person)
+--     end
+-- end
+--
+-- local function genericSellOutputStock(person, stockoutput)
+--     -- stockoutput = the stock the person needs to sell
+-- 	local maxqtytosell = person.stock[stockoutput]
+-- 	local askqty = marketplace.determineQty(maxqtytosell, person.stockPriceHistory[stockoutput]) -- commodity, maxQty, commodityKnowledge
+-- 	askqty = cf.round(askqty)
+--
+--     if askqty > 0 then
+--     	-- determine ask price
+--     	local askprice = marketplace.determineCommodityPrice(person.beliefRange[stockoutput])
+--     	askprice = cf.round(askprice)
+--
+--         -- get an approximate cost price and ensure the ask price is at least that much
+--         local costprice
+--         local stockinput = person.occupationstockinput
+--
+--         if stockinput == nil then   -- will happen with primary producers
+--             -- work out producers productivity and divide buy average income for that productiviy
+--
+--             -- cost price for primary producers = how much food consumed per item
+--             costprice = 1 / person.occupationstockgain * fun.getAvgPrice(person.stockPriceHistory[enum.stockFood])
+--         else    -- not a primary producer
+--             costprice = fun.getAvgPrice(person.stockPriceHistory[stockinput])
+--         end
+--
+--         costprice = cf.round(costprice * 1.30, 2)       -- add a 30% profit margin
+--         if costprice == nil then costprice = 0 end  -- happens at start of game
+--
+--         if stockinput ~= nil then
+--             print("Trying to sell stock type " .. stockoutput .. ". Agent thinks cost price for stock type " .. stockinput .. " is $" .. costprice .. " and ask price is $" .. askprice)
+--         else
+--             print("Primary producer trying to sell stock type " .. stockoutput .. ". Agent thinks cost price is $" .. costprice .. " and ask price is $" .. askprice)
+--         end
+--
+--         askprice = math.max(askprice, costprice)
+--
+--     	-- register the ask
+--     	marketplace.createAsk(stockoutput, askqty, askprice, person.guid)
+--
+--     	-- set destination = market
+--     	fun.getRandomMarketXY(person)
+--     end
+-- end
 
 
 return people
