@@ -21,7 +21,7 @@ function draw.topBar()
 
     -- draw more counts on the far right margin
     local str = "Villagers available: " .. #PERSONS .. " Villagers quit: " .. PERSONS_LEFT
-    love.graphics.print(str, SCREEN_WIDTH - 350, 10)
+    love.graphics.print(str, SCREEN_WIDTH - 400, 10)
 
 end
 
