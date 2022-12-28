@@ -140,7 +140,7 @@ local function drawVillagersLog(person)
     local drawx = SCREEN_WIDTH - 300        --! smaller font
     local drawy = 100
 
-    local maxindex = math.min(100, #person.log)
+    local maxindex = math.min(6, #person.log)
     for i = 1, maxindex do
         love.graphics.print(person.log[i], drawx, drawy)
         drawy = drawy + 20

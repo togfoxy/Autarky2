@@ -158,6 +158,7 @@ function constants.load()
     enum.guiSpinnerUp = 1
     enum.guiSpinnerDown = 2
     enum.guiPaperBG = 3
+    enum.guiButton = 4
 
     enum.sceneOptions = 1       --! this is inconsistently applied
     enum.sceneWorld = 2

@@ -267,7 +267,7 @@ function draw.optionScreen()
     love.graphics.print("Sales tax on purchases", 25, 65)
     love.graphics.print(SALES_TAX * 100 .. "%", 145, 115)
 
-    love.graphics.print("Social security", 25, 200)
+    love.graphics.print("Social security", 55, 200)
 
 	-- draw buttons
 	for k, button in pairs(GUI_BUTTONS) do
@@ -286,7 +286,7 @@ function draw.optionScreen()
 
 			if button.image ~= nil then
                 love.graphics.setColor(1,1,1,1)
-				love.graphics.draw(button.image, button.x, button.y, 0, 1, 1, button.imageoffsetx, button.imageoffsety)
+				love.graphics.draw(button.image, button.x, button.y, 0, button.imagescalex, button.imagescaley, button.imageoffsetx, button.imageoffsety)
 			end
 
 			-- draw the label
