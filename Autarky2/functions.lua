@@ -31,6 +31,9 @@ function functions.loadImages()
     GUI[enum.guiSpinnerUp] = love.graphics.newImage("assets/images/buttonspinnerup.png")
     GUI[enum.guiSpinnerDown] = love.graphics.newImage("assets/images/buttonspinnerdown.png")
 
+    -- MISC
+    IMAGES[enum.miscPaperBG] = love.graphics.newImage("assets/images/paperbg.png")    
+
 
 end
 

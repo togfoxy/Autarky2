@@ -157,6 +157,7 @@ function constants.load()
 
     enum.guiSpinnerUp = 1
     enum.guiSpinnerDown = 2
+    enum.guiPaperBG = 3
 
     enum.sceneOptions = 1       --! this is inconsistently applied
     enum.sceneWorld = 2
@@ -167,6 +168,8 @@ function constants.load()
     enum.buttonOptionsUpSpinner = 2
     enum.buttonOptionsDownSpinner = 3
     enum.buttonOptionsSocialSecurity = 4
+
+    enum.miscPaperBG = 201                      -- start at 200. Icons start at 100
 
 end
 

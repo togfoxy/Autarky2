@@ -129,7 +129,14 @@ end
 
 local function drawVillagersLog(person)
 
+    -- draw background
+    -- love.graphics.draw(IMAGES[enum.miscPaperBG], x, y, r, sx, sy, ox, oy, kx, ky)
+    love.graphics.setColor(1,1,1,1)
+    love.graphics.draw(IMAGES[enum.miscPaperBG], SCREEN_WIDTH - 300, 100, 0, 0.5, 0.25, 5, 5)
+
+    -- draw text
     love.graphics.setFont(FONT[enum.fontMedium])
+    love.graphics.setColor(0,0,0,1)
     local drawx = SCREEN_WIDTH - 300        --! smaller font
     local drawy = 100
 
@@ -138,6 +145,8 @@ local function drawVillagersLog(person)
         love.graphics.print(person.log[i], drawx, drawy)
         drawy = drawy + 20
     end
+
+
 end
 
 function people.draw()
@@ -519,7 +528,7 @@ local function resolveMarketplace()
 
             -- record tax owed. It won't be paid until later
             buyer.stock[enum.stockTaxOwed] = cf.round(buyer.stock[enum.stockTaxOwed] + (outcome.transactionTotalPrice * SALES_TAX),2)
-            local str = "I bought " .. outcome.transactionTotalQty .. " " .. fun.getCommodityLabel(outcome.commodityID) .. " for $" .. outcome.agreedprice
+            local str = "I bought " .. outcome.transactionTotalQty .. " " .. fun.getCommodityLabel(outcome.commodityID) .. " for $" .. outcome.agreedprice .. " each"
             table.insert(buyer.log, 1, str)
         end
     end
