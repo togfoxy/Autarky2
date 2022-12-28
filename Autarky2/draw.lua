@@ -21,7 +21,7 @@ function draw.topBar()
 
     -- draw more counts on the far right margin
     local str = "Villagers available: " .. #PERSONS .. " Villagers quit: " .. PERSONS_LEFT
-    love.graphics.print(str, SCREEN_WIDTH - 350, 10)
+    love.graphics.print(str, SCREEN_WIDTH - 400, 10)
 
 end
 
@@ -267,24 +267,26 @@ function draw.optionScreen()
     love.graphics.print("Sales tax on purchases", 25, 65)
     love.graphics.print(SALES_TAX * 100 .. "%", 145, 115)
 
-    love.graphics.print("Social security", 25, 200)
-
+    love.graphics.print("Social security", 55, 200)
 
 	-- draw buttons
 	for k, button in pairs(GUI_BUTTONS) do
 		if button.scene == enum.sceneOptions and button.visible then
 			-- draw the button
+
             -- draw the bg
             love.graphics.setColor(button.bgcolour)
             love.graphics.rectangle("fill", button.x, button.y, button.width, button.height)			-- drawx/y is the top left corner of the square
 
             -- draw the outline
-            love.graphics.setColor(button.outlineColour)
-            love.graphics.rectangle("line", button.x, button.y, button.width, button.height)			-- drawx/y is the top left corner of the square
+            if button.drawOutline then
+                love.graphics.setColor(button.outlineColour)
+                love.graphics.rectangle("line", button.x, button.y, button.width, button.height)			-- drawx/y is the top left corner of the square
+            end
 
 			if button.image ~= nil then
                 love.graphics.setColor(1,1,1,1)
-				love.graphics.draw(button.image, button.x, button.y)
+				love.graphics.draw(button.image, button.x, button.y, 0, button.imagescalex, button.imagescaley, button.imageoffsetx, button.imageoffsety)
 			end
 
 			-- draw the label
